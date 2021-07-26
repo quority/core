@@ -1,19 +1,19 @@
 {
   "name": "mw.js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "dist/main.js",
   "scripts": {
     "lint": "eslint src/ --ext .js,.ts",
     "lint:fix": "eslint src/ --fix --ext .js,.ts",
-	"prepublish": "tsc --declaration"
+    "prepublish": "tsc --declaration"
   },
   "keywords": [],
   "author": "bitomic <alehandro.rzrv@gmail.com>",
   "license": "MIT",
   "repository": {
-	  "type": "git",
-	  "url": "https://github.com/bitomic/mwjs.git"
+    "type": "git",
+    "url": "https://github.com/bitomic/mwjs.git"
   },
   "homepage": "https://github.com/bitomic/mwjs#readme",
   "dependencies": {
