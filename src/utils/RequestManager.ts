@@ -6,22 +6,15 @@ export class RequestManager {
 	private ctx = request( {
 		jar: true
 	} )
-	private url: string
-
-	constructor( {
-		url
-	}: { url: string } ) {
-		this.url = url
-	}
 
 	get<T>( {
 		url, qs
-	}: { url?: string, qs: Record<string, string> } ): Promise<T> {
+	}: { url: string, qs: Record<string, string> } ): Promise<T> {
 		return new Promise( resolve => {
 			this.ctx.get(
 				{
 					qs,
-					url: url || this.url
+					url: url
 				},
 				( _error, _res, body ) => {
 					resolve( JSON.parse( body ) )
@@ -32,14 +25,14 @@ export class RequestManager {
 
 	post<T>( {
 		url, form
-	}: { url?: string, form: Record<string, string> } ): Promise<T> {
+	}: { url: string, form: Record<string, string> } ): Promise<T> {
 		return new Promise( resolve => {
 			this.ctx.post(
 				{
 					form,
-					url: url || this.url
+					url: url
 				},
-				( error, res, body ) => {
+				( _error, _res, body ) => {
 					resolve( JSON.parse( body ) )
 				}
 			)
