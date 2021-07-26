@@ -1,6 +1,12 @@
-import { RequestManager, Logger } from "../utils"
-import { Bot } from './Bot'
-import { InvalidInterwiki } from "../errors"
+import {
+	Logger, RequestManager
+} from '../utils'
+import {
+	Bot
+} from './Bot'
+import {
+	InvalidInterwiki
+} from '../errors'
 
 export class Wiki {
 	private readonly request: RequestManager
@@ -8,8 +14,10 @@ export class Wiki {
 	readonly api: string
 	readonly interwiki: string
 
-	constructor( { interwiki, request }: { interwiki: string, request: RequestManager } ) {
-		Logger.community( `Initializing wiki "${interwiki}".` )
+	constructor( {
+		interwiki, request
+	}: { interwiki: string, request: RequestManager } ) {
+		Logger.community( `Initializing wiki "${ interwiki }".` )
 
 		this.api = Wiki.interwiki2api( interwiki )
 		this.interwiki = interwiki
@@ -21,31 +29,32 @@ export class Wiki {
 
 		if ( interwiki.match( /[a-z0-9-]+\.[a-z0-9-]+/ ) ) {
 			const [ lang, wikiname ] = interwiki.split( '.' )
-			return `https://${wikiname}.fandom.com/${lang}`
+			return `https://${ wikiname }.fandom.com/${ lang }`
 		} else if ( interwiki.match( /^[a-z0-9-]$/ ) ) {
-			return `https://${interwiki}.fandom.com`
+			return `https://${ interwiki }.fandom.com`
 		}
 		throw new InvalidInterwiki( interwiki )
 	}
 
 	static interwiki2api( interwiki: string ): string {
 		const path = Wiki.interwiki2path( interwiki )
-		return `${path}/api.php`
+		return `${ path }/api.php`
 	}
 
 	static interwiki2url( interwiki: string ): string {
 		const path = Wiki.interwiki2path( interwiki )
-		return `${path}/wiki/`
+		return `${ path }/wiki/`
 	}
 
 	get<T>( params: Record<string, string | number> ): Promise<T> {
 		params.format = 'json'
 		params.formatversion = '2'
 
-		const qs: Record<string, string> = {}
+		const qs: Record<string, string> = {
+		}
 
 		for ( const prop in params ) {
-			qs[ prop ] = `${params[prop]}`
+			qs[ prop ] = `${ params[prop] }`
 		}
 
 		return this.request.get<T>( {
@@ -58,10 +67,11 @@ export class Wiki {
 		params.format = 'json'
 		params.formatversion = '2'
 
-		const qs: Record<string, string> = {}
+		const qs: Record<string, string> = {
+		}
 
 		for ( const prop in params ) {
-			qs[ prop ] = `${params[prop]}`
+			qs[ prop ] = `${ params[prop] }`
 		}
 
 		return this.request.post<T>( {
@@ -89,7 +99,9 @@ export class Wiki {
 		return req
 	}
 
-	async login( { password, username }: { password: string, username: string } ): Promise<Bot> {
+	async login( {
+		password, username
+	}: { password: string, username: string } ): Promise<Bot> {
 		const bot = new Bot( {
 			password,
 			username,

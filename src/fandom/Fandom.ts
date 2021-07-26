@@ -1,5 +1,9 @@
-import { RequestManager } from '../utils'
-import { Wiki } from './Wiki'
+import {
+	RequestManager
+} from '../utils'
+import {
+	Wiki
+} from './Wiki'
 
 export class Fandom {
 	readonly request: RequestManager

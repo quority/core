@@ -1,19 +1,25 @@
-import { Wiki } from "./Wiki"
-import { Logger } from "../utils"
+import {
+	Logger
+} from '../utils'
+import {
+	Wiki
+} from './Wiki'
 
 export class Bot {
 	readonly #password: string
 	readonly #username: string
 	readonly #wiki: Wiki
 
-	constructor( { password, username, wiki }: { password: string, username: string, wiki: Wiki } ) {
+	constructor( {
+		password, username, wiki
+	}: { password: string, username: string, wiki: Wiki } ) {
 		this.#password = password
 		this.#username = username
 		this.#wiki = wiki
 	}
 
 	async login(): Promise<ILoginResponse> {
-		Logger.account( `Logging in into account "${this.#username}".` )
+		Logger.account( `Logging in into account "${ this.#username }".` )
 
 		const tokenreq = await this.#wiki.getToken( 'login' )
 		const lgtoken = tokenreq.query.tokens.logintoken

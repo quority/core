@@ -14,7 +14,7 @@ export class RequestManager {
 			this.ctx.get(
 				{
 					qs,
-					url: url
+					url
 				},
 				( _error, _res, body ) => {
 					resolve( JSON.parse( body ) )
@@ -30,7 +30,7 @@ export class RequestManager {
 			this.ctx.post(
 				{
 					form,
-					url: url
+					url
 				},
 				( _error, _res, body ) => {
 					resolve( JSON.parse( body ) )
