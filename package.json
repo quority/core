@@ -6,6 +6,8 @@
   "scripts": {
     "lint": "eslint src/ --ext .js,.ts",
     "lint:fix": "eslint src/ --fix --ext .js,.ts",
+	"precommit": "npm run lint && npm run prepublish",
+    "prepare": "husky install",
     "prepublish": "rimraf dist && tsc --declaration"
   },
   "keywords": [],
