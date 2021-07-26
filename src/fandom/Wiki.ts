@@ -112,4 +112,32 @@ export class Wiki {
 
 		return bot
 	}
+
+	async query( params: { list: 'allcategories' } & IApiQueryAllcategoriesRequest ): Promise<IApiQueryAllcategoriesItem[]>
+	async query( params: { list: 'allpages' } & IApiQueryAllpagesRequest ): Promise<IApiQueryAllpagesItem[]>
+	async query( params: { list: 'categorymembers' } & IApiQueryCategorymembersRequest ): Promise<IApiQueryCategorymembersItem[]>
+	async query( params: { list: ApiQueryList } & IApiQueryRequest ): Promise<IApiQueryItem[]> {
+		const result: IApiQueryItem[] = []
+
+		// eslint-disable-next-line no-constant-condition
+		while ( true ) {
+			const req = await this.get<IApiQueryResponse<IApiQueryItem>>( {
+				action: 'query',
+				...params
+			} )
+
+			for ( const item of req.query[ params.list ] ) {
+				result.push( item )
+			}
+
+			if ( !req.continue ) break
+
+			const continuekey = Object.keys( req.continue ).find( i => i !== 'continue' )
+			if ( !continuekey ) break
+
+			params[ continuekey ] = req.continue[ continuekey ]
+		}
+
+		return result
+	}
 }
