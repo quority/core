@@ -1,0 +1,157 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": 12,
+        "sourceType": "module"
+    },
+    "plugins": [
+        "@typescript-eslint"
+    ],
+    "rules": {
+		"array-bracket-spacing": [
+			"error",
+			"always"
+		],
+		"arrow-body-style": [
+			"error",
+			"as-needed"
+		],
+		"arrow-parens": [
+			"error",
+			"as-needed"
+		],
+		"arrow-spacing": [
+			"error"
+		],
+		"brace-style": [
+			"error",
+			"1tbs"
+		],
+		"class-methods-use-this": [
+			"error"
+		],
+		"eol-last": [
+			"error",
+			"always"
+		],
+		"eqeqeq": [
+			"error",
+			"always"
+		],
+		"grouped-accessor-pairs": [
+			"error"
+		],
+        "indent": [
+            "error",
+            "tab"
+        ],
+        "linebreak-style": [
+            "error",
+            "windows"
+        ],
+		"newline-per-chained-call": [
+			"error"
+		],
+		"no-console": [
+			"error"
+		],
+		"no-inline-comments": [
+			"error"
+		],
+		"no-multi-assign": [
+			"error"
+		],
+		"no-multi-spaces": [
+			"error"
+		],
+		"no-multiple-empty-lines": [
+			"error"
+		],
+		"no-nested-ternary": [
+			"error"
+		],
+		"no-return-await": [
+			"error"
+		],
+		"no-shadow": [
+			"error",
+			{
+				"builtinGlobals": true
+			}
+		],
+		"no-trailing-spaces": [
+			"error"
+		],
+		"no-useless-constructor": [
+			"error"
+		],
+		"no-var": [
+			"error"
+		],
+		"no-whitespace-before-property": [
+			"error"
+		],
+		"object-curly-newline": [
+			"error",
+			"always"
+		],
+		"object-curly-spacing": [
+			"error",
+			"always"
+		],
+		"object-shorthand": [
+			"error",
+			"always"
+		],
+		"prefer-arrow-callback": [
+			"error"
+		],
+		"prefer-const": [
+			"error"
+		],
+		"prefer-destructuring": [
+			"error"
+		],
+		"prefer-template": [
+			"error"
+		],
+        "quotes": [
+            "error",
+            "single"
+        ],
+        "semi": [
+            "error",
+            "never"
+        ],
+		"sort-imports": [
+			"error"
+		],
+		"sort-keys": [
+			"error"
+		],
+		"space-before-blocks": [
+			"error",
+			"always"
+		],
+		"space-in-parens": [
+			"error",
+			"always"
+		],
+		"spaced-comment": [
+			"error",
+			"always"
+		],
+		"template-curly-spacing": [
+			"error",
+			"always"
+		]
+    }
+}
