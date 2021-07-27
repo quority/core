@@ -1,3 +1,3 @@
 interface IApiQueryRequest {
-	[ key: string ]: string | number | undefined
+	[ key: string ]: string | string[] | number | number[] | undefined
 }

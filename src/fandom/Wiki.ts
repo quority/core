@@ -46,7 +46,7 @@ export class Wiki {
 		return `${ path }/wiki/`
 	}
 
-	async get<T>( params: Record<string, string | number | boolean> ): Promise<T> {
+	async get<T>( params: Record<string, string | string[] | number | number[] | boolean> ): Promise<T> {
 		params.format = 'json'
 		params.formatversion = '2'
 
@@ -56,6 +56,8 @@ export class Wiki {
 		for ( const prop in params ) {
 			if ( typeof params[prop] === 'boolean' ) {
 				qs[ prop ] = params[prop] ? '1' : '0'
+			} else if ( Array.isArray( params[prop] ) ) {
+				qs[ prop ] = (params[prop] as unknown[]).join( '|' )
 			} else {
 				qs[ prop ] = `${ params[prop] }`
 			}
@@ -73,7 +75,7 @@ export class Wiki {
 		return res
 	}
 
-	async post<T>( params: Record<string, string | number | boolean> ): Promise<T> {
+	async post<T>( params: Record<string, string | string[] | number | number[] | boolean> ): Promise<T> {
 		params.format = 'json'
 		params.formatversion = '2'
 
@@ -83,6 +85,8 @@ export class Wiki {
 		for ( const prop in params ) {
 			if ( typeof params[prop] === 'boolean' ) {
 				qs[ prop ] = params[prop] ? '1' : '0'
+			} else if ( Array.isArray( params[prop] ) ) {
+				qs[ prop ] = (params[prop] as unknown[]).join( '|' )
 			} else {
 				qs[ prop ] = `${ params[prop] }`
 			}
