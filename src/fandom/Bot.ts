@@ -40,8 +40,7 @@ export class Bot {
 	}
 
 	async getCSRFToken( force = false ): Promise<string> {
-		if ( force ) {
-		//if ( force || !this.#csrf ) {
+		if ( force || !this.#csrf ) {
 			const token = await this.#wiki.getToken( 'csrf' )
 			this.#csrf = token.query.tokens.csrftoken
 		}
