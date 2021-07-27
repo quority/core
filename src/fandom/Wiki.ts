@@ -46,7 +46,7 @@ export class Wiki {
 		return `${ path }/wiki/`
 	}
 
-	get<T>( params: Record<string, string | number | boolean> ): Promise<T> {
+	async get<T>( params: Record<string, string | number | boolean> ): Promise<T> {
 		params.format = 'json'
 		params.formatversion = '2'
 
@@ -61,13 +61,19 @@ export class Wiki {
 			}
 		}
 
-		return this.request.get<T>( {
+		const res = await this.request.get<T & { error: undefined } | { error: ApiError }>( {
 			qs,
 			url: this.api
 		} )
+
+		if ( res.error !== undefined ) {
+			throw res.error
+		}
+
+		return res
 	}
 
-	post<T>( params: Record<string, string | number | boolean> ): Promise<T> {
+	async post<T>( params: Record<string, string | number | boolean> ): Promise<T> {
 		params.format = 'json'
 		params.formatversion = '2'
 
@@ -82,10 +88,16 @@ export class Wiki {
 			}
 		}
 
-		return this.request.post<T>( {
+		const res = await this.request.post<T & { error: undefined } | { error: ApiError }>( {
 			form: qs,
 			url: this.api
 		} )
+
+		if ( res.error !== undefined ) {
+			throw res.error
+		}
+
+		return res
 	}
 
 	async getToken( type: 'createaccount' ): Promise<IApiQueryTokensResponse<'createaccounttoken'>>
