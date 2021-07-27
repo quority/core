@@ -5,7 +5,7 @@ import {
 	Bot
 } from './Bot'
 import {
-	InvalidInterwiki
+	InvalidInterwikiError
 } from '../errors'
 
 export class Wiki {
@@ -33,7 +33,7 @@ export class Wiki {
 		} else if ( interwiki.match( /^[a-z0-9-]+$/ ) ) {
 			return `https://${ interwiki }.fandom.com`
 		}
-		throw new InvalidInterwiki( interwiki )
+		throw new InvalidInterwikiError( interwiki )
 	}
 
 	static interwiki2api( interwiki: string ): string {
