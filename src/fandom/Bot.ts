@@ -20,6 +20,33 @@ export class Bot {
 		this.#wiki = wiki
 	}
 
+	async delete( {
+		title, reason = ''
+	}: { title: string, reason?: string } ): Promise<boolean> {
+		const token = await this.getCSRFToken()
+
+		const req = await this.#wiki.post<{ delete: { logid: number } }>( {
+			action: 'delete',
+			reason,
+			title,
+			token
+		} )
+			.then( () => true )
+			.catch( async ( e: ApiError ) => {
+				if ( e.code === 'badtoken' || e.code === 'notoken' ) {
+					Logger.warn( 'There was an error with the action. Regenerating CSRF and trying again...' )
+					await this.getCSRFToken( true )
+					return this.delete( {
+						reason, title
+					} )
+				}
+
+				throw e
+			} )
+
+		return req
+	}
+
 	async edit( params: IApiEditRequest ): Promise<IEditResponse> {
 		const token = await this.getCSRFToken()
 		return this.#wiki.post<IEditResponse>( {
@@ -29,8 +56,8 @@ export class Bot {
 			token
 		} )
 			.catch( async ( e: ApiError ) => {
-				Logger.warn( 'There was an error with the action. Regenerating CSRF and trying again...' )
 				if ( e.code === 'notoken' || e.code === 'badtoken' ) {
+					Logger.warn( 'There was an error with the action. Regenerating CSRF and trying again...' )
 					await this.getCSRFToken( true )
 					return this.edit( params )
 				}
