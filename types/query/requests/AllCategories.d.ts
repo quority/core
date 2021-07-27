@@ -7,5 +7,5 @@ interface IApiQueryAllcategoriesRequest extends IApiQueryRequest {
 	acmin?: number
 	acmax?: number
 	aclimit?: number | 'max'
-	acprop?: 'size' | 'hidden' | 'hidden|size'
+	acprop?: Array<'size' | 'hidden'>
 }
