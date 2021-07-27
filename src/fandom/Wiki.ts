@@ -104,6 +104,34 @@ export class Wiki {
 		return res
 	}
 
+	async getPages( _titles: string ): Promise<IApiRevisionsItem>
+	async getPages( _titles: string[] ): Promise<IApiRevisionsItem[]>
+	async getPages( _titles: string | string[] ): Promise<IApiRevisionsItem | IApiRevisionsItem[]> {
+		const titles = Array.isArray( _titles ) ? _titles : [ _titles ]
+
+		const pages: IApiRevisionsItem[] = []
+
+		while ( titles.length !== 0 ) {
+			const res = await this.get<IApiRevisionsResponse>( {
+				action: 'query',
+				titles: titles.splice( 0, 25 ).join('|'),
+				prop: 'revisions',
+				rvprop: 'content',
+				rvslots: 'main'
+			} );
+
+			for ( const page of res.query.pages ) {
+				if ( page.missing === true ) {
+					continue;
+				}
+				
+				pages.push( page )
+			}
+		}
+
+		return Array.isArray( _titles ) ? pages : pages[ 0 ]
+	}
+
 	async getToken( type: 'createaccount' ): Promise<IApiQueryTokensResponse<'createaccounttoken'>>
 	async getToken( type: 'csrf' ): Promise<IApiQueryTokensResponse<'csrftoken'>>
 	async getToken( type: 'deleteglobalaccount' ): Promise<IApiQueryTokensResponse<'deleteglobalaccounttoken'>>
@@ -165,6 +193,26 @@ export class Wiki {
 		}
 
 		return result
+	}
+
+	async *iterPages( titles: string[] ): AsyncGenerator<IApiRevisionsItem, void, unknown> {
+		while ( titles.length !== 0 ) {
+			const res = await this.get<IApiRevisionsResponse>( {
+				action: 'query',
+				titles: titles.splice( 0, 25 ).join('|'),
+				prop: 'revisions',
+				rvprop: 'content',
+				rvslots: 'main'
+			} );
+
+			for ( const page of res.query.pages ) {
+				if ( page.missing === true ) {
+					continue;
+				}
+				
+				yield page
+			}
+		}
 	}
 
 	iterQuery( params: { list: 'allcategories' } & IApiQueryAllcategoriesRequest ): AsyncGenerator<IApiQueryAllcategoriesItem, void, unknown>
