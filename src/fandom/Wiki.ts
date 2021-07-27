@@ -141,7 +141,8 @@ export class Wiki {
 	async query( params: { list: 'allimages' } & IApiQueryAllimagesRequest ): Promise<IApiQueryAllimagesItem[]>
 	async query( params: { list: 'allpages' } & IApiQueryAllpagesRequest ): Promise<IApiQueryAllpagesItem[]>
 	async query( params: { list: 'categorymembers' } & IApiQueryCategorymembersRequest ): Promise<IApiQueryCategorymembersItem[]>
-	async query( params: { list: ApiQueryList } & IApiQueryRequest ): Promise<IApiQueryItem[]> {
+	async query( params: { list: 'usercontribs' } & IApiQueryUsercontribsRequest ): Promise<IApiQueryUsercontribsItem[]>
+	async query( params: { list: string } & IApiQueryRequest ): Promise<IApiQueryItem[]> {
 		const result: IApiQueryItem[] = []
 
 		// eslint-disable-next-line no-constant-condition
