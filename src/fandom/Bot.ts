@@ -37,8 +37,7 @@ export class Bot {
 			.then( () => true )
 			.catch( async ( e: ApiError ) => {
 				if ( e.code === 'badtoken' ) {
-					Logger.warn( 'There was an error with the action. Regenerating CSRF and trying again...' )
-					await this.getCSRFToken( true )
+					await this.regenerateCSRFToken()
 					return this.delete( {
 						reason, title
 					} )
@@ -60,8 +59,7 @@ export class Bot {
 		} )
 			.catch( async ( e: ApiError ) => {
 				if ( e.code === 'badtoken' ) {
-					Logger.warn( 'There was an error with the action. Regenerating CSRF and trying again...' )
-					await this.getCSRFToken( true )
+					await this.regenerateCSRFToken()
 					return this.edit( params )
 				}
 
@@ -89,6 +87,11 @@ export class Bot {
 			lgpassword: this.#password,
 			lgtoken
 		} )
+	}
+
+	private async regenerateCSRFToken(): Promise<void> {
+		Logger.warn( 'There was an error with the action. Regenerating CSRF and trying again...' )
+		await this.getCSRFToken( true )
 	}
 
 	whoAmI(): Promise<{ query: { userinfo: { id: number, name: string } } }> {
