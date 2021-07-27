@@ -114,17 +114,17 @@ export class Wiki {
 		while ( titles.length !== 0 ) {
 			const res = await this.get<IApiRevisionsResponse>( {
 				action: 'query',
-				titles: titles.splice( 0, 25 ).join('|'),
 				prop: 'revisions',
 				rvprop: 'content',
-				rvslots: 'main'
-			} );
+				rvslots: 'main',
+				titles: titles.splice( 0, 25 ).join( '|' )
+			} )
 
 			for ( const page of res.query.pages ) {
 				if ( page.missing === true ) {
-					continue;
+					continue
 				}
-				
+
 				pages.push( page )
 			}
 		}
@@ -199,17 +199,17 @@ export class Wiki {
 		while ( titles.length !== 0 ) {
 			const res = await this.get<IApiRevisionsResponse>( {
 				action: 'query',
-				titles: titles.splice( 0, 25 ).join('|'),
 				prop: 'revisions',
 				rvprop: 'content',
-				rvslots: 'main'
-			} );
+				rvslots: 'main',
+				titles: titles.splice( 0, 25 ).join( '|' )
+			} )
 
 			for ( const page of res.query.pages ) {
 				if ( page.missing === true ) {
-					continue;
+					continue
 				}
-				
+
 				yield page
 			}
 		}
