@@ -9,7 +9,8 @@
     "lint:fix": "eslint src/ --fix --ext .js,.ts",
     "prepare": "husky install",
     "prepublish": "rimraf dist && tsc --declaration",
-	"prepush": "npm run lint && npm run prepublish"
+	"prepush": "npm run lint && npm run prepublish",
+	"update:patch": "npm version patch -m \"chore: set version to %s\" && git push origin main && git push --tags && npm publish"
   },
   "keywords": [],
   "author": "bitomic <alehandro.rzrv@gmail.com>",
