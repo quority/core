@@ -1,4 +1,4 @@
-export * from './_ApiError'
+export * from './_BaseApiError'
 export * from './AssertBotFailed'
 export * from './AssertUserFailed'
 export * from './AutoBlocked'

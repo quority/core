@@ -1,8 +1,8 @@
 import {
-	ApiError
-} from './_ApiError'
+	BaseApiError
+} from './_BaseApiError'
 
-export class NoSuchRCIDError extends ApiError {
+export class NoSuchRCIDError extends BaseApiError {
 	constructor( id: number ) {
 		super( `There is no change with rcid ${ id }.` )
 	}

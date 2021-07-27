@@ -1,8 +1,8 @@
 import {
-	ApiError
-} from './_ApiError'
+	BaseApiError
+} from './_BaseApiError'
 
-export class InvalidTitleError extends ApiError {
+export class InvalidTitleError extends BaseApiError {
 	constructor( title: string ) {
 		super( `Invalid title: ${ title }` )
 	}

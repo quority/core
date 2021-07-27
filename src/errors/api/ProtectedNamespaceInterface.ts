@@ -1,8 +1,8 @@
 import {
-	ApiError
-} from './_ApiError'
+	BaseApiError
+} from './_BaseApiError'
 
-export class ProtectedNamespaceInterfaceError extends ApiError {
+export class ProtectedNamespaceInterfaceError extends BaseApiError {
 	constructor() {
 		super( 'You\'re not allowed to edit interface messages.' )
 	}

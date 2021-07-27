@@ -1,8 +1,8 @@
 import {
-	ApiError
-} from './_ApiError'
+	BaseApiError
+} from './_BaseApiError'
 
-export class NoAPIWriteError extends ApiError {
+export class NoAPIWriteError extends BaseApiError {
 	constructor() {
 		super( 'Editing of this wiki through API is disabled.' )
 	}

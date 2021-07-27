@@ -1,8 +1,8 @@
 import {
-	ApiError
-} from './_ApiError'
+	BaseApiError
+} from './_BaseApiError'
 
-export class MustBePostedError extends ApiError {
+export class MustBePostedError extends BaseApiError {
 	constructor() {
 		super( 'Type of your HTTP request message must be POST.' )
 	}

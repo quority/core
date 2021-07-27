@@ -1,8 +1,8 @@
 import {
-	ApiError
-} from './_ApiError'
+	BaseApiError
+} from './_BaseApiError'
 
-export class NoSuchRevIDError extends ApiError {
+export class NoSuchRevIDError extends BaseApiError {
 	constructor( id: number ) {
 		super( `There is no revision with ID ${ id }.` )
 	}

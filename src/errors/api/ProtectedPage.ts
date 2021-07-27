@@ -1,8 +1,8 @@
 import {
-	ApiError
-} from './_ApiError'
+	BaseApiError
+} from './_BaseApiError'
 
-export class ProtectedPageError extends ApiError {
+export class ProtectedPageError extends BaseApiError {
 	constructor( right: string ) {
 		super( `The "${ right }" right is required to edit this page.` )
 	}

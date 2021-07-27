@@ -1,8 +1,8 @@
 import {
-	ApiError
-} from './_ApiError'
+	BaseApiError
+} from './_BaseApiError'
 
-export class ReadAPIDeniedError extends ApiError {
+export class ReadAPIDeniedError extends BaseApiError {
 	constructor() {
 		super( 'You need read permission to use this module.' )
 	}

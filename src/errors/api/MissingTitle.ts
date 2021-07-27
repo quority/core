@@ -1,8 +1,8 @@
 import {
-	ApiError
-} from './_ApiError'
+	BaseApiError
+} from './_BaseApiError'
 
-export class MissingTitleError extends ApiError {
+export class MissingTitleError extends BaseApiError {
 	constructor( title: string ) {
 		super( `The page you requested doesn't exist: ${ title }` )
 	}

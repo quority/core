@@ -1,8 +1,8 @@
 import {
-	ApiError
-} from './_ApiError'
+	BaseApiError
+} from './_BaseApiError'
 
-export class PermissionDeniedError extends ApiError {
+export class PermissionDeniedError extends BaseApiError {
 	constructor() {
 		super( 'Permission denied.' )
 	}
