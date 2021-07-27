@@ -1,5 +1,6 @@
 import {
-	ApiError
+	ApiError,
+	LoginFailedError
 } from '../errors'
 import {
 	Logger
@@ -81,12 +82,18 @@ export class Bot {
 		const tokenreq = await this.#wiki.getToken( 'login' )
 		const lgtoken = tokenreq.query.tokens.logintoken
 
-		return this.#wiki.post<ILoginResponse>( {
+		const res = await this.#wiki.post<ILoginResponse>( {
 			action: 'login',
 			lgname: this.#username,
 			lgpassword: this.#password,
 			lgtoken
 		} )
+
+		if ( res.login.result !== 'Success' ) {
+			throw new LoginFailedError()
+		}
+
+		return res
 	}
 
 	private async regenerateCSRFToken(): Promise<void> {
