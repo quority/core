@@ -1,6 +1,6 @@
 {
   "name": "mw.js",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "",
   "main": "dist/main.js",
   "scripts": {
@@ -10,9 +10,9 @@
     "prepare": "husky install",
     "prepublish": "rimraf dist && tsc --declaration",
     "prepush": "npm run lint && npm run prepublish",
-	"postupdate": "git push origin main && git push --tags && npm publish",
-	"update:major": "npm version major -m \"chore: set version to %s\" && npm run postupdate",
-	"update:minor": "npm version minor -m \"chore: set version to %s\" && npm run postupdate",
+    "postupdate": "git push origin main && git push --tags && npm publish",
+    "update:major": "npm version major -m \"chore: set version to %s\" && npm run postupdate",
+    "update:minor": "npm version minor -m \"chore: set version to %s\" && npm run postupdate",
     "update:patch": "npm version patch -m \"chore: set version to %s\" && npm run postupdate"
   },
   "keywords": [],
