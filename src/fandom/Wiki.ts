@@ -57,7 +57,7 @@ export class Wiki {
 			if ( typeof params[prop] === 'boolean' ) {
 				qs[ prop ] = params[prop] ? '1' : '0'
 			} else if ( Array.isArray( params[prop] ) ) {
-				qs[ prop ] = (params[prop] as unknown[]).join( '|' )
+				qs[ prop ] = ( params[prop] as unknown[] ).join( '|' )
 			} else {
 				qs[ prop ] = `${ params[prop] }`
 			}
@@ -86,7 +86,7 @@ export class Wiki {
 			if ( typeof params[prop] === 'boolean' ) {
 				qs[ prop ] = params[prop] ? '1' : '0'
 			} else if ( Array.isArray( params[prop] ) ) {
-				qs[ prop ] = (params[prop] as unknown[]).join( '|' )
+				qs[ prop ] = ( params[prop] as unknown[] ).join( '|' )
 			} else {
 				qs[ prop ] = `${ params[prop] }`
 			}
