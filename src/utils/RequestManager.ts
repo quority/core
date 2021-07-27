@@ -1,6 +1,6 @@
 import {
-	defaults as request,
-	Response
+	Response as RequestResponse,
+	defaults as request
 } from 'request'
 
 export class RequestManager {
@@ -40,7 +40,7 @@ export class RequestManager {
 		} )
 	}
 
-	raw( url: string ): Promise<Response> {
+	raw( url: string ): Promise<RequestResponse> {
 		return new Promise( resolve => {
 			this.ctx.get(
 				{
