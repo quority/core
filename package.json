@@ -11,8 +11,8 @@
     "prepublish": "rimraf dist && tsc --declaration",
     "prepush": "npm run lint && npm run prepublish",
 	"postupdate": "git push origin main && git push --tags && npm publish",
-	"update:major": "git version major -m \"chore: set version to %s\" && npm run postupdate",
-	"update:minor": "git version minor -m \"chore: set version to %s\" && npm run postupdate",
+	"update:major": "npm version major -m \"chore: set version to %s\" && npm run postupdate",
+	"update:minor": "npm version minor -m \"chore: set version to %s\" && npm run postupdate",
     "update:patch": "npm version patch -m \"chore: set version to %s\" && npm run postupdate"
   },
   "keywords": [],
