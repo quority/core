@@ -1,3 +1,1 @@
-interface ApiError {
-	code: 'badtoken' | 'notoken'
-}
+type ApiErrorCode = 'protectednamespace-interface' | 'protectednamespace' | 'customcssjsprotected' | 'cascadeprotected' | 'protectedpage' | 'permissiondenied' | 'confirmemail' | 'blocked' | 'autoblocked' | 'ratelimited' | 'readonly' | 'badtoken' | 'missingtitle' | 'mustbeposted' | 'hookaborted' | 'nosuchpageid' | 'nosuchrevid' | 'nosuchrcid' | 'nosuchuser' | 'invalidtitle' | 'invaliduser' | 'assertbotfailed' | 'assertuserfailed' | 'readapidenied' | 'noapiwrite'

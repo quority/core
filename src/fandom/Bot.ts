@@ -1,4 +1,7 @@
 import {
+	ApiError
+} from '../errors'
+import {
 	Logger
 } from '../utils'
 import {
@@ -33,7 +36,7 @@ export class Bot {
 		} )
 			.then( () => true )
 			.catch( async ( e: ApiError ) => {
-				if ( e.code === 'badtoken' || e.code === 'notoken' ) {
+				if ( e.code === 'badtoken' ) {
 					Logger.warn( 'There was an error with the action. Regenerating CSRF and trying again...' )
 					await this.getCSRFToken( true )
 					return this.delete( {
@@ -56,7 +59,7 @@ export class Bot {
 			token
 		} )
 			.catch( async ( e: ApiError ) => {
-				if ( e.code === 'notoken' || e.code === 'badtoken' ) {
+				if ( e.code === 'badtoken' ) {
 					Logger.warn( 'There was an error with the action. Regenerating CSRF and trying again...' )
 					await this.getCSRFToken( true )
 					return this.edit( params )

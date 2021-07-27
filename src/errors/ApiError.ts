@@ -1,7 +1,7 @@
 export class ApiError extends Error {
-	readonly code: string
+	readonly code: ApiErrorCode
 
-	constructor( code: string ) {
+	constructor( code: ApiErrorCode ) {
 		super( `An error has occurred: ${ code }.` )
 		this.code = code
 	}

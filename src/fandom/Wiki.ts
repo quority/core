@@ -64,7 +64,7 @@ export class Wiki {
 			}
 		}
 
-		const res = await this.request.get<T & { error: undefined } | { error: string }>( {
+		const res = await this.request.get<T & { error: undefined } | { error: ApiErrorCode }>( {
 			qs,
 			url: this.api
 		} )
@@ -93,7 +93,7 @@ export class Wiki {
 			}
 		}
 
-		const res = await this.request.post<T & { error: undefined } | { error: string }>( {
+		const res = await this.request.post<T & { error: undefined } | { error: ApiErrorCode }>( {
 			form: qs,
 			url: this.api
 		} )
