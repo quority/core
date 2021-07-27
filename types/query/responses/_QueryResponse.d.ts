@@ -1,4 +1,4 @@
-type ApiQueryList = 'allcategories' | 'allpages' | 'categorymembers'
+type ApiQueryList = 'allcategories' | 'allimages' | 'allpages' | 'categorymembers'
 interface IApiQueryItem {
 	[ key: string ]: string | number | undefined
 }
