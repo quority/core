@@ -1,5 +1,6 @@
 import {
-	defaults as request
+	defaults as request,
+	Response
 } from 'request'
 
 export class RequestManager {
@@ -34,6 +35,19 @@ export class RequestManager {
 				},
 				( _error, _res, body ) => {
 					resolve( JSON.parse( body ) )
+				}
+			)
+		} )
+	}
+
+	raw( url: string ): Promise<Response> {
+		return new Promise( resolve => {
+			this.ctx.get(
+				{
+					url
+				},
+				( _error, res ) => {
+					resolve( res )
 				}
 			)
 		} )

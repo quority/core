@@ -104,6 +104,11 @@ export class Wiki {
 		return res
 	}
 
+	async exists(): Promise<boolean> {
+		const req = await this.request.raw( this.api )
+		return req.statusCode === 200
+	}
+
 	async getPages( _titles: string ): Promise<IApiRevisionsItem>
 	async getPages( _titles: string[] ): Promise<IApiRevisionsItem[]>
 	async getPages( _titles: string | string[] ): Promise<IApiRevisionsItem | IApiRevisionsItem[]> {
