@@ -1,16 +1,16 @@
 {
   "name": "mw.js",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "main": "dist/main.js",
   "scripts": {
-	"build": "tsc",
+    "build": "tsc",
     "lint": "eslint src/ --ext .js,.ts",
     "lint:fix": "eslint src/ --fix --ext .js,.ts",
     "prepare": "husky install",
     "prepublish": "rimraf dist && tsc --declaration",
-	"prepush": "npm run lint && npm run prepublish",
-	"update:patch": "npm version patch -m \"chore: set version to %s\" && git push origin main && git push --tags && npm publish"
+    "prepush": "npm run lint && npm run prepublish",
+    "update:patch": "npm version patch -m \"chore: set version to %s\" && git push origin main && git push --tags && npm publish"
   },
   "keywords": [],
   "author": "bitomic <alehandro.rzrv@gmail.com>",
