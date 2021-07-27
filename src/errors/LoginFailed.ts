@@ -1,5 +1,5 @@
 export class LoginFailedError extends Error {
 	constructor() {
-		super( `The supplied credentials could not be authenticated.` )
+		super( 'The supplied credentials could not be authenticated.' )
 	}
 }
