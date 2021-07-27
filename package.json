@@ -4,7 +4,8 @@
   "description": "",
   "main": "dist/main.js",
   "files": [
-    "dist/**"
+    "dist/**",
+	"!dist/demo/**"
   ],
   "scripts": {
     "build": "tsc",
