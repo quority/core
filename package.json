@@ -4,6 +4,7 @@
   "description": "",
   "main": "dist/main.js",
   "scripts": {
+	"build": "tsc",
     "lint": "eslint src/ --ext .js,.ts",
     "lint:fix": "eslint src/ --fix --ext .js,.ts",
     "prepare": "husky install",
