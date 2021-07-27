@@ -1,12 +1,13 @@
 import {
+	ApiError,
+	InvalidInterwikiError
+} from '../errors'
+import {
 	Logger, RequestManager
 } from '../utils'
 import {
 	Bot
 } from './Bot'
-import {
-	InvalidInterwikiError
-} from '../errors'
 
 export class Wiki {
 	private readonly request: RequestManager
@@ -63,13 +64,13 @@ export class Wiki {
 			}
 		}
 
-		const res = await this.request.get<T & { error: undefined } | { error: ApiError }>( {
+		const res = await this.request.get<T & { error: undefined } | { error: string }>( {
 			qs,
 			url: this.api
 		} )
 
 		if ( res.error !== undefined ) {
-			throw res.error
+			throw new ApiError( res.error )
 		}
 
 		return res
@@ -92,13 +93,13 @@ export class Wiki {
 			}
 		}
 
-		const res = await this.request.post<T & { error: undefined } | { error: ApiError }>( {
+		const res = await this.request.post<T & { error: undefined } | { error: string }>( {
 			form: qs,
 			url: this.api
 		} )
 
 		if ( res.error !== undefined ) {
-			throw res.error
+			throw new ApiError( res.error )
 		}
 
 		return res
