@@ -18,6 +18,16 @@ export class Bot {
 		this.#wiki = wiki
 	}
 
+	async edit( params: IApiEditRequest ): Promise<IEditResponse> {
+		const token = await this.#wiki.getToken( 'csrf' )
+		return this.#wiki.post<IEditResponse>( {
+			...params,
+			action: 'edit',
+			assert: 'user',
+			token: token.query.tokens.csrftoken
+		} )
+	}
+
 	async login(): Promise<ILoginResponse> {
 		Logger.account( `Logging in into account "${ this.#username }".` )
 
