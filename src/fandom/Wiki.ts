@@ -30,7 +30,7 @@ export class Wiki {
 		if ( interwiki.match( /[a-z0-9-]+\.[a-z0-9-]+/ ) ) {
 			const [ lang, wikiname ] = interwiki.split( '.' )
 			return `https://${ wikiname }.fandom.com/${ lang }`
-		} else if ( interwiki.match( /^[a-z0-9-]$/ ) ) {
+		} else if ( interwiki.match( /^[a-z0-9-]+$/ ) ) {
 			return `https://${ interwiki }.fandom.com`
 		}
 		throw new InvalidInterwiki( interwiki )
@@ -46,7 +46,7 @@ export class Wiki {
 		return `${ path }/wiki/`
 	}
 
-	get<T>( params: Record<string, string | number> ): Promise<T> {
+	get<T>( params: Record<string, string | number | boolean> ): Promise<T> {
 		params.format = 'json'
 		params.formatversion = '2'
 
@@ -54,7 +54,11 @@ export class Wiki {
 		}
 
 		for ( const prop in params ) {
-			qs[ prop ] = `${ params[prop] }`
+			if ( typeof params[prop] === 'boolean' ) {
+				qs[ prop ] = params[prop] ? '1' : '0'
+			} else {
+				qs[ prop ] = `${ params[prop] }`
+			}
 		}
 
 		return this.request.get<T>( {
@@ -63,7 +67,7 @@ export class Wiki {
 		} )
 	}
 
-	post<T>( params: Record<string, string | number> ): Promise<T> {
+	post<T>( params: Record<string, string | number | boolean> ): Promise<T> {
 		params.format = 'json'
 		params.formatversion = '2'
 
@@ -71,7 +75,11 @@ export class Wiki {
 		}
 
 		for ( const prop in params ) {
-			qs[ prop ] = `${ params[prop] }`
+			if ( typeof params[prop] === 'boolean' ) {
+				qs[ prop ] = params[prop] ? '1' : '0'
+			} else {
+				qs[ prop ] = `${ params[prop] }`
+			}
 		}
 
 		return this.request.post<T>( {
