@@ -166,4 +166,30 @@ export class Wiki {
 
 		return result
 	}
+
+	iterQuery( params: { list: 'allcategories' } & IApiQueryAllcategoriesRequest ): AsyncGenerator<IApiQueryAllcategoriesItem, void, unknown>
+	iterQuery( params: { list: 'allimages' } & IApiQueryAllimagesRequest ): AsyncGenerator<IApiQueryAllimagesItem, void, unknown>
+	iterQuery( params: { list: 'allpages' } & IApiQueryAllpagesRequest ): AsyncGenerator<IApiQueryAllpagesItem, void, unknown>
+	iterQuery( params: { list: 'categorymembers' } & IApiQueryCategorymembersRequest ): AsyncGenerator<IApiQueryCategorymembersItem, void, unknown>
+	iterQuery( params: { list: 'usercontribs' } & IApiQueryUsercontribsRequest ): AsyncGenerator<IApiQueryUsercontribsItem, void, unknown>
+	async *iterQuery( params: { list: string } & IApiQueryRequest ): AsyncGenerator<IApiQueryItem, void, unknown> {
+		// eslint-disable-next-line no-constant-condition
+		while ( true ) {
+			const req = await this.get<IApiQueryResponse<IApiQueryItem>>( {
+				action: 'query',
+				...params
+			} )
+
+			for ( const item of req.query[ params.list ] ) {
+				yield item
+			}
+
+			if ( !req.continue ) break
+
+			const continuekey = Object.keys( req.continue ).find( i => i !== 'continue' )
+			if ( !continuekey ) break
+
+			params[ continuekey ] = req.continue[ continuekey ]
+		}
+	}
 }
