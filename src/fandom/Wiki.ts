@@ -15,6 +15,20 @@ export class Wiki {
 	readonly api: string
 	readonly interwiki: string
 
+	articlepath?: string
+	base?: string
+	id?: number
+	lang?: string
+	mainpage?: string
+	namespaces?: Record<`${ number }`, INamespace>
+	readonly?: boolean
+	script?: string
+	scriptpath?: string
+	server?: string
+	sitename?: string
+	wikiid?: string
+	writeapi?: boolean
+
 	constructor( {
 		interwiki, request
 	}: { interwiki: string, request: RequestManager } ) {
@@ -138,6 +152,14 @@ export class Wiki {
 		return Array.isArray( _titles ) ? pages : pages[ 0 ]
 	}
 
+	getSiteinfo(): Promise<ISiteinfoResponse> {
+		return this.get<ISiteinfoResponse>( {
+			action: 'query',
+			meta: 'siteinfo',
+			siprop: 'general|namespaces|variables'
+		} )
+	}
+
 	async getToken( type: 'createaccount' ): Promise<IApiQueryTokensResponse<'createaccounttoken'>>
 	async getToken( type: 'csrf' ): Promise<IApiQueryTokensResponse<'csrftoken'>>
 	async getToken( type: 'deleteglobalaccount' ): Promise<IApiQueryTokensResponse<'deleteglobalaccounttoken'>>
@@ -155,6 +177,26 @@ export class Wiki {
 		} )
 
 		return req
+	}
+
+	async load(): Promise<Required<Wiki>> {
+		const siteinfo = ( await this.getSiteinfo() ).query
+
+		this.articlepath = siteinfo.general.articlepath
+		this.base = siteinfo.general.base
+		this.id = siteinfo.variables.find( i => i.id === 'wgCityId' )?.['*'] as number
+		this.lang = siteinfo.variables.find( i => i.id === 'wgLanguageCode' )?.['*'] as string
+		this.mainpage = siteinfo.general.mainpage
+		this.namespaces = siteinfo.namespaces
+		this.readonly = siteinfo.general.readonly
+		this.script = siteinfo.general.script
+		this.scriptpath = siteinfo.general.scriptpath
+		this.server = siteinfo.general.server
+		this.sitename = siteinfo.general.sitename
+		this.wikiid = siteinfo.general.wikiid
+		this.writeapi = siteinfo.general.writeapi
+
+		return this as Required<Wiki>
 	}
 
 	async login( {
