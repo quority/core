@@ -6,9 +6,9 @@
   "scripts": {
     "lint": "eslint src/ --ext .js,.ts",
     "lint:fix": "eslint src/ --fix --ext .js,.ts",
-	"precommit": "npm run lint && npm run prepublish",
     "prepare": "husky install",
-    "prepublish": "rimraf dist && tsc --declaration"
+    "prepublish": "rimraf dist && tsc --declaration",
+	"prepush": "npm run lint && npm run prepublish"
   },
   "keywords": [],
   "author": "bitomic <alehandro.rzrv@gmail.com>",
