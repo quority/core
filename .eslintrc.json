@@ -84,6 +84,7 @@
 		"no-shadow": [
 			"error",
 			{
+				"allow": [ "fetch" ],
 				"builtinGlobals": true
 			}
 		],
