@@ -26,6 +26,10 @@ export class Bot {
 		this.#wiki = wiki
 	}
 
+	get wiki(): Wiki {
+		return this.#wiki
+	}
+
 	async delete( {
 		title, reason = ''
 	}: { title: string, reason?: string } ): Promise<boolean> {
