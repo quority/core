@@ -103,7 +103,9 @@ export class Bot {
 		await this.getCSRFToken( true )
 	}
 
-	async upload( { file, filename }: { file: fs.ReadStream, filename: string } ): Promise<IUploadResponse> {
+	async upload( {
+		file, filename
+	}: { file: fs.ReadStream, filename: string } ): Promise<IUploadResponse> {
 		const token = await this.getCSRFToken()
 		const params = {
 			action: 'upload',
@@ -116,23 +118,25 @@ export class Bot {
 		return this.#wiki.post<IUploadResponse>( params )
 	}
 
-	async uploadByUrl( { filename, url }: { filename: string, url: string } ): Promise<IUploadResponse | undefined> {
+	async uploadByUrl( {
+		filename, url
+	}: { filename: string, url: string } ): Promise<IUploadResponse | undefined> {
 		const image = await fetch( url )
 		if ( !image.ok ) return
-		
+
 		fs.ensureDirSync( './tmp' )
 		const buffer = await image.arrayBuffer()
 		fs.writeFileSync(
-			`./tmp/${filename}`,
+			`./tmp/${ filename }`,
 			Buffer.from( buffer )
 		)
-		
-		const file = fs.createReadStream( `./tmp/${filename}` )
+
+		const file = fs.createReadStream( `./tmp/${ filename }` )
 		const res = await this.upload( {
 			file,
 			filename
 		} )
-		fs.removeSync( `./tmp/${filename}` )
+		fs.removeSync( `./tmp/${ filename }` )
 
 		return res
 	}
