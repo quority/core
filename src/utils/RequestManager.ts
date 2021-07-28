@@ -2,6 +2,7 @@ import {
 	Response as RequestResponse,
 	defaults as request
 } from 'request'
+import fs from 'fs'
 
 export class RequestManager {
 	private ctx = request( {
@@ -26,13 +27,21 @@ export class RequestManager {
 
 	post<T>( {
 		url, form
-	}: { url: string, form: Record<string, string> } ): Promise<T> {
+	}: { url: string, form: Record<string, string | fs.ReadStream> } ): Promise<T> {
 		return new Promise( resolve => {
+			const findReadStream = Object.values( form )
+				.find( i => i instanceof fs.ReadStream )
+			const hasReadStream = findReadStream !== undefined
+
+			const key = hasReadStream ? 'formData' : 'form'
+
+			const params = {
+				[ key ]: form,
+				url
+			}
+
 			this.ctx.post(
-				{
-					form,
-					url
-				},
+				params,
 				( _error, _res, body ) => {
 					resolve( JSON.parse( body ) )
 				}

@@ -8,6 +8,7 @@ import {
 import {
 	Bot
 } from './Bot'
+import fs from 'fs'
 
 export class Wiki {
 	private readonly request: RequestManager
@@ -107,15 +108,17 @@ export class Wiki {
 		return res
 	}
 
-	async post<T>( params: Record<string, string | string[] | number | number[] | boolean> ): Promise<T> {
+	async post<T>( params: Record<string, string | string[] | number | number[] | boolean | fs.ReadStream> ): Promise<T> {
 		params.format = 'json'
 		params.formatversion = '2'
 
-		const qs: Record<string, string> = {
+		const qs: Record<string, string | fs.ReadStream> = {
 		}
 
 		for ( const prop in params ) {
-			if ( typeof params[prop] === 'boolean' ) {
+			if ( params[prop] instanceof fs.ReadStream ) {
+				qs[ prop ] = params[prop] as fs.ReadStream
+			} else if ( typeof params[prop] === 'boolean' ) {
 				qs[ prop ] = params[prop] ? '1' : '0'
 			} else if ( Array.isArray( params[prop] ) ) {
 				qs[ prop ] = ( params[prop] as unknown[] ).join( '|' )
