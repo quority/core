@@ -96,6 +96,7 @@ export class Bot {
 		} )
 
 		if ( res.login.result !== 'Success' ) {
+			Logger.error( res )
 			throw new LoginFailedError()
 		}
 
