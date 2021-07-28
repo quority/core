@@ -61,6 +61,23 @@ export class Wiki {
 		return `${ path }/wiki/`
 	}
 
+	static url2interwiki( url: string ): string {
+		const nolangRegex = /https?:\/\/([a-z0-9-]+)\.fandom\.com\/wiki\//
+		const nolang = url.match( nolangRegex )
+		if ( nolang ) {
+			return nolang[1]
+		}
+
+		const langRegex = /https?:\/\/([a-z0-9-]+)\.fandom\.com\/([a-z-]+)\/wiki\//
+		const lang = url.match( langRegex )
+
+		if ( lang ) {
+			return `${ lang[2] }.${ lang[1] }`
+		}
+
+		throw new InvalidInterwikiError( url )
+	}
+
 	async get<T>( params: Record<string, string | string[] | number | number[] | boolean> ): Promise<T> {
 		params.format = 'json'
 		params.formatversion = '2'
@@ -122,6 +139,28 @@ export class Wiki {
 	async exists(): Promise<boolean> {
 		const req = await this.request.raw( this.api )
 		return req.statusCode === 200
+	}
+
+	async getInterwikis(): Promise<Record<string, string>> {
+		const req = await this.get<IInterwikimap>( {
+			action: 'query',
+			meta: 'siteinfo',
+			siprop: 'interwikimap'
+		} )
+
+		const interwikis = req.query.interwikimap.filter( i => i.language )
+
+		const result: Record<string, string> = {
+		}
+		for ( const iw of interwikis ) {
+			try {
+				result[ iw.prefix ] = Wiki.url2interwiki( iw.url )
+			} catch ( e ) {
+				Logger.error( `An error occurred when processing "${ iw.prefix }" interwiki: ${ iw.url }. It will be skipped.` )
+			}
+		}
+
+		return result
 	}
 
 	async getPages( _titles: string ): Promise<IApiRevisionsItem>
