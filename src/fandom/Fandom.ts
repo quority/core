@@ -1,9 +1,10 @@
 import {
-	Bot
-} from './Bot'
-import {
+	Logger,
 	RequestManager
 } from '../utils'
+import {
+	Bot
+} from './Bot'
 import {
 	Wiki
 } from './Wiki'
@@ -11,8 +12,14 @@ import {
 export class Fandom {
 	readonly request: RequestManager
 
-	constructor() {
+	constructor( {
+		disableLogger = true
+	}: { disableLogger?: boolean } = {
+	} ) {
 		this.request = new RequestManager()
+		if ( disableLogger ) {
+			Logger.disable()
+		}
 	}
 
 	getWiki( interwiki: string ): Wiki {
