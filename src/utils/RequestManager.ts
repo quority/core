@@ -1,4 +1,6 @@
-import fetch, { Response } from 'node-fetch'
+import fetch, {
+	Response
+} from 'node-fetch'
 import FormData from 'form-data'
 import fs from 'fs'
 import tough from 'tough-cookie'
@@ -10,7 +12,7 @@ export class RequestManager {
 		url, qs
 	}: { url: string, qs: Record<string, string> } ): Promise<T> {
 		const params = new URLSearchParams( qs )
-		const req = await fetch( `${url}?${params}`, {
+		const req = await fetch( `${ url }?${ params }`, {
 			headers: {
 				cookie: this.#jar.getCookieStringSync( url )
 			},
