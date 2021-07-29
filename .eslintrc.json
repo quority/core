@@ -84,7 +84,7 @@
 		"no-shadow": [
 			"error",
 			{
-				"allow": [ "fetch" ],
+				"allow": [ "fetch", "FormData", "Response" ],
 				"builtinGlobals": true
 			}
 		],
