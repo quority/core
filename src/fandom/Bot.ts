@@ -10,6 +10,7 @@ import {
 } from './Wiki'
 import fetch from 'node-fetch'
 import fs from 'fs-extra'
+import path from 'path'
 
 export class Bot {
 	readonly #password: string
@@ -140,19 +141,20 @@ export class Bot {
 		const image = await fetch( url )
 		if ( !image.ok ) return
 
-		fs.ensureDirSync( './tmp' )
+		fs.ensureDirSync( path.resolve( __dirname, './tmp' ) )
+		const filepath = path.resolve( __dirname, `./tmp/${ filename }` )
 		const buffer = await image.arrayBuffer()
 		fs.writeFileSync(
-			`./tmp/${ filename }`,
+			filepath,
 			Buffer.from( buffer )
 		)
 
-		const file = fs.createReadStream( `./tmp/${ filename }` )
+		const file = fs.createReadStream( filepath )
 		const res = await this.upload( {
 			file,
 			filename
 		} )
-		fs.removeSync( `./tmp/${ filename }` )
+		fs.removeSync( filepath )
 
 		return res
 	}
