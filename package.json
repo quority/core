@@ -1,6 +1,6 @@
 {
   "name": "mw.js",
-  "version": "0.1.8",
+  "version": "0.2.0",
   "description": "",
   "main": "dist/main.js",
   "files": [
