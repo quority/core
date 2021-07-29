@@ -14,9 +14,10 @@ import fs from 'fs-extra'
 export class Bot {
 	readonly #password: string
 	readonly #username: string
-	readonly #wiki: Wiki
+	#wiki: Wiki
 
 	#csrf?: string
+	#_wikis = new Set<string>()
 
 	constructor( {
 		password, username, wiki
@@ -24,10 +25,20 @@ export class Bot {
 		this.#password = password
 		this.#username = username
 		this.#wiki = wiki
+		this.#_wikis.add( wiki.interwiki )
 	}
 
 	get wiki(): Wiki {
 		return this.#wiki
+	}
+	async setWiki( wiki: Wiki ): Promise<void> {
+		this.#wiki = wiki
+
+		if ( !this.#_wikis.has( wiki.interwiki ) ) {
+			Logger.info( `${ wiki.interwiki } not found in { ${ [ ...this.#_wikis ].join( ', ' ) } }` )
+			await this.login()
+			this.#_wikis.add( wiki.interwiki )
+		}
 	}
 
 	async delete( {
@@ -83,7 +94,7 @@ export class Bot {
 	}
 
 	async login(): Promise<ILoginResponse> {
-		Logger.account( `Logging in into account "${ this.#username }".` )
+		Logger.account( `Logging in into account "${ this.#username }" for "${ this.#wiki.interwiki }".` )
 
 		const tokenreq = await this.#wiki.getToken( 'login' )
 		const lgtoken = tokenreq.query.tokens.logintoken
