@@ -5,9 +5,6 @@ import {
 import {
 	Logger, RequestManager
 } from '../utils'
-import {
-	Bot
-} from './Bot'
 import fs from 'fs'
 
 export class Wiki {
@@ -63,13 +60,13 @@ export class Wiki {
 	}
 
 	static url2interwiki( url: string ): string {
-		const nolangRegex = /https?:\/\/([a-z0-9-]+)\.fandom\.com\/wiki\//
+		const nolangRegex = /https?:\/\/([a-z0-9-]+)\.fandom\.com\/(wiki|api|index)/
 		const nolang = url.match( nolangRegex )
 		if ( nolang ) {
 			return nolang[1]
 		}
 
-		const langRegex = /https?:\/\/([a-z0-9-]+)\.fandom\.com\/([a-z-]+)\/wiki\//
+		const langRegex = /https?:\/\/([a-z0-9-]+)\.fandom\.com\/([a-z-]+)\/(wiki|api|index)/
 		const lang = url.match( langRegex )
 
 		if ( lang ) {
@@ -141,7 +138,7 @@ export class Wiki {
 
 	async exists(): Promise<boolean> {
 		const req = await this.request.raw( this.api )
-		return req.statusCode === 200
+		return req.status === 200
 	}
 
 	async getInterwikis(): Promise<Record<string, string>> {
@@ -239,20 +236,6 @@ export class Wiki {
 		this.writeapi = siteinfo.general.writeapi
 
 		return this as Required<Wiki>
-	}
-
-	async login( {
-		password, username
-	}: { password: string, username: string } ): Promise<Bot> {
-		const bot = new Bot( {
-			password,
-			username,
-			wiki: this
-		} )
-
-		await bot.login()
-
-		return bot
 	}
 
 	async query( params: { list: 'allcategories' } & IApiQueryAllcategoriesRequest ): Promise<IApiQueryAllcategoriesItem[]>
