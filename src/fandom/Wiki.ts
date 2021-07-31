@@ -313,4 +313,40 @@ export class Wiki {
 			params[ continuekey ] = req.continue[ continuekey ]
 		}
 	}
+
+	async *whatLinksHere( titles: string[] ): AsyncGenerator<{
+		linkshere: {
+			title: string,
+			redirect: boolean
+		}[],
+		missing?: boolean,
+		title: string
+	}, void, unknown> {
+		while ( titles.length !== 0 ) {
+			const res = await this.get<{
+				query: {
+					pages: {
+						linkshere: {
+							title: string,
+							redirect: boolean
+						}[],
+						missing?: boolean,
+						title: string
+					}[]
+				}
+			}>( {
+				action: 'query',
+				prop: 'linkshere',
+				titles: titles.splice( 0, 25 ).join( '|' )
+			} )
+
+			for ( const page of res.query.pages ) {
+				if ( page.missing === true ) {
+					continue
+				}
+
+				yield page
+			}
+		}
+	}
 }
