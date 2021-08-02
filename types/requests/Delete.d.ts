@@ -7,5 +7,5 @@ namespace MWRequest {
 		title?: string
 	}
 	
-	export type Delete = RequireOnlyOne<IDeleteRequestBase, 'pageid' | 'title'>
+	export type Delete = RequireOnlyOne<IDeleteRequest, 'pageid' | 'title'>
 }
