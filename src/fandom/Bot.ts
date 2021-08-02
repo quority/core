@@ -1,9 +1,13 @@
 import {
+	BadTokenError,
+	LoginFailedError,
+	MissingTitleError,
+	PermissionDeniedError,
+	UnknownError
+} from '../errors'
+import {
 	Logger
 } from '../utils'
-import {
-	LoginFailedError
-} from '../errors'
 import {
 	Wiki
 } from './Wiki'
@@ -35,7 +39,6 @@ export class Bot {
 		this.#wiki = wiki
 
 		if ( !this.#_wikis.has( wiki.interwiki ) ) {
-			Logger.info( `${ wiki.interwiki } not found in { ${ [ ...this.#_wikis ].join( ', ' ) } }` )
 			await this.login()
 			this.#_wikis.add( wiki.interwiki )
 		}
@@ -43,27 +46,46 @@ export class Bot {
 
 	async delete( {
 		title, reason = ''
-	}: { title: string, reason?: string } ): Promise<boolean> {
+	}: { title: string, reason?: string } ): Promise<MWResponse.Delete> {
 		const token = await this.getCSRFToken()
 
-		const req = await this.#wiki.post<Partial<{ delete: { logid: number } }>>( {
+		const req = await this.#wiki.post<MWResponse.Delete | MWResponse.ApiError>( {
 			action: 'delete',
 			reason,
 			title,
 			token
 		} )
 
-		return req.delete?.logid !== undefined
+		if ( 'error' in req ) {
+			if ( req.error.code === 'badtoken' ) {
+				throw new BadTokenError()
+			} else if ( req.error.code === 'missingtitle' ) {
+				throw new MissingTitleError( title )
+			} else if ( req.error.code === 'permissiondenied' ) {
+				throw new PermissionDeniedError()
+			}
+			
+			throw new UnknownError( req.error.code, req.error.info )
+		}
+		
+		return req
 	}
 
 	async edit( params: MWRequest.Edit ): Promise<MWResponse.Edit> {
 		const token = await this.getCSRFToken()
-		return this.#wiki.post<MWResponse.Edit>( {
+		
+		const req = await this.#wiki.post<MWResponse.Edit | MWResponse.ApiError>( {
 			...params,
 			action: 'edit',
-			assert: 'user',
+			assert: params.bot ? 'bot' : 'user',
 			token
 		} )
+
+		if ( 'error' in req ) {
+			throw new UnknownError( req.error.code, req.error.info )
+		}
+
+		return req
 	}
 
 	async getCSRFToken( force = false ): Promise<string> {
@@ -94,11 +116,6 @@ export class Bot {
 		return res
 	}
 
-	private async regenerateCSRFToken(): Promise<void> {
-		Logger.warn( 'There was an error with the action. Regenerating CSRF and trying again...' )
-		await this.getCSRFToken( true )
-	}
-
 	async upload( {
 		file, filename
 	}: Pick<MWRequest.Upload, 'file' | 'filename'> ): Promise<MWResponse.Upload> {
@@ -111,7 +128,13 @@ export class Bot {
 			token
 		}
 
-		return this.#wiki.post<MWResponse.Upload>( params )
+		const req = await this.#wiki.post<MWResponse.Upload | MWResponse.ApiError>( params )
+
+		if ( 'error' in req ) {
+			throw new UnknownError( req.error.code, req.error.info )
+		}
+
+		return req
 	}
 
 	async uploadByUrl( {
