@@ -1,2 +1,6 @@
 export * from './ApiError'
+export * from './BadTokenError'
 export * from './LoginFailed'
+export * from './MissingTitle'
+export * from './PermissionDenied'
+export * from './UnknownError'
