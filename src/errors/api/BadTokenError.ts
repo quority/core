@@ -4,6 +4,6 @@ import {
 
 export class BadTokenError extends ApiError {
 	constructor( ) {
-		super( `Invalid CSRF token.` )
+		super( 'Invalid CSRF token.' )
 	}
 }

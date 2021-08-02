@@ -64,16 +64,16 @@ export class Bot {
 			} else if ( req.error.code === 'permissiondenied' ) {
 				throw new PermissionDeniedError()
 			}
-			
+
 			throw new UnknownError( req.error.code, req.error.info )
 		}
-		
+
 		return req
 	}
 
 	async edit( params: MWRequest.Edit ): Promise<MWResponse.Edit> {
 		const token = await this.getCSRFToken()
-		
+
 		const req = await this.#wiki.post<MWResponse.Edit | MWResponse.ApiError>( {
 			...params,
 			action: 'edit',
