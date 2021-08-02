@@ -1,10 +1,9 @@
 import {
-	ApiError,
-	InvalidInterwikiError
-} from '../errors'
-import {
 	Logger, RequestManager
 } from '../utils'
+import {
+	InvalidInterwikiError
+} from '../errors'
 import fs from 'fs'
 
 export class Wiki {
@@ -18,7 +17,7 @@ export class Wiki {
 	id?: number
 	lang?: string
 	mainpage?: string
-	namespaces?: Record<`${ number }`, INamespace>
+	namespaces?: Record<`${ number }`, MWResponse.SiteInfoNamespace>
 	readonly?: boolean
 	script?: string
 	scriptpath?: string
@@ -76,7 +75,7 @@ export class Wiki {
 		throw new InvalidInterwikiError( url )
 	}
 
-	async get<T>( params: Record<string, string | string[] | number | number[] | boolean> ): Promise<T> {
+	async get<T>( params: Record<string, string | string[] | number | number[] | boolean | undefined> ): Promise<T> {
 		params.format = 'json'
 		params.formatversion = '2'
 
@@ -84,7 +83,9 @@ export class Wiki {
 		}
 
 		for ( const prop in params ) {
-			if ( typeof params[prop] === 'boolean' ) {
+			if ( !params[prop] ) {
+				continue
+			} else if ( typeof params[prop] === 'boolean' ) {
 				qs[ prop ] = params[prop] ? '1' : '0'
 			} else if ( Array.isArray( params[prop] ) ) {
 				qs[ prop ] = ( params[prop] as unknown[] ).join( '|' )
@@ -93,19 +94,15 @@ export class Wiki {
 			}
 		}
 
-		const res = await this.request.get<T & { error: undefined } | { error: ApiErrorCode }>( {
+		const res = await this.request.get<T>( {
 			qs,
 			url: this.api
 		} )
 
-		if ( res.error !== undefined ) {
-			throw new ApiError( res.error )
-		}
-
 		return res
 	}
 
-	async post<T>( params: Record<string, string | string[] | number | number[] | boolean | fs.ReadStream> ): Promise<T> {
+	async post<T>( params: Record<string, string | string[] | number | number[] | boolean | fs.ReadStream | undefined> ): Promise<T> {
 		params.format = 'json'
 		params.formatversion = '2'
 
@@ -113,7 +110,9 @@ export class Wiki {
 		}
 
 		for ( const prop in params ) {
-			if ( params[prop] instanceof fs.ReadStream ) {
+			if ( !params[prop] ) {
+				continue
+			} else if ( params[prop] instanceof fs.ReadStream ) {
 				qs[ prop ] = params[prop] as fs.ReadStream
 			} else if ( typeof params[prop] === 'boolean' ) {
 				qs[ prop ] = params[prop] ? '1' : '0'
@@ -124,14 +123,10 @@ export class Wiki {
 			}
 		}
 
-		const res = await this.request.post<T & { error: undefined } | { error: ApiErrorCode }>( {
+		const res = await this.request.post<T>( {
 			form: qs,
 			url: this.api
 		} )
-
-		if ( res.error !== undefined ) {
-			throw new ApiError( res.error )
-		}
 
 		return res
 	}
@@ -142,7 +137,7 @@ export class Wiki {
 	}
 
 	async getInterwikis(): Promise<Record<string, string>> {
-		const req = await this.get<IInterwikimap>( {
+		const req = await this.get<MWResponse.InterwikiMap>( {
 			action: 'query',
 			meta: 'siteinfo',
 			siprop: 'interwikimap'
@@ -163,15 +158,15 @@ export class Wiki {
 		return result
 	}
 
-	async getPages( _titles: string ): Promise<IApiRevisionsItem>
-	async getPages( _titles: string[] ): Promise<IApiRevisionsItem[]>
-	async getPages( _titles: string | string[] ): Promise<IApiRevisionsItem | IApiRevisionsItem[]> {
+	async getPages( _titles: string ): Promise<MWResponse.RevisionsItem>
+	async getPages( _titles: string[] ): Promise<MWResponse.RevisionsItem[]>
+	async getPages( _titles: string | string[] ): Promise<MWResponse.RevisionsItem | MWResponse.RevisionsItem[]> {
 		const titles = Array.isArray( _titles ) ? _titles : [ _titles ]
 
-		const pages: IApiRevisionsItem[] = []
+		const pages: MWResponse.RevisionsItem[] = []
 
 		while ( titles.length !== 0 ) {
-			const res = await this.get<IApiRevisionsResponse>( {
+			const res = await this.get<MWResponse.Revisions>( {
 				action: 'query',
 				prop: 'revisions',
 				rvprop: 'content',
@@ -191,25 +186,16 @@ export class Wiki {
 		return Array.isArray( _titles ) ? pages : pages[ 0 ]
 	}
 
-	getSiteinfo(): Promise<ISiteinfoResponse> {
-		return this.get<ISiteinfoResponse>( {
+	getSiteinfo(): Promise<MWResponse.SiteInfo> {
+		return this.get<MWResponse.SiteInfo>( {
 			action: 'query',
 			meta: 'siteinfo',
 			siprop: 'general|namespaces|variables'
 		} )
 	}
 
-	async getToken( type: 'createaccount' ): Promise<IApiQueryTokensResponse<'createaccounttoken'>>
-	async getToken( type: 'csrf' ): Promise<IApiQueryTokensResponse<'csrftoken'>>
-	async getToken( type: 'deleteglobalaccount' ): Promise<IApiQueryTokensResponse<'deleteglobalaccounttoken'>>
-	async getToken( type: 'login' ): Promise<IApiQueryTokensResponse<'logintoken'>>
-	async getToken( type: 'patrol' ): Promise<IApiQueryTokensResponse<'patroltoken'>>
-	async getToken( type: 'rollback' ): Promise<IApiQueryTokensResponse<'rollbacktoken'>>
-	async getToken( type: 'setglobalaccountstatus' ): Promise<IApiQueryTokensResponse<'setglobalaccountstatustoken'>>
-	async getToken( type: 'userrights' ): Promise<IApiQueryTokensResponse<'userrightstoken'>>
-	async getToken( type: 'watch' ): Promise<IApiQueryTokensResponse<'watchtoken'>>
-	async getToken( type: TokenType ): Promise<IApiQueryTokensResponse<ITokenType>> {
-		const req = await this.get<IApiQueryTokensResponse<ITokenType>>( {
+	async getToken<Token extends MWTypes.TokenType>( type: Token ): Promise<MWResponse.Tokens<Token>> {
+		const req = await this.get<MWResponse.Tokens<Token>>( {
 			action: 'query',
 			meta: 'tokens',
 			type
@@ -238,17 +224,17 @@ export class Wiki {
 		return this as Required<Wiki>
 	}
 
-	async query( params: { list: 'allcategories' } & IApiQueryAllcategoriesRequest ): Promise<IApiQueryAllcategoriesItem[]>
-	async query( params: { list: 'allimages' } & IApiQueryAllimagesRequest ): Promise<IApiQueryAllimagesItem[]>
-	async query( params: { list: 'allpages' } & IApiQueryAllpagesRequest ): Promise<IApiQueryAllpagesItem[]>
-	async query( params: { list: 'categorymembers' } & IApiQueryCategorymembersRequest ): Promise<IApiQueryCategorymembersItem[]>
-	async query( params: { list: 'usercontribs' } & IApiQueryUsercontribsRequest ): Promise<IApiQueryUsercontribsItem[]>
-	async query( params: { list: string } & IApiQueryRequest ): Promise<IApiQueryItem[]> {
-		const result: IApiQueryItem[] = []
+	async query( params: { list: 'allcategories' } & MWRequest.AllCategories ): Promise<MWResponse.QueryItem.AllCategories[]>
+	async query( params: { list: 'allimages' } & MWRequest.AllImages ): Promise<MWResponse.QueryItem.AllImages[]>
+	async query( params: { list: 'allpages' } & MWRequest.AllPages ): Promise<MWResponse.QueryItem.AllPages[]>
+	async query( params: { list: 'categorymembers' } & MWRequest.CategoryMembers ): Promise<MWResponse.QueryItem.CategoryMembers[]>
+	async query( params: { list: 'usercontribs' } & MWRequest.UserContribs ): Promise<MWResponse.QueryItem.UserContribs[]>
+	async query( params: { list: string } & MWRequest.ApiQuery ): Promise<MWResponse.QueryItem.ApiQuery[]> {
+		const result: MWResponse.QueryItem.ApiQuery[] = []
 
 		// eslint-disable-next-line no-constant-condition
 		while ( true ) {
-			const req = await this.get<IApiQueryResponse<IApiQueryItem>>( {
+			const req = await this.get<MWResponse.ApiQuery>( {
 				action: 'query',
 				...params
 			} )
@@ -268,9 +254,9 @@ export class Wiki {
 		return result
 	}
 
-	async *iterPages( titles: string[] ): AsyncGenerator<IApiRevisionsItem, void, unknown> {
+	async *iterPages( titles: string[] ): AsyncGenerator<MWResponse.RevisionsItem, void, unknown> {
 		while ( titles.length !== 0 ) {
-			const res = await this.get<IApiRevisionsResponse>( {
+			const res = await this.get<MWResponse.Revisions>( {
 				action: 'query',
 				prop: 'revisions',
 				rvprop: 'content',
@@ -288,15 +274,15 @@ export class Wiki {
 		}
 	}
 
-	iterQuery( params: { list: 'allcategories' } & IApiQueryAllcategoriesRequest ): AsyncGenerator<IApiQueryAllcategoriesItem, void, unknown>
-	iterQuery( params: { list: 'allimages' } & IApiQueryAllimagesRequest ): AsyncGenerator<IApiQueryAllimagesItem, void, unknown>
-	iterQuery( params: { list: 'allpages' } & IApiQueryAllpagesRequest ): AsyncGenerator<IApiQueryAllpagesItem, void, unknown>
-	iterQuery( params: { list: 'categorymembers' } & IApiQueryCategorymembersRequest ): AsyncGenerator<IApiQueryCategorymembersItem, void, unknown>
-	iterQuery( params: { list: 'usercontribs' } & IApiQueryUsercontribsRequest ): AsyncGenerator<IApiQueryUsercontribsItem, void, unknown>
-	async *iterQuery( params: { list: string } & IApiQueryRequest ): AsyncGenerator<IApiQueryItem, void, unknown> {
+	iterQuery( params: { list: 'allcategories' } & MWRequest.AllCategories ): AsyncGenerator<MWResponse.QueryItem.AllCategories, void, unknown>
+	iterQuery( params: { list: 'allimages' } & MWRequest.AllImages ): AsyncGenerator<MWResponse.QueryItem.AllImages, void, unknown>
+	iterQuery( params: { list: 'allpages' } & MWRequest.AllPages ): AsyncGenerator<MWResponse.QueryItem.AllPages, void, unknown>
+	iterQuery( params: { list: 'categorymembers' } & MWRequest.CategoryMembers ): AsyncGenerator<MWResponse.QueryItem.CategoryMembers, void, unknown>
+	iterQuery( params: { list: 'usercontribs' } & MWRequest.UserContribs ): AsyncGenerator<MWResponse.QueryItem.UserContribs, void, unknown>
+	async *iterQuery( params: { list: string } & MWRequest.ApiQuery ): AsyncGenerator<MWResponse.QueryItem.ApiQuery, void, unknown> {
 		// eslint-disable-next-line no-constant-condition
 		while ( true ) {
-			const req = await this.get<IApiQueryResponse<IApiQueryItem>>( {
+			const req = await this.get<MWResponse.ApiQuery>( {
 				action: 'query',
 				...params
 			} )

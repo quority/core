@@ -1,10 +1,9 @@
 import {
-	ApiError,
-	LoginFailedError
-} from '../errors'
-import {
 	Logger
 } from '../utils'
+import {
+	LoginFailedError
+} from '../errors'
 import {
 	Wiki
 } from './Wiki'
@@ -47,43 +46,24 @@ export class Bot {
 	}: { title: string, reason?: string } ): Promise<boolean> {
 		const token = await this.getCSRFToken()
 
-		const req = await this.#wiki.post<{ delete: { logid: number } }>( {
+		const req = await this.#wiki.post<Partial<{ delete: { logid: number } }>>( {
 			action: 'delete',
 			reason,
 			title,
 			token
 		} )
-			.then( () => true )
-			.catch( async ( e: ApiError ) => {
-				if ( e.code === 'badtoken' ) {
-					await this.regenerateCSRFToken()
-					return this.delete( {
-						reason, title
-					} )
-				}
 
-				throw e
-			} )
-
-		return req
+		return req.delete?.logid !== undefined
 	}
 
-	async edit( params: IApiEditRequest ): Promise<IEditResponse> {
+	async edit( params: MWRequest.Edit ): Promise<MWResponse.Edit> {
 		const token = await this.getCSRFToken()
-		return this.#wiki.post<IEditResponse>( {
+		return this.#wiki.post<MWResponse.Edit>( {
 			...params,
 			action: 'edit',
 			assert: 'user',
 			token
 		} )
-			.catch( async ( e: ApiError ) => {
-				if ( e.code === 'badtoken' ) {
-					await this.regenerateCSRFToken()
-					return this.edit( params )
-				}
-
-				throw e
-			} )
 	}
 
 	async getCSRFToken( force = false ): Promise<string> {
@@ -94,13 +74,13 @@ export class Bot {
 		return this.#csrf as string
 	}
 
-	async login(): Promise<ILoginResponse> {
+	async login(): Promise<MWResponse.Login> {
 		Logger.account( `Logging in into account "${ this.#username }" for "${ this.#wiki.interwiki }".` )
 
 		const tokenreq = await this.#wiki.getToken( 'login' )
 		const lgtoken = tokenreq.query.tokens.logintoken
 
-		const res = await this.#wiki.post<ILoginResponse>( {
+		const res = await this.#wiki.post<MWResponse.Login>( {
 			action: 'login',
 			lgname: this.#username,
 			lgpassword: this.#password,
@@ -108,8 +88,7 @@ export class Bot {
 		} )
 
 		if ( res.login.result !== 'Success' ) {
-			Logger.error( res )
-			throw new LoginFailedError()
+			throw new LoginFailedError( this.#username )
 		}
 
 		return res
@@ -122,7 +101,7 @@ export class Bot {
 
 	async upload( {
 		file, filename
-	}: { file: fs.ReadStream, filename: string } ): Promise<IUploadResponse> {
+	}: Pick<MWRequest.Upload, 'file' | 'filename'> ): Promise<MWResponse.Upload> {
 		const token = await this.getCSRFToken()
 		const params = {
 			action: 'upload',
@@ -132,12 +111,12 @@ export class Bot {
 			token
 		}
 
-		return this.#wiki.post<IUploadResponse>( params )
+		return this.#wiki.post<MWResponse.Upload>( params )
 	}
 
 	async uploadByUrl( {
 		filename, url
-	}: { filename: string, url: string } ): Promise<IUploadResponse | undefined> {
+	}: { filename: string, url: string } ): Promise<MWResponse.Upload | undefined> {
 		const image = await fetch( url )
 		if ( !image.ok ) return
 

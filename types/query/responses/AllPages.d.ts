@@ -1,14 +1,18 @@
-interface IApiQueryAllpagesItem extends IApiQueryItem {
-	pageid: number
-	ns: number
-	title: string
-}
-
-interface IApiQueryAllpagesResponse extends IApiQueryResponse<IApiQueryAllpagesItem> {
-	continue?: {
-		apcontinue: string
+namespace MWResponse {
+	export namespace QueryItem {
+		export interface AllPages extends QueryItem.ApiQuery {
+			pageid: number
+			ns: number
+			title: string
+		}
 	}
-	query: {
-		allpages: IApiQueryAllpagesItem[]
+
+	export interface AllPages extends MWResponse.ApiQuery {
+		continue: {
+			apcontinue: string
+		}
+		query: {
+			allpages: QueryItem.AllPages[]
+		}
 	}
 }

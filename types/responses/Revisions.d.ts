@@ -1,21 +1,23 @@
-interface IApiRevisionsItem {
-	missing?: boolean
-	pageid: number
-	ns: number
-	title: string
-	revisions: {
-		slots: {
-			main: {
-				contentmodel: string
-				contentformat: string
-				content: string
+namespace MWResponse {
+	export interface RevisionsItem {
+		missing?: boolean
+		pageid: number
+		ns: number
+		title: string
+		revisions: {
+			slots: {
+				main: {
+					contentmodel: string
+					contentformat: string
+					content: string
+				}
 			}
-		}
-	}[]
-}
+		}[]
+	}
 
-interface IApiRevisionsResponse {
-	query: {
-		pages: IApiRevisionsItem[]
+	export interface Revisions {
+		query: {
+			pages: RevisionsItem[]
+		}
 	}
 }

@@ -1,12 +1,16 @@
-interface IApiQueryAllcategoriesItem extends IApiQueryItem {
-	category: string
-}
-
-interface IApiQueryAllcategoriesResponse extends IApiQueryResponse<IApiQueryAllcategoriesItem> {
-	continue: {
-		accontinue: string
+namespace MWResponse {
+	export namespace QueryItem {
+		export interface AllCategories extends QueryItem.ApiQuery {
+			category: string
+		}
 	}
-	query: {
-		allcategories: IApiQueryAllcategoriesItem[]
+
+	export interface AllCategories extends MWResponse.ApiQuery {
+		continue: {
+			accontinue: string
+		}
+		query: {
+			allcategories: QueryItem.AllCategories[]
+		}
 	}
 }
