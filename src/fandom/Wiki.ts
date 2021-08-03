@@ -224,6 +224,30 @@ export class Wiki {
 		return this as Required<Wiki>
 	}
 
+	async pagesExist( _titles: string ): Promise<Record<string, boolean>>
+	async pagesExist( _titles: string[] ): Promise<Record<string, boolean>>
+	async pagesExist( _titles: string | string[] ): Promise<Record<string, boolean>> {
+		const titles = Array.isArray( _titles ) ? _titles : [ _titles ]
+
+		const pages: Record<string, boolean> = {}
+
+		while ( titles.length !== 0 ) {
+			const res = await this.get<MWResponse.Revisions>( {
+				action: 'query',
+				prop: 'revisions',
+				rvprop: 'content',
+				rvslots: 'main',
+				titles: titles.splice( 0, 25 ).join( '|' )
+			} )
+
+			for ( const page of res.query.pages ) {
+				pages[ page.title ] = page.missing ? false : true
+			}
+		}
+
+		return pages
+	}
+
 	async query( params: { list: 'allcategories' } & MWRequest.AllCategories ): Promise<MWResponse.QueryItem.AllCategories[]>
 	async query( params: { list: 'allimages' } & MWRequest.AllImages ): Promise<MWResponse.QueryItem.AllImages[]>
 	async query( params: { list: 'allpages' } & MWRequest.AllPages ): Promise<MWResponse.QueryItem.AllPages[]>
