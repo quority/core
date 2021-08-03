@@ -229,7 +229,8 @@ export class Wiki {
 	async pagesExist( _titles: string | string[] ): Promise<Record<string, boolean>> {
 		const titles = Array.isArray( _titles ) ? _titles : [ _titles ]
 
-		const pages: Record<string, boolean> = {}
+		const pages: Record<string, boolean> = {
+		}
 
 		while ( titles.length !== 0 ) {
 			const res = await this.get<MWResponse.Revisions>( {
