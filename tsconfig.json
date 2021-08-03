@@ -9,7 +9,7 @@
 	  "esModuleInterop": true,
 	  "skipLibCheck": true,
 	  "forceConsistentCasingInFileNames": true,
-	  "typeRoots": [ "./types/index.d.ts" ]
+	  "typeRoots": [ "./types/**" ]
 	}
   }
   
