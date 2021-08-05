@@ -1,12 +1,12 @@
 {
   "name": "mw.js",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "",
   "main": "dist/main.js",
   "files": [
     "dist/**",
     "!dist/demo/**",
-	"types/**"
+    "types/**"
   ],
   "scripts": {
     "build": "tsc",
