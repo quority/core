@@ -16,6 +16,9 @@
         "@typescript-eslint"
     ],
     "rules": {
+		"@typescript-eslint/no-namespace": [
+			"off"
+		],
 		"array-bracket-spacing": [
 			"error",
 			"always"

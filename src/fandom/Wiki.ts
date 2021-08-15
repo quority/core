@@ -2,6 +2,9 @@ import {
 	Logger, RequestManager
 } from '../utils'
 import {
+	MWResponses, QueryRequests, QueryResponses, TokenType
+} from '../types'
+import {
 	InvalidInterwikiError
 } from '../errors'
 import fs from 'fs'
@@ -17,7 +20,7 @@ export class Wiki {
 	id?: number
 	lang?: string
 	mainpage?: string
-	namespaces?: Record<`${ number }`, MWResponse.SiteInfoNamespace>
+	namespaces?: Record<`${ number }`, MWResponses.SiteInfoNamespace>
 	readonly?: boolean
 	script?: string
 	scriptpath?: string
@@ -137,7 +140,7 @@ export class Wiki {
 	}
 
 	async getInterwikis(): Promise<Record<string, string>> {
-		const req = await this.get<MWResponse.InterwikiMap>( {
+		const req = await this.get<MWResponses.InterwikiMap>( {
 			action: 'query',
 			meta: 'siteinfo',
 			siprop: 'interwikimap'
@@ -158,15 +161,15 @@ export class Wiki {
 		return result
 	}
 
-	async getPages( _titles: string ): Promise<MWResponse.RevisionsItem>
-	async getPages( _titles: string[] ): Promise<MWResponse.RevisionsItem[]>
-	async getPages( _titles: string | string[] ): Promise<MWResponse.RevisionsItem | MWResponse.RevisionsItem[]> {
+	async getPages( _titles: string ): Promise<MWResponses.RevisionsItem>
+	async getPages( _titles: string[] ): Promise<MWResponses.RevisionsItem[]>
+	async getPages( _titles: string | string[] ): Promise<MWResponses.RevisionsItem | MWResponses.RevisionsItem[]> {
 		const titles = Array.isArray( _titles ) ? _titles : [ _titles ]
 
-		const pages: MWResponse.RevisionsItem[] = []
+		const pages: MWResponses.RevisionsItem[] = []
 
 		while ( titles.length !== 0 ) {
-			const res = await this.get<MWResponse.Revisions>( {
+			const res = await this.get<MWResponses.Revisions>( {
 				action: 'query',
 				prop: 'revisions',
 				rvprop: 'content',
@@ -186,16 +189,16 @@ export class Wiki {
 		return Array.isArray( _titles ) ? pages : pages[ 0 ]
 	}
 
-	getSiteinfo(): Promise<MWResponse.SiteInfo> {
-		return this.get<MWResponse.SiteInfo>( {
+	getSiteinfo(): Promise<MWResponses.SiteInfo> {
+		return this.get<MWResponses.SiteInfo>( {
 			action: 'query',
 			meta: 'siteinfo',
 			siprop: 'general|namespaces|variables'
 		} )
 	}
 
-	async getToken<Token extends MWTypes.TokenType>( type: Token ): Promise<MWResponse.Tokens<Token>> {
-		const req = await this.get<MWResponse.Tokens<Token>>( {
+	async getToken<Token extends TokenType>( type: Token ): Promise<MWResponses.Tokens<Token>> {
+		const req = await this.get<MWResponses.Tokens<Token>>( {
 			action: 'query',
 			meta: 'tokens',
 			type
@@ -233,7 +236,7 @@ export class Wiki {
 		}
 
 		while ( titles.length !== 0 ) {
-			const res = await this.get<MWResponse.Revisions>( {
+			const res = await this.get<MWResponses.Revisions>( {
 				action: 'query',
 				prop: 'revisions',
 				rvprop: 'content',
@@ -249,17 +252,17 @@ export class Wiki {
 		return pages
 	}
 
-	async query( params: { list: 'allcategories' } & MWRequest.AllCategories ): Promise<MWResponse.QueryItem.AllCategories[]>
-	async query( params: { list: 'allimages' } & MWRequest.AllImages ): Promise<MWResponse.QueryItem.AllImages[]>
-	async query( params: { list: 'allpages' } & MWRequest.AllPages ): Promise<MWResponse.QueryItem.AllPages[]>
-	async query( params: { list: 'categorymembers' } & MWRequest.CategoryMembers ): Promise<MWResponse.QueryItem.CategoryMembers[]>
-	async query( params: { list: 'usercontribs' } & MWRequest.UserContribs ): Promise<MWResponse.QueryItem.UserContribs[]>
-	async query( params: { list: string } & MWRequest.ApiQuery ): Promise<MWResponse.QueryItem.ApiQuery[]> {
-		const result: MWResponse.QueryItem.ApiQuery[] = []
+	async query( params: { list: 'allcategories' } & QueryRequests.AllCategories ): Promise<QueryResponses.QueryItem.AllCategories[]>
+	async query( params: { list: 'allimages' } & QueryRequests.AllImages ): Promise<QueryResponses.QueryItem.AllImages[]>
+	async query( params: { list: 'allpages' } & QueryRequests.AllPages ): Promise<QueryResponses.QueryItem.AllPages[]>
+	async query( params: { list: 'categorymembers' } & QueryRequests.CategoryMembers ): Promise<QueryResponses.QueryItem.CategoryMembers[]>
+	async query( params: { list: 'usercontribs' } & QueryRequests.UserContribs ): Promise<QueryResponses.QueryItem.UserContribs[]>
+	async query( params: { list: string } & QueryRequests.ApiQuery ): Promise<QueryResponses.QueryItem.ApiQuery[]> {
+		const result: QueryResponses.QueryItem.ApiQuery[] = []
 
 		// eslint-disable-next-line no-constant-condition
 		while ( true ) {
-			const req = await this.get<MWResponse.ApiQuery>( {
+			const req = await this.get<QueryResponses.ApiQuery<string, string, QueryResponses.QueryItem.ApiQuery>>( {
 				action: 'query',
 				...params
 			} )
@@ -272,16 +275,16 @@ export class Wiki {
 
 			const continuekey = Object.keys( req.continue ).find( i => i !== 'continue' )
 			if ( !continuekey ) break
-
+			// @ts-expect-error - faulty typing i don't know how to fix
 			params[ continuekey ] = req.continue[ continuekey ]
 		}
 
 		return result
 	}
 
-	async *iterPages( titles: string[] ): AsyncGenerator<MWResponse.RevisionsItem, void, unknown> {
+	async *iterPages( titles: string[] ): AsyncGenerator<MWResponses.RevisionsItem, void, unknown> {
 		while ( titles.length !== 0 ) {
-			const res = await this.get<MWResponse.Revisions>( {
+			const res = await this.get<MWResponses.Revisions>( {
 				action: 'query',
 				prop: 'revisions',
 				rvprop: 'content',
@@ -299,15 +302,15 @@ export class Wiki {
 		}
 	}
 
-	iterQuery( params: { list: 'allcategories' } & MWRequest.AllCategories ): AsyncGenerator<MWResponse.QueryItem.AllCategories, void, unknown>
-	iterQuery( params: { list: 'allimages' } & MWRequest.AllImages ): AsyncGenerator<MWResponse.QueryItem.AllImages, void, unknown>
-	iterQuery( params: { list: 'allpages' } & MWRequest.AllPages ): AsyncGenerator<MWResponse.QueryItem.AllPages, void, unknown>
-	iterQuery( params: { list: 'categorymembers' } & MWRequest.CategoryMembers ): AsyncGenerator<MWResponse.QueryItem.CategoryMembers, void, unknown>
-	iterQuery( params: { list: 'usercontribs' } & MWRequest.UserContribs ): AsyncGenerator<MWResponse.QueryItem.UserContribs, void, unknown>
-	async *iterQuery( params: { list: string } & MWRequest.ApiQuery ): AsyncGenerator<MWResponse.QueryItem.ApiQuery, void, unknown> {
+	iterQuery( params: { list: 'allcategories' } & QueryRequests.AllCategories ): AsyncGenerator<QueryResponses.QueryItem.AllCategories, void, unknown>
+	iterQuery( params: { list: 'allimages' } & QueryRequests.AllImages ): AsyncGenerator<QueryResponses.QueryItem.AllImages, void, unknown>
+	iterQuery( params: { list: 'allpages' } & QueryRequests.AllPages ): AsyncGenerator<QueryResponses.QueryItem.AllPages, void, unknown>
+	iterQuery( params: { list: 'categorymembers' } & QueryRequests.CategoryMembers ): AsyncGenerator<QueryResponses.QueryItem.CategoryMembers, void, unknown>
+	iterQuery( params: { list: 'usercontribs' } & QueryRequests.UserContribs ): AsyncGenerator<QueryResponses.QueryItem.UserContribs, void, unknown>
+	async *iterQuery( params: { list: string } & QueryRequests.ApiQuery ): AsyncGenerator<QueryResponses.QueryItem.ApiQuery, void, unknown> {
 		// eslint-disable-next-line no-constant-condition
 		while ( true ) {
-			const req = await this.get<MWResponse.ApiQuery>( {
+			const req = await this.get<QueryResponses.ApiQuery<string, string, QueryResponses.QueryItem.ApiQuery>>( {
 				action: 'query',
 				...params
 			} )
@@ -320,7 +323,7 @@ export class Wiki {
 
 			const continuekey = Object.keys( req.continue ).find( i => i !== 'continue' )
 			if ( !continuekey ) break
-
+			// @ts-expect-error - faulty typing i don't know how to fix
 			params[ continuekey ] = req.continue[ continuekey ]
 		}
 	}

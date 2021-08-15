@@ -6,6 +6,10 @@ import {
 	UnknownError
 } from '../errors'
 import {
+	MWRequests,
+	MWResponses
+} from '../types'
+import {
 	Logger
 } from '../utils'
 import {
@@ -46,10 +50,10 @@ export class Bot {
 
 	async delete( {
 		title, reason = ''
-	}: { title: string, reason?: string } ): Promise<MWResponse.Delete> {
+	}: { title: string, reason?: string } ): Promise<MWResponses.Delete> {
 		const token = await this.getCSRFToken()
 
-		const req = await this.#wiki.post<MWResponse.Delete | MWResponse.ApiError>( {
+		const req = await this.#wiki.post<MWResponses.Delete | MWResponses.ApiError>( {
 			action: 'delete',
 			reason,
 			title,
@@ -71,10 +75,10 @@ export class Bot {
 		return req
 	}
 
-	async edit( params: MWRequest.Edit ): Promise<MWResponse.Edit> {
+	async edit( params: MWRequests.Edit ): Promise<MWResponses.Edit> {
 		const token = await this.getCSRFToken()
 
-		const req = await this.#wiki.post<MWResponse.Edit | MWResponse.ApiError>( {
+		const req = await this.#wiki.post<MWResponses.Edit | MWResponses.ApiError>( {
 			...params,
 			action: 'edit',
 			assert: params.bot ? 'bot' : 'user',
@@ -96,13 +100,13 @@ export class Bot {
 		return this.#csrf as string
 	}
 
-	async login(): Promise<MWResponse.Login> {
+	async login(): Promise<MWResponses.Login> {
 		Logger.account( `Logging in into account "${ this.#username }" for "${ this.#wiki.interwiki }".` )
 
 		const tokenreq = await this.#wiki.getToken( 'login' )
 		const lgtoken = tokenreq.query.tokens.logintoken
 
-		const res = await this.#wiki.post<MWResponse.Login>( {
+		const res = await this.#wiki.post<MWResponses.Login>( {
 			action: 'login',
 			lgname: this.#username,
 			lgpassword: this.#password,
@@ -118,7 +122,7 @@ export class Bot {
 
 	async upload( {
 		file, filename
-	}: Pick<MWRequest.Upload, 'file' | 'filename'> ): Promise<MWResponse.Upload> {
+	}: Pick<MWRequests.Upload, 'file' | 'filename'> ): Promise<MWResponses.Upload> {
 		const token = await this.getCSRFToken()
 		const params = {
 			action: 'upload',
@@ -128,7 +132,7 @@ export class Bot {
 			token
 		}
 
-		const req = await this.#wiki.post<MWResponse.Upload | MWResponse.ApiError>( params )
+		const req = await this.#wiki.post<MWResponses.Upload | MWResponses.ApiError>( params )
 
 		if ( 'error' in req ) {
 			throw new UnknownError( req.error.code, req.error.info )
@@ -139,7 +143,7 @@ export class Bot {
 
 	async uploadByUrl( {
 		filename, url
-	}: { filename: string, url: string } ): Promise<MWResponse.Upload | undefined> {
+	}: { filename: string, url: string } ): Promise<MWResponses.Upload | undefined> {
 		const image = await fetch( url )
 		if ( !image.ok ) return
 

@@ -8,6 +8,7 @@
     "!dist/demo/**",
     "types/**"
   ],
+  "types": "dist/main.d.ts",
   "scripts": {
     "build": "tsc",
     "lint": "eslint src/ --ext .js,.ts",
