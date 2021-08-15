@@ -1,7 +1,11 @@
+import {
+	UserRights
+} from '../UserRights'
+
 export namespace QueryResponses {
 	export namespace QueryItem {
 		export interface ApiQuery {
-			[ key: string ]: string | number | undefined
+			[ key: string ]: string | string[] | number | undefined
 		}
 
 		export interface AllCategories extends ApiQuery {
@@ -41,6 +45,13 @@ export namespace QueryResponses {
 			timestamp: string
 			comment: string
 			size: number
+		}
+
+		export interface Users extends ApiQuery {
+			userid: number
+			name: string
+			groups: string[]
+			rights: UserRights[]
 		}
 	}
 

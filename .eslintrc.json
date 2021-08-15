@@ -84,13 +84,6 @@
 		"no-return-await": [
 			"error"
 		],
-		"no-shadow": [
-			"error",
-			{
-				"allow": [ "fetch", "FormData", "Response" ],
-				"builtinGlobals": true
-			}
-		],
 		"no-trailing-spaces": [
 			"error"
 		],

@@ -68,4 +68,9 @@ export namespace QueryRequests {
 		ucshow?: Array< '!autopatrolled' | '!minor' | '!new' | '!patrolled' | '!top' | 'autopatrolled' | 'minor' | 'new' | 'patrolled' | 'top' >
 		uctag?: string
 	}
+
+	export interface Users extends ApiQuery {
+		usprop?: Array<'blockinfo' | 'groups' | 'groupmemberships' | 'implicitgroups' | 'rights' | 'editcount' | 'registration' | 'emailable' | 'gender' | 'centralids' | 'cancreate'>
+		ususers: string | string[]
+	}
 }
