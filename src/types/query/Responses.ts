@@ -34,6 +34,19 @@ export namespace QueryResponses {
 			title: string
 		}
 
+		export interface RecentChanges extends ApiQuery {
+			type: string
+			ns: number
+			title: string
+			pageid: number
+			revid: number
+			old_revid: number
+			rcid: number
+			user: string
+			oldlen: number
+			newlen: number
+		}
+
 		export interface UserContribs extends ApiQuery {
 			userid: number
 			user: string
@@ -72,6 +85,8 @@ export namespace QueryResponses {
 	export type AllPages = ApiQuery<'ap', 'allpages', QueryItem.AllPages>
 
 	export type CategoryMembers = ApiQuery<'cm', 'categorymembers', QueryItem.CategoryMembers>
+
+	export type RecentChanges = ApiQuery<'rc', 'recentchanges', QueryItem.RecentChanges>
 
 	export type UserContribs = ApiQuery<'uc', 'usercontribs', QueryItem.UserContribs>
 }

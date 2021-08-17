@@ -1,6 +1,6 @@
 export namespace QueryRequests {
 	export interface ApiQuery {
-		[ key: string ]: string | string[] | number | number[] | undefined
+		[ key: string ]: string | string[] | number | number[] | boolean | undefined
 	}
 
 	export interface AllCategories extends ApiQuery {
@@ -54,6 +54,21 @@ export namespace QueryRequests {
 		cmdir?: 'ascending' | 'descending' | 'newer' | 'older'
 		cmstart?: string
 		cmend?: string
+	}
+
+	export interface RecentChanges extends ApiQuery {
+		rcstart?: string
+		rcend?: string
+		rcdir?: 'newer' | 'older'
+		rcnamespace?: '*' | number | number[]
+		rcuser?: string
+		rcexcludeuser?: string
+		rcprop?: Array<'user' | 'userid' | 'comment' | 'flags' | 'timestamp' | 'title' | 'ids' | 'sizes' | 'redirect' | 'patrolled' | 'loginfo' | 'tags'>
+		rcshow?: Array<'!anon' | '!autropatrolled' | '!bot' | '!minor' | '!patrolled' | '!redirect' | 'anon' | 'autopatrolled' | 'bot' | 'minor' | 'patrolled' | 'redirect' | 'unpatrolled'>
+		rclimit?: number | 'max'
+		rctype?: Array<'edit' | 'new' | 'log' | 'categorize'>
+		rctoponly?: boolean
+		rctitle?: string
 	}
 
 	export interface UserContribs extends ApiQuery {

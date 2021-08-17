@@ -256,6 +256,7 @@ export class Wiki {
 	async query( params: { list: 'allimages' } & QueryRequests.AllImages ): Promise<QueryResponses.QueryItem.AllImages[]>
 	async query( params: { list: 'allpages' } & QueryRequests.AllPages ): Promise<QueryResponses.QueryItem.AllPages[]>
 	async query( params: { list: 'categorymembers' } & QueryRequests.CategoryMembers ): Promise<QueryResponses.QueryItem.CategoryMembers[]>
+	async query( params: { list: 'recentchanges' } & QueryRequests.RecentChanges ): Promise<QueryResponses.QueryItem.RecentChanges[]>
 	async query( params: { list: 'usercontribs' } & QueryRequests.UserContribs ): Promise<QueryResponses.QueryItem.UserContribs[]>
 	async query( params: { list: 'users' } & QueryRequests.Users ): Promise<QueryResponses.QueryItem.Users[]>
 	async query( params: { list: string } & QueryRequests.ApiQuery ): Promise<QueryResponses.QueryItem.ApiQuery[]> {
@@ -307,6 +308,7 @@ export class Wiki {
 	iterQuery( params: { list: 'allimages' } & QueryRequests.AllImages ): AsyncGenerator<QueryResponses.QueryItem.AllImages, void, unknown>
 	iterQuery( params: { list: 'allpages' } & QueryRequests.AllPages ): AsyncGenerator<QueryResponses.QueryItem.AllPages, void, unknown>
 	iterQuery( params: { list: 'categorymembers' } & QueryRequests.CategoryMembers ): AsyncGenerator<QueryResponses.QueryItem.CategoryMembers, void, unknown>
+	iterQuery( params: { list: 'recentchanges' } & QueryRequests.RecentChanges ): AsyncGenerator<QueryResponses.QueryItem.RecentChanges, void, unknown>
 	iterQuery( params: { list: 'usercontribs' } & QueryRequests.UserContribs ): AsyncGenerator<QueryResponses.QueryItem.UserContribs, void, unknown>
 	iterQuery( params: { list: 'users' } & QueryRequests.Users ): AsyncGenerator<QueryResponses.QueryItem.Users, void, unknown>
 	async *iterQuery( params: { list: string } & QueryRequests.ApiQuery ): AsyncGenerator<QueryResponses.QueryItem.ApiQuery, void, unknown> {
