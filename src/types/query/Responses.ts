@@ -89,4 +89,6 @@ export namespace QueryResponses {
 	export type RecentChanges = ApiQuery<'rc', 'recentchanges', QueryItem.RecentChanges>
 
 	export type UserContribs = ApiQuery<'uc', 'usercontribs', QueryItem.UserContribs>
+
+	export type Users = ApiQuery<'us', 'users', QueryItem.Users>
 }
