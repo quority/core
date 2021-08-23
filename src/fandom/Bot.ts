@@ -142,6 +142,34 @@ export class Bot {
 	}
 
 	async uploadByUrl( {
+		filename, ignorewarnings = 1, url
+	}: { filename: string, ignorewarnings?: 0 | 1, url: string } ): Promise<MWResponses.Upload> {
+		const token = await this.getCSRFToken()
+		const params = {
+			action: 'upload',
+			filename,
+			ignorewarnings,
+			token,
+			url
+		}
+
+		const req = await this.#wiki.post<MWResponses.Upload | MWResponses.ApiError>( params )
+
+		if ( 'error' in req ) {
+			throw new UnknownError( req.error.code, req.error.info )
+		}
+
+		return req
+	}
+
+	/**
+	 * @param { Object } params.filename - Name to use for the uploaded file.
+	 * @param { Object } params.url - URL of the file to upload.
+	 * @description Upload an image by an URL. \
+	 * Not to be confused with the `uploadByUrl` method, which uses MediaWiki's extension. \
+	 * It will store the image locally in order to upload it.
+	 */
+	async uploadFromUrl( {
 		filename, url
 	}: { filename: string, url: string } ): Promise<MWResponses.Upload | undefined> {
 		const image = await fetch( url )
