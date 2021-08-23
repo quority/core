@@ -259,6 +259,7 @@ export class Wiki {
 	async query( params: { list: 'recentchanges' } & QueryRequests.RecentChanges ): Promise<QueryResponses.QueryItem.RecentChanges[]>
 	async query( params: { list: 'usercontribs' } & QueryRequests.UserContribs ): Promise<QueryResponses.QueryItem.UserContribs[]>
 	async query( params: { list: 'users' } & QueryRequests.Users ): Promise<QueryResponses.QueryItem.Users[]>
+	async query( params: { list: string } & QueryRequests.ApiQuery ): Promise<QueryResponses.QueryItem.ApiQuery[]>
 	async query( params: { list: string } & QueryRequests.ApiQuery ): Promise<QueryResponses.QueryItem.ApiQuery[]> {
 		const result: QueryResponses.QueryItem.ApiQuery[] = []
 
@@ -311,6 +312,7 @@ export class Wiki {
 	iterQuery( params: { list: 'recentchanges' } & QueryRequests.RecentChanges ): AsyncGenerator<QueryResponses.QueryItem.RecentChanges, void, unknown>
 	iterQuery( params: { list: 'usercontribs' } & QueryRequests.UserContribs ): AsyncGenerator<QueryResponses.QueryItem.UserContribs, void, unknown>
 	iterQuery( params: { list: 'users' } & QueryRequests.Users ): AsyncGenerator<QueryResponses.QueryItem.Users, void, unknown>
+	iterQuery( params: { list: string } & QueryRequests.ApiQuery ): AsyncGenerator<QueryResponses.QueryItem.ApiQuery, void, unknown>
 	async *iterQuery( params: { list: string } & QueryRequests.ApiQuery ): AsyncGenerator<QueryResponses.QueryItem.ApiQuery, void, unknown> {
 		// eslint-disable-next-line no-constant-condition
 		while ( true ) {
