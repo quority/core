@@ -1,5 +1,7 @@
 export * from './ApiError'
 export * from './BadTokenError'
+export * from './DisabledExtension'
+export * from './FileExistsNoChangeError'
 export * from './LoginFailed'
 export * from './MissingTitle'
 export * from './PermissionDenied'
