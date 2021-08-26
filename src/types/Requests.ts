@@ -34,11 +34,14 @@ export namespace MWRequests {
 		lgtoken: string
 	}
 
-	export interface Upload {
-		action: 'upload',
-		file: fs.ReadStream,
-		filename: string,
-		ignorewarnings?: 1,
+	export type Upload = {
+		action: 'upload'
+		filename: string
+		ignorewarnings?: 1
 		token: string
-	}
+	} & ( {
+		file: fs.ReadStream
+	} | {
+		url: string
+	} )
 }

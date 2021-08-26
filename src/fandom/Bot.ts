@@ -1,5 +1,7 @@
 import {
 	BadTokenError,
+	DisabledExtensionError,
+	FileExistsNoChangeError,
 	LoginFailedError,
 	MissingTitleError,
 	PermissionDeniedError,
@@ -129,34 +131,14 @@ export class Bot {
 	}
 
 	async upload( {
-		file, filename
-	}: Pick<MWRequests.Upload, 'file' | 'filename'> ): Promise<MWResponses.Upload> {
+		file = undefined, filename, url = undefined
+	}: { filename: string } & ( { file: fs.ReadStream, url?: undefined } | { file?: undefined, url: string } ) ): Promise<MWResponses.Upload> {
 		const token = await this.getCSRFToken()
 		const params = {
 			action: 'upload',
 			file,
 			filename,
 			ignorewarnings: 1,
-			token
-		}
-
-		const req = await this.#wiki.post<MWResponses.Upload | MWResponses.ApiError>( params )
-
-		if ( 'error' in req ) {
-			throw new UnknownError( req.error.code, req.error.info )
-		}
-
-		return req
-	}
-
-	async uploadByUrl( {
-		filename, ignorewarnings = 1, url
-	}: { filename: string, ignorewarnings?: 0 | 1, url: string } ): Promise<MWResponses.Upload> {
-		const token = await this.getCSRFToken()
-		const params = {
-			action: 'upload',
-			filename,
-			ignorewarnings,
 			token,
 			url
 		}
@@ -164,10 +146,26 @@ export class Bot {
 		const req = await this.#wiki.post<MWResponses.Upload | MWResponses.ApiError>( params )
 
 		if ( 'error' in req ) {
+			if ( req.error.code === 'permissiondenied' ) {
+				throw new PermissionDeniedError()
+			} else if ( req.error.code === 'copyuploaddisabled' ) {
+				throw new DisabledExtensionError( 'Upload by URL' )
+			} else if ( req.error.code === 'fileexists-no-change' ) {
+				throw new FileExistsNoChangeError()
+			}
 			throw new UnknownError( req.error.code, req.error.info )
 		}
 
 		return req
+	}
+
+	async uploadByUrl( {
+		filename, url
+	}: { filename: string, url: string } ): Promise<MWResponses.Upload> {
+		return this.upload( {
+			filename,
+			url
+		} )
 	}
 
 	/**
