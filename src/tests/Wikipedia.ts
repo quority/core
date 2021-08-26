@@ -6,7 +6,7 @@ import {
 } from '../main'
 import assert from 'assert'
 
-describe( `Wikipedia`, () => {
+describe( 'Wikipedia', () => {
 	const {
 		WIKIPEDIA_API, WIKIPEDIA_PASSWORD, WIKIPEDIA_USERNAME
 	} = process.env as Record<string, string>

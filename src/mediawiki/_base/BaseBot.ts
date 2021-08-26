@@ -12,11 +12,11 @@ import {
 	MWResponses
 } from '../../types'
 import {
-	Logger
-} from '../../utils'
-import {
 	BaseWiki
 } from './BaseWiki'
+import {
+	Logger
+} from '../../utils'
 import fetch from 'node-fetch'
 import fs from 'fs-extra'
 import path from 'path'

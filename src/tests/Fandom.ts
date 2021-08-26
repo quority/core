@@ -2,13 +2,13 @@
 import 'dotenv/config'
 import 'mocha'
 import {
-	FandomBot, Fandom
+	Fandom, FandomBot
 } from '../main'
 import assert from 'assert'
 
 const now = Date.now()
 
-describe( `Fandom`, () => {
+describe( 'Fandom', () => {
 	const {
 		FANDOM_PASSWORD, FANDOM_USERNAME, FANDOM_WIKI
 	} = process.env as Record<string, string>

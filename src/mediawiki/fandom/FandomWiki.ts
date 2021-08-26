@@ -20,7 +20,7 @@ export class FandomWiki extends BaseWiki {
 			request
 		} )
 		Logger.community( `Initializing wiki "${ interwiki }".` )
-		
+
 		this.interwiki = interwiki
 	}
 }

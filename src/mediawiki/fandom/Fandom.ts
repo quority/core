@@ -3,14 +3,14 @@ import {
 	RequestManager
 } from '../../utils'
 import {
-	InvalidInterwikiError
-} from '../../errors'
-import {
 	FandomBot
 } from './FandomBot'
 import {
 	FandomWiki
 } from './FandomWiki'
+import {
+	InvalidInterwikiError
+} from '../../errors'
 
 export class Fandom {
 	readonly request: RequestManager
