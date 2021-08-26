@@ -50,6 +50,19 @@ export namespace MWResponses {
 		}
 	}
 
+	export interface Purge {
+		purge: ( {
+			ns: number
+			title: string
+		} & (
+			{
+				missing: string
+			} | {
+				purged: string
+			}
+		) )[]
+	}
+
 	export interface RevisionsItem {
 		missing?: boolean
 		pageid: number

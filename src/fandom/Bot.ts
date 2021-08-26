@@ -120,6 +120,14 @@ export class Bot {
 		return res
 	}
 
+	purge( titles: string[] ): Promise<Record<string, boolean>> {
+		return this.wiki.purge( titles )
+	}
+
+	touch( titles: string[] ): Promise<Record<string, boolean>> {
+		return this.wiki.purge( titles )
+	}
+
 	async upload( {
 		file, filename
 	}: Pick<MWRequests.Upload, 'file' | 'filename'> ): Promise<MWResponses.Upload> {

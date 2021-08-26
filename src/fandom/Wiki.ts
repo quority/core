@@ -252,6 +252,28 @@ export class Wiki {
 		return pages
 	}
 
+	async purge( titles: string[] ): Promise<Record<string, boolean>> {
+		const result: Record<string, boolean> = {
+		}
+
+		while ( titles.length !== 0 ) {
+			const req = await this.post<MWResponses.Purge>( {
+				action: 'purge',
+				titles: titles.splice( 0, 50 ).join( '|' )
+			} )
+
+			for ( const item of req.purge ) {
+				if ( 'missing' in item ) {
+					result[ item.title ] = false
+				} else {
+					result[ item.title ] = true
+				}
+			}
+		}
+
+		return result
+	}
+
 	async query( params: { list: 'allcategories' } & QueryRequests.AllCategories ): Promise<QueryResponses.QueryItem.AllCategories[]>
 	async query( params: { list: 'allimages' } & QueryRequests.AllImages ): Promise<QueryResponses.QueryItem.AllImages[]>
 	async query( params: { list: 'allpages' } & QueryRequests.AllPages ): Promise<QueryResponses.QueryItem.AllPages[]>
