@@ -14,7 +14,7 @@ export class BaseWiki {
 	constructor( {
 		api, disableLogger = true, request
 	}: { api: string, disableLogger?: boolean, request?: RequestManager } ) {
-		this.api = api
+		this.api = api.trim()
 		this.request = request ?? new RequestManager()
 		if ( disableLogger ) {
 			Logger.disable()

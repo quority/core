@@ -31,8 +31,8 @@ export class BaseBot<Wiki extends BaseWiki = BaseWiki> {
 	constructor( {
 		password, username, wiki
 	}: { password: string, username: string, wiki: Wiki } ) {
-		this.#password = password
-		this.#username = username
+		this.#password = password.trim()
+		this.#username = username.trim()
 		this.#wiki = wiki
 	}
 
