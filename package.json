@@ -1,7 +1,7 @@
 {
   "name": "mw.js",
   "version": "0.5.0",
-  "description": "",
+  "description": "Typed MediaWiki API client for node.js using TypeScript.",
   "main": "dist/main.js",
   "files": [
     "dist/**",
@@ -21,7 +21,12 @@
     "update:minor": "npm version minor -m \"chore: set version to %s\" && npm run postupdate",
     "update:patch": "npm version patch -m \"chore: set version to %s\" && npm run postupdate"
   },
-  "keywords": [],
+  "keywords": [
+	  "Fandom",
+	  "MediaWiki",
+	  "MediaWiki API",
+	  "wiki"
+  ],
   "author": "bitomic <alehandro.rzrv@gmail.com>",
   "license": "MIT",
   "repository": {
