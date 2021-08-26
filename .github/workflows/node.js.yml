@@ -30,4 +30,8 @@ jobs:
         FANDOM_PASSWORD: ${{ secrets.FANDOM_PASSWORD }}
         FANDOM_USERNAME: ${{ secrets.FANDOM_USERNAME }}
         FANDOM_WIKI: bitomic
+
+        WIKIPEDIA_API: https://es.wikipedia.org/w/api.php
+        WIKIPEDIA_PASSWORD: ${{ secrets.WIKIPEDIA_PASSWORD }}
+        WIKIPEDIA_USERNAME: ${{ secrets.WIKIPEDIA_USERNAME }}
       run: npm run test
