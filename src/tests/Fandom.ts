@@ -2,19 +2,19 @@
 import 'dotenv/config'
 import 'mocha'
 import {
-	Bot, Fandom
+	FandomBot, Fandom
 } from '../main'
 import assert from 'assert'
 
 const now = Date.now()
 
-describe( `Bot @ ${ now }`, () => {
+describe( `Fandom`, () => {
 	const {
 		FANDOM_PASSWORD, FANDOM_USERNAME, FANDOM_WIKI
 	} = process.env as Record<string, string>
 	const fandom = new Fandom()
 	const wiki = fandom.getWiki( FANDOM_WIKI.trim() )
-	let bot: Bot
+	let bot: FandomBot
 
 	const login = it( '#login', async () => {
 		bot = await fandom.login( {
