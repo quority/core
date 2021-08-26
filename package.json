@@ -1,6 +1,6 @@
 {
   "name": "mw.js",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Typed MediaWiki API client for node.js using TypeScript.",
   "main": "dist/main.js",
   "files": [
@@ -16,16 +16,16 @@
     "prepare": "husky install",
     "prepush": "npm run lint && rimraf dist && tsc --declaration --listEmittedFiles && npm run test",
     "postupdate": "git push origin main && git push --tags --no-verify && npm publish -f",
-	"test": "mocha ./dist/tests",
+    "test": "mocha ./dist/tests",
     "update:major": "npm version major -m \"chore: set version to %s\" && npm run postupdate",
     "update:minor": "npm version minor -m \"chore: set version to %s\" && npm run postupdate",
     "update:patch": "npm version patch -m \"chore: set version to %s\" && npm run postupdate"
   },
   "keywords": [
-	  "Fandom",
-	  "MediaWiki",
-	  "MediaWiki API",
-	  "wiki"
+    "Fandom",
+    "MediaWiki",
+    "MediaWiki API",
+    "wiki"
   ],
   "author": "bitomic <alehandro.rzrv@gmail.com>",
   "license": "MIT",
