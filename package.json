@@ -6,7 +6,7 @@
   "files": [
     "dist/**",
     "!dist/demo/**",
-    "types/**"
+    "!dist/tests/**"
   ],
   "types": "dist/main.d.ts",
   "scripts": {
