@@ -6,7 +6,9 @@ import {
 } from '../main'
 import assert from 'assert'
 
-describe( 'Bot', () => {
+const now = Date.now()
+
+describe( `Bot @ ${ now }`, () => {
 	const {
 		FANDOM_PASSWORD, FANDOM_USERNAME, FANDOM_WIKI
 	} = process.env as Record<string, string>
@@ -29,7 +31,7 @@ describe( 'Bot', () => {
 
 		const action = await bot.edit( {
 			text: 'This is a test.',
-			title: 'Test'
+			title: `Test @ ${ now }`
 		} )
 
 		assert.strictEqual( action.edit.result, 'Success' )
@@ -39,7 +41,33 @@ describe( 'Bot', () => {
 		assert.strictEqual( login.isPassed(), true )
 
 		await bot.delete( {
-			title: 'Test'
+			title: `Test @ ${ now }`
 		} )
 	} )
+
+	it( '#setWiki', async () => {
+		assert.strictEqual( login.isPassed(), true )
+
+		const wikis = {
+			comunidad: fandom.getWiki( 'comunidad' ),
+			'genshin-impact': fandom.getWiki( 'es.genshin-impact' ),
+			twice: fandom.getWiki( 'twice' )
+		}
+
+		let id: number
+
+		for ( let i = 0; i < 2; i++ ) {
+			await bot.setWiki( wikis.comunidad )
+			id = await bot.whoAmI().then( res => res.query.userinfo.id )
+			assert.notStrictEqual( id, 0 )
+
+			await bot.setWiki( wikis['genshin-impact'] )
+			id = await bot.whoAmI().then( res => res.query.userinfo.id )
+			assert.notStrictEqual( id, 0 )
+
+			await bot.setWiki( wikis.twice )
+			id = await bot.whoAmI().then( res => res.query.userinfo.id )
+			assert.notStrictEqual( id, 0 )
+		}
+	} ).timeout( 8000 )
 } )
