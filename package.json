@@ -14,7 +14,7 @@
     "lint": "eslint src/ --ext .js,.ts",
     "lint:fix": "eslint src/ --fix --ext .js,.ts",
     "prepare": "husky install",
-    "prepush": "npm run lint && rimraf dist && tsc --declaration --listEmittedFiles",
+    "prepush": "npm run lint && rimraf dist && tsc --declaration --listEmittedFiles && npm run test",
     "postupdate": "git push origin main && git push --tags --no-verify && npm publish -f",
 	"test": "mocha ./dist/tests",
     "update:major": "npm version major -m \"chore: set version to %s\" && npm run postupdate",
