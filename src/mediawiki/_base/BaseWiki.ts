@@ -201,6 +201,7 @@ export class BaseWiki {
 	async query( params: { list: 'allimages' } & QueryRequests.AllImages, limit?: number ): Promise<QueryResponses.QueryItem.AllImages[]>
 	async query( params: { list: 'allpages' } & QueryRequests.AllPages, limit?: number ): Promise<QueryResponses.QueryItem.AllPages[]>
 	async query( params: { list: 'categorymembers' } & QueryRequests.CategoryMembers, limit?: number ): Promise<QueryResponses.QueryItem.CategoryMembers[]>
+	async query( params: { list: 'logevents' } & QueryRequests.LogEvents, limit?: number ): Promise<QueryResponses.QueryItem.LogEvents[]>
 	async query( params: { list: 'recentchanges' } & QueryRequests.RecentChanges, limit?: number ): Promise<QueryResponses.QueryItem.RecentChanges[]>
 	async query( params: { list: 'usercontribs' } & QueryRequests.UserContribs, limit?: number ): Promise<QueryResponses.QueryItem.UserContribs[]>
 	async query( params: { list: 'users' } & QueryRequests.Users, limit?: number ): Promise<QueryResponses.QueryItem.Users[]>
@@ -257,6 +258,7 @@ export class BaseWiki {
 	iterQuery( params: { list: 'allimages' } & QueryRequests.AllImages, limit?: number ): AsyncGenerator<QueryResponses.QueryItem.AllImages, void, unknown>
 	iterQuery( params: { list: 'allpages' } & QueryRequests.AllPages, limit?: number ): AsyncGenerator<QueryResponses.QueryItem.AllPages, void, unknown>
 	iterQuery( params: { list: 'categorymembers' } & QueryRequests.CategoryMembers, limit?: number ): AsyncGenerator<QueryResponses.QueryItem.CategoryMembers, void, unknown>
+	iterQuery( params: { list: 'logevents' } & QueryRequests.LogEvents, limit?: number ): AsyncGenerator<QueryResponses.QueryItem.LogEvents, void, unknown>
 	iterQuery( params: { list: 'recentchanges' } & QueryRequests.RecentChanges, limit?: number ): AsyncGenerator<QueryResponses.QueryItem.RecentChanges, void, unknown>
 	iterQuery( params: { list: 'usercontribs' } & QueryRequests.UserContribs, limit?: number ): AsyncGenerator<QueryResponses.QueryItem.UserContribs, void, unknown>
 	iterQuery( params: { list: 'users' } & QueryRequests.Users, limit?: number ): AsyncGenerator<QueryResponses.QueryItem.Users, void, unknown>

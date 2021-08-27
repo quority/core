@@ -34,6 +34,19 @@ export namespace QueryResponses {
 			title: string
 		}
 
+		export interface LogEvents extends ApiQuery {
+			action: string
+			comment: string
+			logid: number
+			logpage: number
+			ns: number
+			pageid: number
+			timestamp: string
+			title: string
+			type: string
+			user: string
+		}
+
 		export interface RecentChanges extends ApiQuery {
 			type: string
 			ns: number
@@ -85,6 +98,8 @@ export namespace QueryResponses {
 	export type AllPages = ApiQuery<'ap', 'allpages', QueryItem.AllPages>
 
 	export type CategoryMembers = ApiQuery<'cm', 'categorymembers', QueryItem.CategoryMembers>
+	
+	export type LogEvents = ApiQuery<'le', 'logevents', QueryItem.LogEvents>
 
 	export type RecentChanges = ApiQuery<'rc', 'recentchanges', QueryItem.RecentChanges>
 
