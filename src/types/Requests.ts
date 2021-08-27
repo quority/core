@@ -52,7 +52,7 @@ export namespace MWRequests {
 	type ProtectionAction = 'edit' | 'move'
 	type ProtectionLevel = 'all' | 'autoconfirmed' | 'sysop'
 	interface IProtectRequest {
-		protections: Array<`${ProtectionAction}=${ProtectionLevel}`> | ''
+		protections: Array<`${ ProtectionAction }=${ ProtectionLevel }`> | ''
 		expiry?: string
 		reason?: string
 		cascade?: boolean

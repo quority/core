@@ -131,7 +131,7 @@ export class BaseBot<Wiki extends BaseWiki = BaseWiki> {
 
 	async protect( params: MWRequests.Protect ): Promise<MWResponses.Protect> {
 		const token = await this.getCSRFToken()
-		
+
 		return this.wiki.post( {
 			...params,
 			action: 'protect',
