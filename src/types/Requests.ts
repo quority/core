@@ -37,6 +37,19 @@ export namespace MWRequests {
 		ignorewarnings?: boolean
 	}
 
+	type ProtectionAction = 'edit' | 'move'
+	type ProtectionLevel = 'all' | 'autoconfirmed' | 'sysop'
+	interface IProtectRequest {
+		protections: Array<`${ProtectionAction}=${ProtectionLevel}`> | ''
+		expiry?: string
+		reason?: string
+		cascade?: boolean
+
+		title?: string
+		pageid?: number
+	}
+	export type Protect = RequireOnlyOne<IProtectRequest, 'title' | 'pageid'>
+
 	export interface Login {
 		action: 'login'
 		lgname: string

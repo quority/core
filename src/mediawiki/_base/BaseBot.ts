@@ -120,6 +120,16 @@ export class BaseBot<Wiki extends BaseWiki = BaseWiki> {
 		return req
 	}
 
+	async protect( params: MWRequests.Protect ): Promise<MWResponses.Protect> {
+		const token = await this.getCSRFToken()
+		
+		return this.wiki.post( {
+			...params,
+			action: 'protect',
+			token
+		} )
+	}
+
 	purge( titles: string[] ): Promise<Record<string, boolean>> {
 		return this.wiki.purge( titles )
 	}

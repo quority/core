@@ -1,4 +1,7 @@
 import {
+	RequireOnlyOne
+} from './utils'
+import {
 	TokenType
 } from './Tokens'
 
@@ -57,6 +60,19 @@ export namespace MWResponses {
 			reason?: string
 			talkfrom?: string
 			talkto?: string
+		}
+	}
+
+	export type Protect = {
+		protect: {
+			title: string
+			reason: string
+			protections: ( {
+				expiry: string
+			} & RequireOnlyOne<{
+				edit?: string
+				move: string
+			}, 'edit' | 'move'> )[]
 		}
 	}
 
