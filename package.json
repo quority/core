@@ -17,9 +17,9 @@
     "prepush": "npm run lint && npm run build && npm run test",
     "postupdate": "git push origin main && git push --tags --no-verify && npm publish -f",
     "test": "mocha ./dist/tests",
-    "update:major": "npm version major -m \"chore: set version to %s\" && npm run postupdate",
-    "update:minor": "npm version minor -m \"chore: set version to %s\" && npm run postupdate",
-    "update:patch": "npm version patch -m \"chore: set version to %s\" && npm run postupdate"
+    "update:major": "npm version major -m \"🔖 Set version to %s\" && npm run postupdate",
+    "update:minor": "npm version minor -m \"🔖 Set version to %s\" && npm run postupdate",
+    "update:patch": "npm version patch -m \"🔖 Set version to %s\" && npm run postupdate"
   },
   "keywords": [
     "Fandom",
@@ -53,6 +53,7 @@
     "@typescript-eslint/parser": "^4.28.4",
     "dotenv": "^10.0.0",
     "eslint": "^7.31.0",
+    "gitmoji-cli": "^4.5.1",
     "husky": "^7.0.1",
     "mocha": "^9.1.0",
     "rimraf": "^3.0.2",
