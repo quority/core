@@ -25,8 +25,7 @@ jobs:
     - run: npm ci
     - run: npm run build --if-present
 
-    - name: Test
-      env:
+    - env:
         FANDOM_PASSWORD: ${{ secrets.FANDOM_PASSWORD }}
         FANDOM_USERNAME: ${{ secrets.FANDOM_USERNAME }}
         FANDOM_WIKI: bitomic
