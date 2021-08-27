@@ -147,6 +147,15 @@ export class BaseBot<Wiki extends BaseWiki = BaseWiki> {
 		return this.wiki.purge( titles )
 	}
 
+	async unblock( params: { user: string, reason?: string } ): Promise<MWResponses.Block> {
+		const token = await this.getCSRFToken()
+		return this.wiki.post( {
+			...params,
+			action: 'unblock',
+			token
+		} )
+	}
+
 	async upload( {
 		file = undefined, filename, url = undefined
 	}: { filename: string } & ( { file: fs.ReadStream, url?: undefined } | { file?: undefined, url: string } ) ): Promise<MWResponses.Upload> {
