@@ -4,6 +4,18 @@ import {
 import fs from 'fs'
 
 export namespace MWRequests {
+	export interface Block {
+		user: string
+		expiry: string
+		reason?: string
+		anononly?: boolean
+		nocreate?: boolean
+		autoblock?: boolean
+		noemail?: boolean
+		allowusertalk?: boolean
+		reblock?: boolean
+	}
+
 	interface IDeleteRequest {
 		reason?: string
 		token: string

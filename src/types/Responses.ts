@@ -13,6 +13,23 @@ export namespace MWResponses {
 		}
 	}
 
+	export interface Block {
+		block: {
+			user: string
+			userID: number
+			expiry: string
+			id: number
+			reason: string
+			anononly?: boolean
+			nocreate?: boolean
+			autoblock?: boolean
+			noemail?: boolean
+			hidename?: boolean
+			allowusertalk?: boolean
+			watchuser?: boolean
+		}
+	}
+
 	export interface Delete {
 		delete: {
 			title: string

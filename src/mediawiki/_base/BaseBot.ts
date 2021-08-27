@@ -37,6 +37,15 @@ export class BaseBot<Wiki extends BaseWiki = BaseWiki> {
 		this.#wiki = wiki
 	}
 
+	async block( params: MWRequests.Block ): Promise<MWResponses.Block> {
+		const token = await this.getCSRFToken()
+		return this.wiki.post( {
+			...params,
+			action: 'block',
+			token
+		} )
+	}
+
 	async delete( {
 		title, reason = ''
 	}: { title: string, reason?: string } ): Promise<MWResponses.Delete> {
