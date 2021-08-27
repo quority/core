@@ -197,15 +197,15 @@ export class BaseWiki {
 		return result
 	}
 
-	async query( params: { list: 'allcategories' } & QueryRequests.AllCategories ): Promise<QueryResponses.QueryItem.AllCategories[]>
-	async query( params: { list: 'allimages' } & QueryRequests.AllImages ): Promise<QueryResponses.QueryItem.AllImages[]>
-	async query( params: { list: 'allpages' } & QueryRequests.AllPages ): Promise<QueryResponses.QueryItem.AllPages[]>
-	async query( params: { list: 'categorymembers' } & QueryRequests.CategoryMembers ): Promise<QueryResponses.QueryItem.CategoryMembers[]>
-	async query( params: { list: 'recentchanges' } & QueryRequests.RecentChanges ): Promise<QueryResponses.QueryItem.RecentChanges[]>
-	async query( params: { list: 'usercontribs' } & QueryRequests.UserContribs ): Promise<QueryResponses.QueryItem.UserContribs[]>
-	async query( params: { list: 'users' } & QueryRequests.Users ): Promise<QueryResponses.QueryItem.Users[]>
-	async query( params: { list: string } & QueryRequests.ApiQuery ): Promise<QueryResponses.QueryItem.ApiQuery[]>
-	async query( params: { list: string } & QueryRequests.ApiQuery ): Promise<QueryResponses.QueryItem.ApiQuery[]> {
+	async query( params: { list: 'allcategories' } & QueryRequests.AllCategories, limit?: number ): Promise<QueryResponses.QueryItem.AllCategories[]>
+	async query( params: { list: 'allimages' } & QueryRequests.AllImages, limit?: number ): Promise<QueryResponses.QueryItem.AllImages[]>
+	async query( params: { list: 'allpages' } & QueryRequests.AllPages, limit?: number ): Promise<QueryResponses.QueryItem.AllPages[]>
+	async query( params: { list: 'categorymembers' } & QueryRequests.CategoryMembers, limit?: number ): Promise<QueryResponses.QueryItem.CategoryMembers[]>
+	async query( params: { list: 'recentchanges' } & QueryRequests.RecentChanges, limit?: number ): Promise<QueryResponses.QueryItem.RecentChanges[]>
+	async query( params: { list: 'usercontribs' } & QueryRequests.UserContribs, limit?: number ): Promise<QueryResponses.QueryItem.UserContribs[]>
+	async query( params: { list: 'users' } & QueryRequests.Users, limit?: number ): Promise<QueryResponses.QueryItem.Users[]>
+	async query( params: { list: string } & QueryRequests.ApiQuery, limit?: number ): Promise<QueryResponses.QueryItem.ApiQuery[]>
+	async query( params: { list: string } & QueryRequests.ApiQuery, limit?: number ): Promise<QueryResponses.QueryItem.ApiQuery[]> {
 		const result: QueryResponses.QueryItem.ApiQuery[] = []
 
 		// eslint-disable-next-line no-constant-condition
@@ -217,6 +217,9 @@ export class BaseWiki {
 
 			for ( const item of req.query[ params.list ] ) {
 				result.push( item )
+				if ( limit && result.length === limit ) {
+					return result
+				}
 			}
 
 			if ( !req.continue ) break
@@ -250,15 +253,16 @@ export class BaseWiki {
 		}
 	}
 
-	iterQuery( params: { list: 'allcategories' } & QueryRequests.AllCategories ): AsyncGenerator<QueryResponses.QueryItem.AllCategories, void, unknown>
-	iterQuery( params: { list: 'allimages' } & QueryRequests.AllImages ): AsyncGenerator<QueryResponses.QueryItem.AllImages, void, unknown>
-	iterQuery( params: { list: 'allpages' } & QueryRequests.AllPages ): AsyncGenerator<QueryResponses.QueryItem.AllPages, void, unknown>
-	iterQuery( params: { list: 'categorymembers' } & QueryRequests.CategoryMembers ): AsyncGenerator<QueryResponses.QueryItem.CategoryMembers, void, unknown>
-	iterQuery( params: { list: 'recentchanges' } & QueryRequests.RecentChanges ): AsyncGenerator<QueryResponses.QueryItem.RecentChanges, void, unknown>
-	iterQuery( params: { list: 'usercontribs' } & QueryRequests.UserContribs ): AsyncGenerator<QueryResponses.QueryItem.UserContribs, void, unknown>
-	iterQuery( params: { list: 'users' } & QueryRequests.Users ): AsyncGenerator<QueryResponses.QueryItem.Users, void, unknown>
-	iterQuery( params: { list: string } & QueryRequests.ApiQuery ): AsyncGenerator<QueryResponses.QueryItem.ApiQuery, void, unknown>
-	async *iterQuery( params: { list: string } & QueryRequests.ApiQuery ): AsyncGenerator<QueryResponses.QueryItem.ApiQuery, void, unknown> {
+	iterQuery( params: { list: 'allcategories' } & QueryRequests.AllCategories, limit?: number ): AsyncGenerator<QueryResponses.QueryItem.AllCategories, void, unknown>
+	iterQuery( params: { list: 'allimages' } & QueryRequests.AllImages, limit?: number ): AsyncGenerator<QueryResponses.QueryItem.AllImages, void, unknown>
+	iterQuery( params: { list: 'allpages' } & QueryRequests.AllPages, limit?: number ): AsyncGenerator<QueryResponses.QueryItem.AllPages, void, unknown>
+	iterQuery( params: { list: 'categorymembers' } & QueryRequests.CategoryMembers, limit?: number ): AsyncGenerator<QueryResponses.QueryItem.CategoryMembers, void, unknown>
+	iterQuery( params: { list: 'recentchanges' } & QueryRequests.RecentChanges, limit?: number ): AsyncGenerator<QueryResponses.QueryItem.RecentChanges, void, unknown>
+	iterQuery( params: { list: 'usercontribs' } & QueryRequests.UserContribs, limit?: number ): AsyncGenerator<QueryResponses.QueryItem.UserContribs, void, unknown>
+	iterQuery( params: { list: 'users' } & QueryRequests.Users, limit?: number ): AsyncGenerator<QueryResponses.QueryItem.Users, void, unknown>
+	iterQuery( params: { list: string } & QueryRequests.ApiQuery, limit?: number ): AsyncGenerator<QueryResponses.QueryItem.ApiQuery, void, unknown>
+	async *iterQuery( params: { list: string } & QueryRequests.ApiQuery, limit?: number ): AsyncGenerator<QueryResponses.QueryItem.ApiQuery, void, unknown> {
+		let counter = 0
 		// eslint-disable-next-line no-constant-condition
 		while ( true ) {
 			const req = await this.get<QueryResponses.ApiQuery<string, string, QueryResponses.QueryItem.ApiQuery>>( {
@@ -268,6 +272,10 @@ export class BaseWiki {
 
 			for ( const item of req.query[ params.list ] ) {
 				yield item
+				counter++
+				if ( limit && counter === limit ) {
+					return
+				}
 			}
 
 			if ( !req.continue ) break
