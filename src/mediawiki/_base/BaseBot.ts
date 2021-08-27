@@ -1,26 +1,13 @@
 import {
-	ArticleExistsError,
-	BadTokenError,
-	DisabledExtensionError,
-	FileExistsNoChangeError,
-	FileTypeMismatchError,
-	ImmobileNamespaceError,
-	LoginFailedError,
-	MissingTitleError,
-	NonFileNamespaceError,
-	PermissionDeniedError,
-	ProtectedPageError,
-	ProtectedTitleError,
-	SelfMoveError,
-	UnknownError
-} from '../../errors'
-import {
 	MWRequests,
 	MWResponses
 } from '../../types'
 import {
 	BaseWiki
 } from './BaseWiki'
+import {
+	ErrorManager
+} from '../../errors'
 import {
 	Logger
 } from '../../utils'
@@ -63,15 +50,8 @@ export class BaseBot<Wiki extends BaseWiki = BaseWiki> {
 		} )
 
 		if ( 'error' in req ) {
-			if ( req.error.code === 'badtoken' ) {
-				throw new BadTokenError()
-			} else if ( req.error.code === 'missingtitle' ) {
-				throw new MissingTitleError( title )
-			} else if ( req.error.code === 'permissiondenied' ) {
-				throw new PermissionDeniedError()
-			}
-
-			throw new UnknownError( req.error.code, req.error.info )
+			const error = ErrorManager.getError( req.error.code, req.error.info )
+			throw error
 		}
 
 		return req
@@ -88,7 +68,8 @@ export class BaseBot<Wiki extends BaseWiki = BaseWiki> {
 		} )
 
 		if ( 'error' in req ) {
-			throw new UnknownError( req.error.code, req.error.info )
+			const error = ErrorManager.getError( req.error.code, req.error.info )
+			throw error
 		}
 
 		return req
@@ -116,7 +97,8 @@ export class BaseBot<Wiki extends BaseWiki = BaseWiki> {
 		} )
 
 		if ( res.login.result !== 'Success' ) {
-			throw new LoginFailedError( this.#username )
+			const error = ErrorManager.getError( 'Failed', this.#username )
+			throw error
 		}
 
 		return res
@@ -131,24 +113,8 @@ export class BaseBot<Wiki extends BaseWiki = BaseWiki> {
 		} )
 
 		if ( 'error' in req ) {
-			if ( [ 'cantmove', 'cantmovefile' ].includes( req.error.code ) ) {
-				throw new PermissionDeniedError()
-			} else if ( req.error.code === 'selfmove' ) {
-				throw new SelfMoveError()
-			} else if ( req.error.code === 'immobilenamespace' ) {
-				throw new ImmobileNamespaceError()
-			} else if ( req.error.code === 'articleexists' ) {
-				throw new ArticleExistsError()
-			} else if ( req.error.code === 'protectedpage' ) {
-				throw new ProtectedPageError()
-			} else if ( req.error.code === 'protectedtitle' ) {
-				throw new ProtectedTitleError()
-			} else if ( req.error.code === 'nonfilenamespace' ) {
-				throw new NonFileNamespaceError()
-			} else if ( req.error.code === 'filetypemismatch' ) {
-				throw new FileTypeMismatchError()
-			}
-			throw new UnknownError( req.error.code, req.error.info )
+			const error = ErrorManager.getError( req.error.code, req.error.info )
+			throw error
 		}
 
 		return req
@@ -178,14 +144,8 @@ export class BaseBot<Wiki extends BaseWiki = BaseWiki> {
 		const req = await this.#wiki.post<MWResponses.Upload | MWResponses.ApiError>( params )
 
 		if ( 'error' in req ) {
-			if ( req.error.code === 'permissiondenied' ) {
-				throw new PermissionDeniedError()
-			} else if ( req.error.code === 'copyuploaddisabled' ) {
-				throw new DisabledExtensionError( 'Upload by URL' )
-			} else if ( req.error.code === 'fileexists-no-change' ) {
-				throw new FileExistsNoChangeError()
-			}
-			throw new UnknownError( req.error.code, req.error.info )
+			const error = ErrorManager.getError( req.error.code, req.error.info )
+			throw error
 		}
 
 		return req
