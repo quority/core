@@ -50,6 +50,16 @@ export namespace MWResponses {
 		}
 	}
 
+	export interface Move {
+		move: {
+			from: string
+			to: string
+			reason?: string
+			talkfrom?: string
+			talkto?: string
+		}
+	}
+
 	export interface Purge {
 		purge: ( {
 			ns: number

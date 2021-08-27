@@ -1,10 +1,17 @@
 import {
+	ArticleExistsError,
 	BadTokenError,
 	DisabledExtensionError,
 	FileExistsNoChangeError,
+	FileTypeMismatchError,
+	ImmobileNamespaceError,
 	LoginFailedError,
 	MissingTitleError,
+	NonFileNamespaceError,
 	PermissionDeniedError,
+	ProtectedPageError,
+	ProtectedTitleError,
+	SelfMoveError,
 	UnknownError
 } from '../../errors'
 import {
@@ -113,6 +120,38 @@ export class BaseBot<Wiki extends BaseWiki = BaseWiki> {
 		}
 
 		return res
+	}
+
+	async move( params: MWRequests.Move ): Promise<MWResponses.Move> {
+		const token = await this.getCSRFToken()
+		const req = await this.#wiki.post<MWResponses.Move | MWResponses.ApiError>( {
+			...params,
+			action: 'move',
+			token
+		} )
+
+		if ( 'error' in req ) {
+			if ( [ 'cantmove', 'cantmovefile' ].includes( req.error.code ) ) {
+				throw new PermissionDeniedError()
+			} else if ( req.error.code === 'selfmove' ) {
+				throw new SelfMoveError()
+			} else if ( req.error.code === 'immobilenamespace' ) {
+				throw new ImmobileNamespaceError()
+			} else if ( req.error.code === 'articleexists' ) {
+				throw new ArticleExistsError()
+			} else if ( req.error.code === 'protectedpage' ) {
+				throw new ProtectedPageError()
+			} else if ( req.error.code === 'protectedtitle' ) {
+				throw new ProtectedTitleError()
+			} else if ( req.error.code === 'nonfilenamespace' ) {
+				throw new NonFileNamespaceError()
+			} else if ( req.error.code === 'filetypemismatch' ) {
+				throw new FileTypeMismatchError()
+			}
+			throw new UnknownError( req.error.code, req.error.info )
+		}
+
+		return req
 	}
 
 	purge( titles: string[] ): Promise<Record<string, boolean>> {

@@ -27,6 +27,16 @@ export namespace MWRequests {
 
 	export type Edit = RequireOnlyOne<IEditRequest, 'pageid' | 'title'>
 
+	export type Move = {
+		from: string
+		to: string
+		reason?: string
+		movetalk?: boolean
+		movesubpages?: boolean
+		noredirect?: boolean
+		ignorewarnings?: boolean
+	}
+
 	export interface Login {
 		action: 'login'
 		lgname: string
