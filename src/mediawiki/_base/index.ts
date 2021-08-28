@@ -1,2 +1,2 @@
-export * from './BaseBot'
-export * from './BaseWiki'
+export * from './Bot'
+export * from './Wiki'

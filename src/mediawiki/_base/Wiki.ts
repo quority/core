@@ -7,7 +7,7 @@ import {
 } from '../../types'
 import fs from 'fs'
 
-export class BaseWiki {
+export class Wiki {
 	readonly api: string
 	readonly request: RequestManager
 

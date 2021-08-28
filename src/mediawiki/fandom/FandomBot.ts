@@ -1,11 +1,11 @@
 import {
-	BaseBot
+	Bot
 } from '../_base'
 import {
 	FandomWiki
 } from './FandomWiki'
 
-export class FandomBot extends BaseBot<FandomWiki> {
+export class FandomBot extends Bot<FandomWiki> {
 	#_wikis = new Set<string>()
 
 	constructor( {

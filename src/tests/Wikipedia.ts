@@ -2,7 +2,7 @@
 import 'dotenv/config'
 import 'mocha'
 import {
-	BaseBot, BaseWiki
+	Bot, Wiki
 } from '../main'
 import assert from 'assert'
 
@@ -10,10 +10,10 @@ describe( 'Wikipedia', () => {
 	const {
 		WIKIPEDIA_API, WIKIPEDIA_PASSWORD, WIKIPEDIA_USERNAME
 	} = process.env as Record<string, string>
-	const wiki = new BaseWiki( {
+	const wiki = new Wiki( {
 		api: WIKIPEDIA_API
 	} )
-	const bot = new BaseBot( {
+	const bot = new Bot( {
 		password: WIKIPEDIA_PASSWORD,
 		username: WIKIPEDIA_USERNAME,
 		wiki

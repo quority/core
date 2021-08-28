@@ -3,8 +3,8 @@ import {
 	MWResponses
 } from '../../types'
 import {
-	BaseWiki
-} from './BaseWiki'
+	Wiki
+} from './Wiki'
 import {
 	ErrorManager
 } from '../../errors'
@@ -15,25 +15,25 @@ import fetch from 'node-fetch'
 import fs from 'fs-extra'
 import path from 'path'
 
-export class BaseBot<Wiki extends BaseWiki = BaseWiki> {
+export class Bot<WikiType extends Wiki = Wiki> {
 	readonly #password: string
 	readonly #username: string
-	#wiki: Wiki
+	#wiki: WikiType
 
 	#csrf?: string
 
 	constructor( {
 		password, username, wiki
-	}: { password: string, username: string, wiki: Wiki } ) {
+	}: { password: string, username: string, wiki: WikiType } ) {
 		this.#password = password.trim()
 		this.#username = username.trim()
 		this.#wiki = wiki
 	}
 
-	protected get wiki(): Wiki {
+	protected get wiki(): WikiType {
 		return this.#wiki
 	}
-	protected set wiki( wiki: Wiki ) {
+	protected set wiki( wiki: WikiType ) {
 		this.#wiki = wiki
 	}
 

@@ -2,13 +2,13 @@ import {
 	Logger, RequestManager
 } from '../../utils'
 import {
-	BaseWiki
+	Wiki
 } from '../_base'
 import {
 	Fandom
 } from './Fandom'
 
-export class FandomWiki extends BaseWiki {
+export class FandomWiki extends Wiki {
 	readonly interwiki: string
 
 	constructor( {
