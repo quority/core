@@ -3,14 +3,14 @@ import {
 	MWResponses
 } from '../../types'
 import {
-	Wiki
-} from './Wiki'
-import {
 	ErrorManager
 } from '../../errors'
 import {
 	Logger
 } from '../../utils'
+import {
+	Wiki
+} from './Wiki'
 import fetch from 'node-fetch'
 import fs from 'fs-extra'
 import path from 'path'
