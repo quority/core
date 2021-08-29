@@ -3,13 +3,28 @@ import {
 	RequestManager
 } from '../../utils'
 import {
-	MWResponses, QueryRequests, QueryResponses, TokenType
+	MWResponses, QueryRequests, QueryResponses, SiteInfo, TokenType
 } from '../../types'
 import fs from 'fs'
+
+export type Loaded<T extends Wiki = Wiki> = Required<T>
 
 export class Wiki {
 	readonly api: string
 	readonly request: RequestManager
+
+	mainpage?: string
+	base?: string
+	sitename?: string
+	lang?: string
+	readonly?: boolean
+	writeapi?: boolean
+	articlepath?: string
+	scriptpath?: string
+	script?: string
+	server?: string
+	servername?: string
+	wikiid?: string
 
 	constructor( {
 		api, disableLogger = true, request
@@ -104,6 +119,14 @@ export class Wiki {
 		return result
 	}
 
+	getSiteInfo<T extends SiteInfo.WikiLoadable>( ...properties: T[] ): Promise<SiteInfo.SiteInfo<SiteInfo.SiteInfoQuery, T>> {
+		return this.get( {
+			action: 'query',
+			meta: 'siteinfo',
+			siprop: properties.join( '|' )
+		} )
+	}
+
 	async getPages( _titles: string ): Promise<MWResponses.RevisionsItem>
 	async getPages( _titles: string[] ): Promise<MWResponses.RevisionsItem[]>
 	async getPages( _titles: string | string[] ): Promise<MWResponses.RevisionsItem | MWResponses.RevisionsItem[]> {
@@ -132,14 +155,6 @@ export class Wiki {
 		return Array.isArray( _titles ) ? pages : pages[ 0 ]
 	}
 
-	getSiteinfo(): Promise<MWResponses.SiteInfo> {
-		return this.get<MWResponses.SiteInfo>( {
-			action: 'query',
-			meta: 'siteinfo',
-			siprop: 'general|namespaces|variables'
-		} )
-	}
-
 	async getToken<Token extends TokenType>( type: Token ): Promise<MWResponses.Tokens<Token>> {
 		const req = await this.get<MWResponses.Tokens<Token>>( {
 			action: 'query',
@@ -148,6 +163,25 @@ export class Wiki {
 		} )
 
 		return req
+	}
+
+	async load(): Promise<Loaded<this>> {
+		const siteinfo = await this.getSiteInfo( 'general' )
+
+		this.mainpage = siteinfo.query.general.mainpage
+		this.base = siteinfo.query.general.base
+		this.sitename = siteinfo.query.general.sitename
+		this.lang = siteinfo.query.general.lang
+		this.readonly = siteinfo.query.general.readonly
+		this.writeapi = siteinfo.query.general.writeapi
+		this.articlepath = siteinfo.query.general.articlepath
+		this.scriptpath = siteinfo.query.general.scriptpath
+		this.script = siteinfo.query.general.script
+		this.server = siteinfo.query.general.server
+		this.servername = siteinfo.query.general.servername
+		this.wikiid = siteinfo.query.general.wikiid
+
+		return this as Loaded<this>
 	}
 
 	async pagesExist( _titles: string ): Promise<Record<string, boolean>>
