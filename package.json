@@ -37,7 +37,7 @@
   "dependencies": {
     "form-data": "^4.0.0",
     "fs-extra": "^10.0.0",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.0.0",
     "signale": "^1.4.0",
     "tough-cookie": "^4.0.0"
   },
