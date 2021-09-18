@@ -1,5 +1,5 @@
 import {
-	Logger,
+	ICookieStoreOptions,
 	RequestManager
 } from '../../utils'
 import {
@@ -16,13 +16,21 @@ export class Fandom {
 	readonly request: RequestManager
 
 	constructor( {
-		disableLogger = true
-	}: { disableLogger?: boolean } = {
+		cookies,
+		prettyCookies
+	}: { cookies?: string, prettyCookies?: boolean } = {
 	} ) {
-		this.request = new RequestManager()
-		if ( disableLogger ) {
-			Logger.disable()
-		}
+		const store: ICookieStoreOptions | undefined = cookies
+			? {
+				path: cookies, regex: [ /^wikicities_/, /^wikia_/ ]
+			}
+			: undefined
+		this.request = new RequestManager( {
+			jarOptions: {
+				prettify: prettyCookies,
+				store
+			}
+		} )
 	}
 
 	static interwiki2path( _interwiki: string ): string {
