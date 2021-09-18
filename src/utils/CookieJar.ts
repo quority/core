@@ -42,9 +42,7 @@ export class CookieJar {
 	}
 
 	clear( url: string ): void {
-		const {
-			host
-		} = new URL( url )
+		const host = this.getHost( url )
 		if ( !this.#storage[ host ] ) return
 		delete this.#storage[ host ]
 	}
@@ -55,9 +53,7 @@ export class CookieJar {
 	}
 
 	get( url: string ): string {
-		const {
-			host
-		} = new URL( url )
+		const host = this.getHost( url )
 		if ( !this.#storage[ host ] ) return ''
 		return this.#storage[ host ].join( ';' )
 	}
@@ -69,9 +65,7 @@ export class CookieJar {
 
 		if ( !toughcookie || !this.allowCookie( toughcookie ) ) return
 
-		const {
-			host
-		} = new URL( url )
+		const host = this.getHost( url )
 		if ( !this.#storage[ host ] ) this.#storage[ host ] = []
 		this.#storage[ host ].push( toughcookie )
 
@@ -83,6 +77,16 @@ export class CookieJar {
 		const regexes = Array.isArray( this.#store.regex ) ? this.#store.regex : [ this.#store.regex ]
 		const match = regexes.find( regex => cookie.key.match( regex ) )
 		return match !== undefined
+	}
+
+	private getHost( url: string ): string {
+		const { host, pathname } = new URL( url )
+		const lang = pathname.match( /\/([a-z-]+)\// )?.[1]
+
+		if ( lang ) {
+			return `${host}/${lang}`
+		}
+		return host
 	}
 
 	private save(): void {
