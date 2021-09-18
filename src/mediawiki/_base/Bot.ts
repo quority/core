@@ -93,6 +93,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 	}
 
 	async login(): Promise<MWResponses.Login> {
+		this.#wiki.request.clear( this.#wiki.api )
 		Logger.account( `Logging in into account "${ this.#username }" for "${ this.#wiki.api }".` )
 
 		const tokenreq = await this.#wiki.getToken( 'login' )
