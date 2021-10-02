@@ -80,11 +80,13 @@ export class CookieJar {
 	}
 
 	private getHost( url: string ): string {
-		const { host, pathname } = new URL( url )
+		const {
+			host, pathname
+		} = new URL( url )
 		const lang = pathname.match( /\/([a-z-]+)\// )?.[1]
 
 		if ( lang ) {
-			return `${host}/${lang}`
+			return `${ host }/${ lang }`
 		}
 		return host
 	}

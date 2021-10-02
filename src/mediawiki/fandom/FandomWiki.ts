@@ -7,20 +7,6 @@ import {
 import {
 	Fandom
 } from './Fandom'
-import {
-	SiteInfo
-} from '../../types'
-
-type FandomWikiLoadable = SiteInfo.WikiLoadable | 'variables'
-interface FandomSiteInfoQuery extends SiteInfo.SiteInfoQuery {
-	variables: ( {
-		id: 'wgLanguageCode'
-		'*': string
-	} | {
-		id: 'wgCityId'
-		'*': number
-	} )[]
-}
 
 export class FandomWiki extends Wiki {
 	readonly interwiki: string
@@ -37,14 +23,6 @@ export class FandomWiki extends Wiki {
 		Logger.community( `Initializing wiki "${ interwiki }".` )
 
 		this.interwiki = interwiki
-	}
-
-	async getSiteInfo<T extends FandomWikiLoadable>( ...properties: T[] ): Promise<SiteInfo.SiteInfo<FandomSiteInfoQuery, T>> {
-		return this.get( {
-			action: 'query',
-			meta: 'siteinfo',
-			siprop: properties.join( '|' )
-		} )
 	}
 
 	async load(): Promise<Loaded<this>> {

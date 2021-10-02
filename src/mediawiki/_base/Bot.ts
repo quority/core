@@ -1,6 +1,7 @@
 import {
-	MWRequests,
-	MWResponses
+	MediaWikiRequest,
+	MediaWikiResponse,
+	ReducedRequest
 } from '../../types'
 import {
 	ErrorManager
@@ -37,24 +38,21 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		this.#wiki = wiki
 	}
 
-	async block( params: MWRequests.Block ): Promise<MWResponses.Block> {
+	async block( params: ReducedRequest<MediaWikiRequest.Block> ): Promise<MediaWikiResponse.Block> {
 		const token = await this.getCSRFToken()
-		return this.wiki.post( {
+		return this.wiki.post<MediaWikiResponse.Block, MediaWikiRequest.Block>( {
 			...params,
 			action: 'block',
 			token
 		} )
 	}
 
-	async delete( {
-		title, reason = ''
-	}: { title: string, reason?: string } ): Promise<MWResponses.Delete> {
+	async delete( params: ReducedRequest<MediaWikiRequest.Delete> ): Promise<MediaWikiResponse.Delete> {
 		const token = await this.getCSRFToken()
 
-		const req = await this.#wiki.post<MWResponses.Delete | MWResponses.ApiError>( {
+		const req = await this.#wiki.post<MediaWikiResponse.Delete | MediaWikiResponse.ApiError>( {
+			...params,
 			action: 'delete',
-			reason,
-			title,
 			token
 		} )
 
@@ -66,10 +64,10 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		return req
 	}
 
-	async edit( params: MWRequests.Edit ): Promise<MWResponses.Edit> {
+	async edit( params: ReducedRequest<MediaWikiRequest.Edit> ): Promise<MediaWikiResponse.Edit> {
 		const token = await this.getCSRFToken()
 
-		const req = await this.#wiki.post<MWResponses.Edit | MWResponses.ApiError>( {
+		const req = await this.#wiki.post<MediaWikiResponse.Edit | MediaWikiResponse.ApiError>( {
 			...params,
 			action: 'edit',
 			assert: params.bot ? 'bot' : 'user',
@@ -92,14 +90,14 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		return this.#csrf as string
 	}
 
-	async login(): Promise<MWResponses.Login> {
+	async login(): Promise<MediaWikiResponse.Login> {
 		this.#wiki.request.clear( this.#wiki.api )
 		Logger.account( `Logging in into account "${ this.#username }" for "${ this.#wiki.api }".` )
 
 		const tokenreq = await this.#wiki.getToken( 'login' )
 		const lgtoken = tokenreq.query.tokens.logintoken
 
-		const res = await this.#wiki.post<MWResponses.Login>( {
+		const res = await this.#wiki.post<MediaWikiResponse.Login, MediaWikiRequest.Login>( {
 			action: 'login',
 			lgname: this.#username,
 			lgpassword: this.#password,
@@ -114,9 +112,9 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		return res
 	}
 
-	async move( params: MWRequests.Move ): Promise<MWResponses.Move> {
+	async move( params: ReducedRequest<MediaWikiRequest.Move> ): Promise<MediaWikiResponse.Move> {
 		const token = await this.getCSRFToken()
-		const req = await this.#wiki.post<MWResponses.Move | MWResponses.ApiError>( {
+		const req = await this.#wiki.post<MediaWikiResponse.Move | MediaWikiResponse.ApiError>( {
 			...params,
 			action: 'move',
 			token
@@ -130,7 +128,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		return req
 	}
 
-	async protect( params: MWRequests.Protect ): Promise<MWResponses.Protect> {
+	async protect( params: ReducedRequest<MediaWikiRequest.Protect> ): Promise<MediaWikiResponse.Protect> {
 		const token = await this.getCSRFToken()
 
 		return this.wiki.post( {
@@ -148,7 +146,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		return this.wiki.purge( titles )
 	}
 
-	async unblock( params: { user: string, reason?: string } ): Promise<MWResponses.Block> {
+	async unblock( params: ReducedRequest<MediaWikiRequest.Block> ): Promise<MediaWikiResponse.Block> {
 		const token = await this.getCSRFToken()
 		return this.wiki.post( {
 			...params,
@@ -157,20 +155,14 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		} )
 	}
 
-	async upload( {
-		file = undefined, filename, url = undefined
-	}: { filename: string } & ( { file: fs.ReadStream, url?: undefined } | { file?: undefined, url: string } ) ): Promise<MWResponses.Upload> {
+	async upload( params: ReducedRequest<MediaWikiRequest.Upload> ): Promise<MediaWikiResponse.Upload> {
 		const token = await this.getCSRFToken()
-		const params = {
-			action: 'upload',
-			file,
-			filename,
-			ignorewarnings: 1,
-			token,
-			url
-		}
 
-		const req = await this.#wiki.post<MWResponses.Upload | MWResponses.ApiError>( params )
+		const req = await this.#wiki.post<MediaWikiResponse.Upload | MediaWikiResponse.ApiError>( {
+			...params,
+			action: 'upload',
+			token
+		} )
 
 		if ( 'error' in req ) {
 			const error = ErrorManager.getError( req.error.code, req.error.info )
@@ -178,15 +170,6 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		}
 
 		return req
-	}
-
-	async uploadByUrl( {
-		filename, url
-	}: { filename: string, url: string } ): Promise<MWResponses.Upload> {
-		return this.upload( {
-			filename,
-			url
-		} )
 	}
 
 	/**
@@ -198,7 +181,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 	 */
 	async uploadFromUrl( {
 		filename, url
-	}: { filename: string, url: string } ): Promise<MWResponses.Upload | undefined> {
+	}: { filename: string, url: string } ): Promise<MediaWikiResponse.Upload | undefined> {
 		const image = await fetch( url )
 		if ( !image.ok ) return
 
