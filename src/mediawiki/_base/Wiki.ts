@@ -188,6 +188,12 @@ export class Wiki {
 		return req
 	}
 
+	getURL( title: string ): string {
+		const base = new URL( this.api ).origin
+		const articlepath = new URL( this.articlepath ?? '/wiki/$1', base ).href
+		return articlepath.replace( '$1', encodeURI( title ) )
+	}
+
 	async load(): Promise<Loaded<this>> {
 		const siteinfo = await this.getSiteInfo( 'general' )
 
