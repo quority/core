@@ -90,7 +90,16 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		return this.#csrf as string
 	}
 
-	async login(): Promise<MediaWikiResponse.Login> {
+	async isLoggedIn(): Promise<boolean> {
+		const whoami = await this.whoAmI()
+		return whoami.query.userinfo.id !== 0
+	}
+
+	async login( force = false ): Promise<void> {
+		if ( !force ) {
+			const isLoggedIn = await this.isLoggedIn()
+			if ( isLoggedIn ) return
+		}
 		this.#wiki.request.clear( this.#wiki.api )
 		Logger.account( `Logging in into account "${ this.#username }" for "${ this.#wiki.api }".` )
 
@@ -108,8 +117,6 @@ export class Bot<WikiType extends Wiki = Wiki> {
 			const error = ErrorManager.getError( 'Failed', this.#username )
 			throw error
 		}
-
-		return res
 	}
 
 	async move( params: ReducedRequest<MediaWikiRequest.Move> ): Promise<MediaWikiResponse.Move> {
