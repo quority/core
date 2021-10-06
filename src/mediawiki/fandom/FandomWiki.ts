@@ -25,6 +25,11 @@ export class FandomWiki extends Wiki {
 		this.interwiki = interwiki
 	}
 
+	override getURL( title: string ): string {
+		const base = this.api.replace( '/api.php', '/wiki/' )
+		return new URL( title, base ).href
+	}
+
 	async load(): Promise<Loaded<this>> {
 		const siteinfo = await this.getSiteInfo( 'general', 'variables' )
 
