@@ -188,6 +188,48 @@ export class Wiki {
 		return req
 	}
 
+	async getTransclusions( title: string ): Promise<string[]> {
+		const result: string[] = []
+
+		const params: Record<string, string | number> = {
+			action: 'query',
+			prop: 'transcludedin',
+			tilimit: 'max',
+			tinamespace: '0',
+			tiprop: 'title',
+			tishow: '!redirect',
+			titles: title
+		}
+
+		// eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
+		while ( true ) {
+			const req = await this.get< {
+				continue?: {
+					ticontinue: string
+				}
+				query: {
+					pages: Array<{
+						transcludedin: Array<{
+							ns: number
+							title: string
+						}>
+					}>
+				}
+			} >( params )
+
+			for ( const item of req.query.pages[ 0 ].transcludedin ) {
+				if ( item.ns !== 0 ) continue
+				result.push( item.title )
+			}
+
+			if ( !req.continue ) break
+
+			params.ticontinue = req.continue.ticontinue
+		}
+
+		return result
+	}
+
 	getURL( title: string ): string {
 		const base = new URL( this.api ).origin
 		const articlepath = new URL( this.articlepath ?? '/wiki/$1', base ).href
