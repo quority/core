@@ -163,7 +163,7 @@ export class Wiki {
 				prop: 'revisions',
 				rvprop: 'content',
 				rvslots: 'main',
-				titles: titles.splice( 0, 25 ).join( '|' )
+				titles: titles.splice( 0, 50 ).join( '|' )
 			} )
 
 			for ( const page of res.query.pages ) {
@@ -269,7 +269,7 @@ export class Wiki {
 				prop: 'revisions',
 				rvprop: 'content',
 				rvslots: 'main',
-				titles: titles.splice( 0, 25 ).join( '|' )
+				titles: titles.splice( 0, 50 ).join( '|' )
 			} )
 
 			for ( const page of res.query.pages ) {
@@ -345,7 +345,7 @@ export class Wiki {
 				prop: 'revisions',
 				rvprop: 'content',
 				rvslots: 'main',
-				titles: titles.splice( 0, 25 ).join( '|' )
+				titles: titles.splice( 0, 50 ).join( '|' )
 			} )
 
 			for ( const page of res.query.pages ) {
@@ -415,7 +415,7 @@ export class Wiki {
 			}>( {
 				action: 'query',
 				prop: 'linkshere',
-				titles: titles.splice( 0, 25 ).join( '|' )
+				titles: titles.splice( 0, 50 ).join( '|' )
 			} )
 
 			for ( const page of res.query.pages ) {
