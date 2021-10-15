@@ -13,7 +13,11 @@ export interface ICookieStoreOptions {
 }
 
 export interface ICookieStorage {
-	[ url: string ]: tough.Cookie[]
+	[ url: string ]: Map<string, tough.Cookie>
+}
+
+export interface ICookieStorageJSON {
+	[ url: string ]: Record<string, unknown>[]
 }
 
 export class CookieJar {
@@ -31,14 +35,18 @@ export class CookieJar {
 		this.#store = store
 
 		if ( !this.#store || !fs.existsSync( this.#store.path ) ) return
-		this.#storage = fs.readJsonSync( this.#store.path )
+		const jsonCookies: ICookieStorageJSON = fs.readJsonSync( this.#store.path )
 
-		for ( const host in this.#storage ) {
-			this.#storage[ host ] = this.#storage[ host ]
-				.map( cookie => tough.Cookie.fromJSON( cookie ) )
-				.filter( ( cookie ): cookie is tough.Cookie => cookie !== null )
-				.filter( cookie => Date.now() < cookie.expiryTime() )
+		for ( const host in jsonCookies ) {
+			this.#storage[ host ] = new Map()
+			for ( const cookiedata of jsonCookies[ host ] ) {
+				const cookie = tough.Cookie.fromJSON( cookiedata )
+				if ( !cookie ) continue
+				if ( cookie.expiryTime() < Date.now() ) continue
+				this.#storage[ host ].set( cookie.key, cookie )
+			}
 		}
+		this.expire()
 	}
 
 	clear( url: string ): void {
@@ -52,10 +60,32 @@ export class CookieJar {
 		}
 	}
 
+	expire( url?: string ): void {
+		const hosts = url ?? Object.keys( this.#storage )
+		for ( const host of hosts ) {
+			const collection = this.#storage[ host ]
+			for ( const [ key, cookie ] of collection ) {
+				let shouldDelete = false
+				const isMaxAged = cookie.creation
+					&& typeof cookie.maxAge === 'number'
+					&& cookie.creation.getTime() + cookie.maxAge * 1000 < Date.now()
+				if ( isMaxAged ) shouldDelete = false
+				if ( typeof cookie.maxAge === 'string' ) shouldDelete = true
+
+				const isExpired = cookie.expires instanceof Date
+					&& cookie.expires.getTime() < Date.now()
+				if ( isExpired ) shouldDelete = false
+
+				if ( shouldDelete ) collection.delete( key )
+			}
+		}
+	}
+
 	get( url: string ): string {
 		const host = CookieJar.getHost( url )
+		this.expire( host )
 		if ( !this.#storage[ host ] ) return ''
-		return this.#storage[ host ].join( ';' )
+		return [ ...this.#storage[ host ].values() ].join( ';' )
 	}
 
 	set( {
@@ -66,8 +96,8 @@ export class CookieJar {
 		if ( !toughcookie || !this.allowCookie( toughcookie ) ) return
 
 		const host = CookieJar.getHost( url )
-		if ( !this.#storage[ host ] ) this.#storage[ host ] = []
-		this.#storage[ host ].push( toughcookie )
+		if ( !this.#storage[ host ] ) this.#storage[ host ] = new Map()
+		this.#storage[ host ].set( toughcookie.key, toughcookie )
 
 		this.save()
 	}
@@ -95,7 +125,17 @@ export class CookieJar {
 		if ( !this.#store ) return
 
 		fs.ensureFileSync( this.#store.path )
-		fs.writeJSONSync( this.#store.path, this.#storage, {
+		const jsonCookies: ICookieStorageJSON = {
+		}
+		for ( const host in this.#storage ) {
+			jsonCookies[ host ] = []
+			const cookies = this.#storage[ host ]
+			for ( const cookie of cookies.values() ) {
+				jsonCookies[ host ].push( cookie.toJSON() )
+			}
+		}
+
+		fs.writeJSONSync( this.#store.path, jsonCookies, {
 			spaces: this.#prettify ? '\t' : undefined
 		} )
 	}
