@@ -64,6 +64,7 @@ export class CookieJar {
 		const hosts = url ?? Object.keys( this.#storage )
 		for ( const host of hosts ) {
 			const collection = this.#storage[ host ]
+			if ( !collection ) continue
 			for ( const [ key, cookie ] of collection ) {
 				let shouldDelete = false
 				const isMaxAged = cookie.creation
