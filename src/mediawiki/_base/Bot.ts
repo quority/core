@@ -119,6 +119,14 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		}
 	}
 
+	async logout(): Promise<void> {
+		await this.#wiki.post( {
+			action: 'logout',
+			token: await this.getCSRFToken()
+		} )
+		this.#wiki.request.clear( this.#wiki.api )
+	}
+
 	async move( params: ReducedRequest<MediaWikiRequest.Move> ): Promise<MediaWikiResponse.Move> {
 		const token = await this.getCSRFToken()
 		const req = await this.#wiki.post<MediaWikiResponse.Move | MediaWikiResponse.ApiError>( {
