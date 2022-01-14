@@ -1,8 +1,9 @@
-import {
+import type fs from 'fs'
+import type {
 	RequireOnlyOne
 } from './utils'
-import fs from 'fs'
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace MediaWikiRequest {
 	/**
 	 * Options to block an user.

@@ -3,9 +3,9 @@ import {
 } from './ApiError'
 
 export class BadTokenError extends ApiError {
-	static override readonly code = 'badtoken'
+	public static override readonly code = 'badtoken'
 
-	constructor( ) {
+	public constructor( ) {
 		super( 'Invalid CSRF token.' )
 	}
 }

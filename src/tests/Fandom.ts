@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import 'dotenv/config'
 import 'mocha'
-import {
-	Fandom, FandomBot
-} from '../main'
 import assert from 'assert'
+import {
+	Fandom
+} from '../main'
+import type { FandomBot
+} from '../main'
 
 const now = Date.now()
 
@@ -65,7 +67,7 @@ describe( 'Fandom', () => {
 			id = await bot.whoAmI().then( res => res.query.userinfo.id )
 			assert.notStrictEqual( id, 0 )
 
-			await bot.setWiki( wikis['genshin-impact'] )
+			await bot.setWiki( wikis[ 'genshin-impact' ] )
 			id = await bot.whoAmI().then( res => res.query.userinfo.id )
 			assert.notStrictEqual( id, 0 )
 

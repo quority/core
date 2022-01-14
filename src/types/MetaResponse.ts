@@ -1,7 +1,8 @@
-import {
+import type {
 	TokenType
 } from './utils'
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace MediaWikiMetaResponse {
 	export interface MetaResponse {
 		batchcomplete?: ''
@@ -9,32 +10,32 @@ export namespace MediaWikiMetaResponse {
 
 	export interface AllMessages extends MetaResponse {
 		query: {
-			allmessages: {
+			allmessages: Array<{
 				name: string
 				normalizedname: string
 				'*': string
-			}[]
+			}>
 		}
 	}
 
 	export interface FileRepoInfo extends MetaResponse {
 		query: {
-			repos: {
+			repos: Array<{
 				displayname: string
 				name: string
 				url: string
-			}[]
+			}>
 		}
 	}
 
 	export interface SiteInfo extends MetaResponse {
 		query: {
-			dbrepllag: {
+			dbrepllag: Array<{
 				host: string
 				lag: number
-			}[]
+			}>
 			defaultoptions: Record<string, unknown>
-			extensions: {
+			extensions: Array<{
 				author: string
 				descriptionmsg: string
 				license: string
@@ -43,11 +44,11 @@ export namespace MediaWikiMetaResponse {
 				type: string
 				url: string
 				version: string
-			}[]
+			}>
 			extensiontags: string[]
-			fileextensions: {
+			fileextensions: Array<{
 				ext: string
-			}[]
+			}>
 			functionhooks: string[]
 			general: {
 				allunicodefixes: boolean
@@ -84,7 +85,7 @@ export namespace MediaWikiMetaResponse {
 				wikiid: string
 				writeapi: boolean
 			}
-			interwikimap: ( {
+			interwikimap: Array<{
 				api?: string
 				local?: boolean
 				prefix: string
@@ -95,34 +96,34 @@ export namespace MediaWikiMetaResponse {
 				local: true
 				prefix: string
 				url: string
-			} )[]
-			languages: {
+			}>
+			languages: Array<{
 				bcp47: string
 				code: string
 				name: string
-			}[]
+			}>
 			languagevariants: Record<string, unknown>
-			libraries: {
+			libraries: Array<{
 				name: string
 				version: unknown
-			}[]
-			magicwords: {
+			}>
+			magicwords: Array<{
 				aliases: string[]
 				'case-sensitive': boolean
 				name: string
-			}[]
-			namespaces: {
+			}>
+			namespaces: Array<{
 				canonical?: string
 				content: boolean
 				id: number
 				name: string
 				noincludable: boolean
 				subpages: boolean
-			}[]
-			namespacealiases: {
+			}>
+			namespacealiases: Array<{
 				alias: string
 				id: number
-			}[]
+			}>
 			protocols: string[]
 			rightsinfo: {
 				text: string
@@ -134,20 +135,20 @@ export namespace MediaWikiMetaResponse {
 				semiprotectedlevels: string[]
 				types: string[]
 			}
-			showhooks: {
+			showhooks: Array<{
 				name: string
 				subscribers: string[]
-			}[]
-			skins: {
+			}>
+			skins: Array<{
 				code: string
 				default?: boolean
 				name: string
 				unusable?: boolean
-			}[]
-			specialpagealiases: {
+			}>
+			specialpagealiases: Array<{
 				aliases: string[]
 				realname: string
-			}[]
+			}>
 			statistics: {
 				activeusers: number
 				admins: number
@@ -180,14 +181,14 @@ export namespace MediaWikiMetaResponse {
 					local: string
 				}
 			}
-			usergroups: {
+			usergroups: Array<{
 				name: string
 				rights: string[]
-			}[]
-			variables: {
+			}>
+			variables: Array<{
 				id: string
 				'*': unknown
-			}[]
+			}>
 		}
 	}
 

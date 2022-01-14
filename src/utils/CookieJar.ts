@@ -17,7 +17,7 @@ export interface ICookieStorage {
 }
 
 export interface ICookieStorageJSON {
-	[ url: string ]: Record<string, unknown>[]
+	[ url: string ]: Array<Record<string, unknown>>
 }
 
 export class CookieJar {
@@ -25,7 +25,7 @@ export class CookieJar {
 	#store?: ICookieStoreOptions
 	#prettify: boolean
 
-	constructor( {
+	public constructor( {
 		prettify, store
 	}: { prettify?: boolean, store?: ICookieStoreOptions | undefined } = {
 	} ) {
@@ -35,7 +35,7 @@ export class CookieJar {
 		if ( store ) this.#store = store
 
 		if ( !this.#store || !fs.existsSync( this.#store.path ) ) return
-		const jsonCookies: ICookieStorageJSON = fs.readJsonSync( this.#store.path )
+		const jsonCookies = fs.readJsonSync( this.#store.path ) as ICookieStorageJSON
 
 		for ( const host in jsonCookies ) {
 			this.#storage[ host ] = new Map()
@@ -51,23 +51,25 @@ export class CookieJar {
 		this.expire()
 	}
 
-	clear( url: string ): void {
+	public clear( url: string ): void {
 		const host = CookieJar.getHost( url )
 		if ( !this.#storage[ host ] ) return
-		delete this.#storage[ host ]
+		this.#storage[ host ]?.clear()
 	}
 
-	clearAll(): void {
+	public clearAll(): void {
 		this.#storage = {
 		}
 	}
 
-	expire( url?: string ): void {
+	public expire( url?: string ): void {
 		const hosts = url ?? Object.keys( this.#storage )
 		for ( const host of hosts ) {
 			const collection = this.#storage[ host ]
 			if ( !collection ) continue
-			for ( const [ key, cookie ] of collection ) {
+			for ( const [
+				key, cookie
+			] of collection ) {
 				let shouldDelete = false
 				const isMaxAged = cookie.creation
 					&& typeof cookie.maxAge === 'number'
@@ -84,7 +86,7 @@ export class CookieJar {
 		}
 	}
 
-	get( url: string ): string {
+	public get( url: string ): string {
 		const host = CookieJar.getHost( url )
 		this.expire( host )
 		const storage = this.#storage[ host ]
@@ -92,7 +94,7 @@ export class CookieJar {
 		return [ ...storage.values() ].join( ';' )
 	}
 
-	set( {
+	public set( {
 		cookie, url
 	}: { cookie: string, url: string } ): void {
 		const toughcookie = tough.parse( cookie )
@@ -117,7 +119,7 @@ export class CookieJar {
 		const {
 			host, pathname
 		} = new URL( url )
-		const lang = pathname.match( /\/([a-z-]+)\// )?.[1]
+		const lang = pathname.match( /\/([a-z-]+)\// )?.[ 1 ]
 
 		if ( lang ) {
 			return `${ host }/${ lang }`

@@ -3,9 +3,9 @@ import {
 } from './ApiError'
 
 export class PermissionDeniedError extends ApiError {
-	static override readonly code = 'permissiondenied'
+	public static override readonly code = 'permissiondenied'
 
-	constructor() {
+	public constructor() {
 		super( 'The action you have requested is limited and you don\'t have enough rights.' )
 	}
 }

@@ -3,9 +3,9 @@ import {
 } from './ApiError'
 
 export class ArticleExistsError extends ApiError {
-	static override readonly code = 'articleexists'
+	public static override readonly code = 'articleexists'
 
-	constructor() {
+	public constructor() {
 		super( 'The destination article already exists and is not a redirect to the source article.' )
 	}
 }

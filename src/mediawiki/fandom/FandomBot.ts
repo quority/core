@@ -1,14 +1,14 @@
 import {
 	Bot
 } from '../_base'
-import {
+import type {
 	FandomWiki
 } from './FandomWiki'
 
 export class FandomBot extends Bot<FandomWiki> {
 	#_wikis = new Set<string>()
 
-	constructor( {
+	public constructor( {
 		password, username, wiki
 	}: { password: string, username: string, wiki: FandomWiki } ) {
 		super( {
@@ -19,7 +19,7 @@ export class FandomBot extends Bot<FandomWiki> {
 		this.#_wikis.add( wiki.interwiki )
 	}
 
-	async setWiki( wiki: FandomWiki ): Promise<void> {
+	public async setWiki( wiki: FandomWiki ): Promise<void> {
 		this.wiki = wiki
 
 		if ( !this.#_wikis.has( wiki.interwiki ) ) {

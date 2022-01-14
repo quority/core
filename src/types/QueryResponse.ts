@@ -1,7 +1,8 @@
-import {
+import type {
 	MediaWikiQueryItem
 } from './QueryItem'
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace MediaWikiQueryResponses {
 	export interface QueryResponse<Shortname extends string, Name extends string, Item extends MediaWikiQueryItem.QueryItem> {
 		batchcomplete?: boolean

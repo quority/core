@@ -3,9 +3,9 @@ import {
 } from './ApiError'
 
 export class NonFileNamespaceError extends ApiError {
-	static override readonly code = 'nonfilenamespace'
+	public static override readonly code = 'nonfilenamespace'
 
-	constructor() {
+	public constructor() {
 		super( 'Cannot move file to non-file namespace.' )
 	}
 }

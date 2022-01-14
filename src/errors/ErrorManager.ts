@@ -6,13 +6,12 @@ type ApiError = ConstructorOf<typeof errors.ApiError>
 
 export class ErrorManager {
 	private static errors = Object.entries( errors )
-		.reduce( ( errors, [ _, error ] ) => {
+		.reduce( ( errors, [
+			_, error
+		] ) => {
 			const {
 				code
 			} = error
-			if ( code === undefined ) {
-				return errors
-			}
 			if ( Array.isArray( code ) ) {
 				for ( const c of code ) {
 					errors[ c ] = error
@@ -24,7 +23,7 @@ export class ErrorManager {
 		}, {
 		} as Record<string, ApiError> )
 
-	static getError( code: string, ...args: unknown[] ): errors.ApiError {
+	public static getError( code: string, ...args: unknown[] ): errors.ApiError {
 		const error = ErrorManager.errors[ code ] ?? ErrorManager.errors.unknown
 		// @ts-expect-error - typings issue
 		return new error( ...args )

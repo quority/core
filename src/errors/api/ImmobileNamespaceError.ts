@@ -3,9 +3,9 @@ import {
 } from './ApiError'
 
 export class ImmobileNamespaceError extends ApiError {
-	static override readonly code = 'immobilenamespace'
+	public static override readonly code = 'immobilenamespace'
 
-	constructor() {
+	public constructor() {
 		super( 'You tried to move pages from or to a namespace that is protected from moving.' )
 	}
 }

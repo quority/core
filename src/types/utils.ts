@@ -1,4 +1,4 @@
-import fs from 'fs'
+import type fs from 'fs'
 
 export type ReducedRequest<T> = Omit<T, 'action' | 'token'>
 

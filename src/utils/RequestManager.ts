@@ -1,31 +1,32 @@
-import fetch, {
-	Response
-} from 'node-fetch'
 import {
 	CookieJar
 } from './CookieJar'
+import fetch from 'node-fetch'
 import FormData from 'form-data'
-import fs from 'fs'
+import type fs from 'fs'
+import type {
+	Response
+} from 'node-fetch'
 
 export class RequestManager {
 	#jar: CookieJar
 
-	constructor( {
+	public constructor( {
 		jarOptions
 	}: { jarOptions?: ConstructorParameters<typeof CookieJar>[0] } = {
 	} ) {
 		this.#jar = new CookieJar( jarOptions )
 	}
 
-	get jar(): Readonly<CookieJar> {
+	public get jar(): Readonly<CookieJar> {
 		return this.#jar
 	}
 
-	clear( url: string ): void {
+	public clear( url: string ): void {
 		this.#jar.clear( url )
 	}
 
-	async get<T>( {
+	public async get<T>( {
 		url, qs
 	}: { url: string, qs: Record<string, string> } ): Promise<T> {
 		const params = new URLSearchParams( qs )
@@ -43,10 +44,10 @@ export class RequestManager {
 			} )
 		}
 
-		return req.json()
+		return req.json() as unknown as T
 	}
 
-	async post<T>( {
+	public async post<T>( {
 		url, form
 	}: { url: string, form: Record<string, string | fs.ReadStream> } ): Promise<T> {
 		const formData = new FormData()
@@ -69,10 +70,10 @@ export class RequestManager {
 			} )
 		}
 
-		return req.json()
+		return req.json() as unknown as T
 	}
 
-	raw( url: string ): Promise<Response> {
+	public raw( url: string ): Promise<Response> {
 		return fetch( url, {
 			headers: {
 				cookie: this.#jar.get( url )

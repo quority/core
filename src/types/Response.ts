@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace MediaWikiResponse {
 	export interface ApiError {
 		error: {
@@ -63,7 +64,7 @@ export namespace MediaWikiResponse {
 		}
 	}
 
-	export type Protect = {
+	export interface Protect {
 		protect: {
 			protections: string[]
 			reason: string
@@ -72,7 +73,7 @@ export namespace MediaWikiResponse {
 	}
 
 	export interface Purge {
-		purge: ( {
+		purge: Array<{
 			ns: number
 			title: string
 		} & (
@@ -81,17 +82,17 @@ export namespace MediaWikiResponse {
 			} | {
 				purged: string
 			}
-		) )[]
+		)>
 	}
 
 	export interface Revisions {
 		query: {
-			pages: {
+			pages: Array<{
 				missing?: boolean
 				pageid: number
 				ns: number
 				title: string
-				revisions: {
+				revisions: Array<{
 					slots: {
 						main: {
 							contentmodel: string
@@ -99,8 +100,8 @@ export namespace MediaWikiResponse {
 							content: string
 						}
 					}
-				}[]
-			}[]
+				}>
+			}>
 		}
 	}
 

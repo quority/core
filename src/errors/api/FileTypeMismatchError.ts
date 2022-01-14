@@ -3,9 +3,9 @@ import {
 } from './ApiError'
 
 export class FileTypeMismatchError extends ApiError {
-	static override readonly code = 'filetypemismatch'
+	public static override readonly code = 'filetypemismatch'
 
-	constructor() {
+	public constructor() {
 		super( 'The new file extension does not match its type.' )
 	}
 }

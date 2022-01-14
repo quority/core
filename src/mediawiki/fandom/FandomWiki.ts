@@ -1,18 +1,21 @@
 import {
-	Loaded, Wiki
-} from '../_base'
-import {
-	Logger, RequestManager
-} from '../../utils'
-import {
 	Fandom
 } from './Fandom'
+import type {
+	Loaded } from '../_base'
+import {
+	Logger
+} from '../../utils'
+import type { RequestManager
+} from '../../utils'
+import { Wiki
+} from '../_base'
 
 export class FandomWiki extends Wiki {
-	readonly interwiki: string
-	id?: number
+	public readonly interwiki: string
+	public id?: number
 
-	constructor( {
+	public constructor( {
 		interwiki, request
 	}: { interwiki: string, request: RequestManager } ) {
 		super( {
@@ -24,12 +27,12 @@ export class FandomWiki extends Wiki {
 		this.interwiki = interwiki
 	}
 
-	override getURL( title: string ): string {
+	public override getURL( title: string ): string {
 		const base = this.api.replace( '/api.php', '/wiki/' )
 		return new URL( title, base ).href
 	}
 
-	override async load(): Promise<Loaded<this>> {
+	public override async load(): Promise<Loaded<this>> {
 		const siteinfo = await this.getSiteInfo( 'general', 'variables' )
 
 		this.mainpage = siteinfo.query.general.mainpage
@@ -45,7 +48,7 @@ export class FandomWiki extends Wiki {
 		this.servername = siteinfo.query.general.servername
 		this.wikiid = siteinfo.query.general.wikiid
 
-		this.id = siteinfo.query.variables.find( i => i.id === 'wgCityId' )?.['*'] as number
+		this.id = siteinfo.query.variables.find( i => i.id === 'wgCityId' )?.[ '*' ] as number
 
 		return this as Loaded<this>
 	}

@@ -1,28 +1,31 @@
 import {
-	ICookieStoreOptions,
-	RequestManager
-} from '../../utils'
-import {
 	FandomBot
 } from './FandomBot'
 import {
 	FandomWiki
 } from './FandomWiki'
+import type {
+	ICookieStoreOptions } from '../../utils'
 import {
 	InvalidInterwikiError
 } from '../../errors'
+import {
+	RequestManager
+} from '../../utils'
 
 export class Fandom {
-	readonly request: RequestManager
+	public readonly request: RequestManager
 
-	constructor( {
+	public constructor( {
 		cookies,
 		prettyCookies
 	}: { cookies?: string, prettyCookies?: boolean } = {
 	} ) {
 		const store: ICookieStoreOptions | undefined = cookies
 			? {
-				path: cookies, regex: [ /^wikicities_/, /^wikia_/ ]
+				path: cookies, regex: [
+					/^wikicities_/, /^wikia_/
+				]
 			}
 			: undefined
 		this.request = new RequestManager( {
@@ -33,11 +36,13 @@ export class Fandom {
 		} )
 	}
 
-	static interwiki2path( _interwiki: string ): string {
+	public static interwiki2path( _interwiki: string ): string {
 		const interwiki = _interwiki.toLowerCase()
 
 		if ( interwiki.match( /[a-z0-9-]+\.[a-z0-9-]+/ ) ) {
-			const [ lang, wikiname ] = interwiki.split( '.' )
+			const [
+				lang, wikiname
+			] = interwiki.split( '.' )
 			return `https://${ wikiname }.fandom.com/${ lang }`
 		} else if ( interwiki.match( /^[a-z0-9-]+$/ ) ) {
 			return `https://${ interwiki }.fandom.com`
@@ -45,17 +50,17 @@ export class Fandom {
 		throw new InvalidInterwikiError( interwiki )
 	}
 
-	static interwiki2api( interwiki: string ): string {
+	public static interwiki2api( interwiki: string ): string {
 		const path = Fandom.interwiki2path( interwiki )
 		return `${ path }/api.php`
 	}
 
-	static interwiki2url( interwiki: string ): string {
+	public static interwiki2url( interwiki: string ): string {
 		const path = Fandom.interwiki2path( interwiki )
 		return `${ path }/wiki/`
 	}
 
-	static url2interwiki( url: string ): string {
+	public static url2interwiki( url: string ): string {
 		const nolangRegex = /https?:\/\/([a-z0-9-]+)\.fandom\.com\/(wiki|api|index)/
 		const nolang = url.match( nolangRegex )?.[ 1 ]
 		if ( nolang ) {
@@ -66,42 +71,42 @@ export class Fandom {
 		const lang = url.match( langRegex )
 
 		if ( lang ) {
-			return `${ lang[2] }.${ lang[1] }`
+			return `${ lang[ 2 ] }.${ lang[ 1 ] }`
 		}
 
 		throw new InvalidInterwikiError( url )
 	}
 
-	async getUserAvatar( username: string ): Promise<string | undefined> {
+	public async getUserAvatar( username: string ): Promise<string | undefined> {
 		const userId = await this.getUserId( username )
-		if ( !userId ) return
+		if ( !userId ) return undefined
 
 		const req = await this.request.raw( `https://services.fandom.com/user-attribute/user/${ userId }/attr/avatar` )
-		const res: { value?: string } = await req.json()
+		const res = await req.json() as unknown as { value?: string }
 
 		return res.value
 	}
 
-	async getUserDiscordTag( username: string ): Promise<string | undefined> {
+	public async getUserDiscordTag( username: string ): Promise<string | undefined> {
 		const userId = await this.getUserId( username )
-		if ( !userId ) return
+		if ( !userId ) return undefined
 
 		const req = await this.request.raw( `https://services.fandom.com/user-attribute/user/${ userId }/attr/discordHandle` )
-		const res: { value?: string } = await req.json()
+		const res = await req.json() as unknown as { value?: string }
 
 		return res.value
 	}
 
-	async getUserId( username: string ): Promise<number | undefined> {
+	public async getUserId( username: string ): Promise<number | undefined> {
 		const wiki = this.getWiki( 'community' )
 		const query = await wiki.query( {
 			list: 'users',
 			ususers: username
 		} )
-		return query[0]?.userid
+		return query[ 0 ]?.userid
 	}
 
-	async getUsersIds( usernames: string[] ): Promise<Record<string, number | undefined>> {
+	public async getUsersIds( usernames: string[] ): Promise<Record<string, number | undefined>> {
 		const wiki = this.getWiki( 'community' )
 		const query = await wiki.query( {
 			list: 'users',
@@ -114,14 +119,14 @@ export class Fandom {
 		} as Record<string, number> )
 	}
 
-	getWiki( interwiki: string ): FandomWiki {
+	public getWiki( interwiki: string ): FandomWiki {
 		return new FandomWiki( {
 			interwiki,
 			request: this.request
 		} )
 	}
 
-	async login( {
+	public async login( {
 		password, username, wiki
 	}: { password: string, username: string, wiki?: FandomWiki } ): Promise<FandomBot> {
 		const bot = new FandomBot( {

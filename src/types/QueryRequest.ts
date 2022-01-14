@@ -1,7 +1,8 @@
-import {
+import type {
 	RequireOnlyOne
 } from './utils'
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace MediaWikiQueryRequest {
 	export interface QueryRequest {
 		action: 'query'

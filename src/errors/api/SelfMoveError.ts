@@ -3,9 +3,9 @@ import {
 } from './ApiError'
 
 export class SelfMoveError extends ApiError {
-	static override readonly code = 'selfmove'
+	public static override readonly code = 'selfmove'
 
-	constructor() {
+	public constructor() {
 		super( 'Can\'t move a page to itself.' )
 	}
 }

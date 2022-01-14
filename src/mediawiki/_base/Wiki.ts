@@ -2,7 +2,7 @@ import {
 	Logger,
 	RequestManager
 } from '../../utils'
-import {
+import type {
 	MediaWikiMetaRequest,
 	MediaWikiMetaResponse,
 	MediaWikiQueryItem,
@@ -20,23 +20,23 @@ import fs from 'fs'
 export type Loaded<T extends Wiki = Wiki> = Required<T>
 
 export class Wiki {
-	readonly api: string
-	readonly request: RequestManager
+	public readonly api: string
+	public readonly request: RequestManager
 
-	mainpage?: string
-	base?: string
-	sitename?: string
-	lang?: string
-	readonly?: boolean
-	writeapi?: boolean
-	articlepath?: string
-	scriptpath?: string
-	script?: string
-	server?: string
-	servername?: string
-	wikiid?: string
+	public mainpage?: string
+	public base?: string
+	public sitename?: string
+	public lang?: string
+	public readonly?: boolean
+	public writeapi?: boolean
+	public articlepath?: string
+	public scriptpath?: string
+	public script?: string
+	public server?: string
+	public servername?: string
+	public wikiid?: string
 
-	constructor( {
+	public constructor( {
 		api, disableLogger = true, request
 	}: { api: string, disableLogger?: boolean, request?: RequestManager } ) {
 		this.api = api.trim()
@@ -46,7 +46,7 @@ export class Wiki {
 		}
 	}
 
-	async get<T, U = RequestGETParameters>( userparams: U ): Promise<T> {
+	public async get<T, U = RequestGETParameters>( userparams: U ): Promise<T> {
 		const params = {
 			...userparams,
 			format: 'json',
@@ -60,12 +60,11 @@ export class Wiki {
 		let prop: ParamsKey
 		for ( prop in params ) {
 			const value = params[ prop ]
-			if ( !value ) {
-				continue
-			} else if ( typeof value === 'boolean' ) {
+			if ( typeof value === 'boolean' ) {
 				qs[ prop ] = value ? '1' : '0'
 			} else if ( Array.isArray( value ) ) {
-				qs[ prop ] = ( value as unknown[] ).join( '|' )
+				const values = value as unknown[]
+				qs[ prop ] =  values.join( '|' )
 			} else {
 				qs[ prop ] = `${ value }`
 			}
@@ -79,7 +78,7 @@ export class Wiki {
 		return res
 	}
 
-	async post<T, U = RequestPOSTParameters>( userparams: U ): Promise<T> {
+	public async post<T, U = RequestPOSTParameters>( userparams: U ): Promise<T> {
 		const params = {
 			...userparams,
 			format: 'json',
@@ -93,14 +92,13 @@ export class Wiki {
 		let prop: ParamsKey
 		for ( prop in params ) {
 			const value = params[ prop ]
-			if ( !value ) {
-				continue
-			} else if ( value instanceof fs.ReadStream ) {
+			if ( value instanceof fs.ReadStream ) {
 				qs[ prop ] = value as fs.ReadStream
 			} else if ( typeof value === 'boolean' ) {
 				qs[ prop ] = value ? '1' : '0'
 			} else if ( Array.isArray( value ) ) {
-				qs[ prop ] = ( value as unknown[] ).join( '|' )
+				const values = value as unknown[]
+				qs[ prop ] = values.join( '|' )
 			} else {
 				qs[ prop ] = `${ value }`
 			}
@@ -114,12 +112,12 @@ export class Wiki {
 		return res
 	}
 
-	async exists(): Promise<boolean> {
+	public async exists(): Promise<boolean> {
 		const req = await this.request.raw( this.api )
 		return req.status === 200
 	}
 
-	async getInterwikis(): Promise<Record<string, string>> {
+	public async getInterwikis(): Promise<Record<string, string>> {
 		const req = await this.get<MediaWikiMetaResponse.SiteInfo>( {
 			action: 'query',
 			meta: 'siteinfo',
@@ -141,7 +139,7 @@ export class Wiki {
 		return result
 	}
 
-	getSiteInfo<T extends keyof MediaWikiMetaResponse.SiteInfo[ 'query' ]>( ...properties: T[] ): Promise<MediaWikiMetaResponse.SiteInfo> {
+	public getSiteInfo<T extends keyof MediaWikiMetaResponse.SiteInfo[ 'query' ]>( ...properties: T[] ): Promise<MediaWikiMetaResponse.SiteInfo> {
 		return this.get<MediaWikiMetaResponse.SiteInfo, MediaWikiMetaRequest.SiteInfo>( {
 			action: 'query',
 			meta: 'siteinfo',
@@ -149,9 +147,9 @@ export class Wiki {
 		} )
 	}
 
-	async getPages( _titles: string ): Promise<string>
-	async getPages( _titles: string[] ): Promise<Record<string, string>>
-	async getPages( _titles: string | string[] ): Promise<string | Record<string, string>> {
+	public async getPages( _titles: string ): Promise<string>
+	public async getPages( _titles: string[] ): Promise<Record<string, string>>
+	public async getPages( _titles: string | string[] ): Promise<string | Record<string, string>> {
 		const titles = Array.isArray( _titles ) ? _titles : [ _titles ]
 
 		const pages: Record<string, string> = {
@@ -170,7 +168,7 @@ export class Wiki {
 				if ( page.missing === true ) {
 					pages[ page.title ] = ''
 				}
-				
+
 				const content = page.revisions[ 0 ]?.slots.main.content
 				if ( content ) pages[ page.title ] = content
 			}
@@ -179,7 +177,7 @@ export class Wiki {
 		return Array.isArray( _titles ) ? pages : Object.values( pages )[ 0 ] ?? {}
 	}
 
-	async getToken<Token extends TokenType>( type: Token ): Promise<MediaWikiMetaResponse.Tokens<Token>> {
+	public async getToken<Token extends TokenType>( type: Token ): Promise<MediaWikiMetaResponse.Tokens<Token>> {
 		const req = await this.get<MediaWikiMetaResponse.Tokens<Token>, MediaWikiMetaRequest.Tokens>( {
 			action: 'query',
 			meta: 'tokens',
@@ -189,7 +187,7 @@ export class Wiki {
 		return req
 	}
 
-	async getTransclusions( title: string ): Promise<string[]> {
+	public async getTransclusions( title: string ): Promise<string[]> {
 		const result: string[] = []
 
 		const params: Record<string, string | number> = {
@@ -234,13 +232,13 @@ export class Wiki {
 		return result
 	}
 
-	getURL( title: string ): string {
+	public getURL( title: string ): string {
 		const base = new URL( this.api ).origin
 		const articlepath = new URL( this.articlepath ?? '/wiki/$1', base ).href
 		return articlepath.replace( '$1', encodeURI( title ) )
 	}
 
-	async load(): Promise<Loaded<this>> {
+	public async load(): Promise<Loaded<this>> {
 		const siteinfo = await this.getSiteInfo( 'general' )
 
 		this.mainpage = siteinfo.query.general.mainpage
@@ -259,9 +257,9 @@ export class Wiki {
 		return this as Loaded<this>
 	}
 
-	async pagesExist( _titles: string ): Promise<Record<string, boolean>>
-	async pagesExist( _titles: string[] ): Promise<Record<string, boolean>>
-	async pagesExist( _titles: string | string[] ): Promise<Record<string, boolean>> {
+	public async pagesExist( _titles: string ): Promise<Record<string, boolean>>
+	public async pagesExist( _titles: string[] ): Promise<Record<string, boolean>>
+	public async pagesExist( _titles: string | string[] ): Promise<Record<string, boolean>> {
 		const titles = Array.isArray( _titles ) ? _titles : [ _titles ]
 
 		const pages: Record<string, boolean> = {
@@ -284,7 +282,7 @@ export class Wiki {
 		return pages
 	}
 
-	async purge( titles: string[] ): Promise<Record<string, boolean>> {
+	public async purge( titles: string[] ): Promise<Record<string, boolean>> {
 		const result: Record<string, boolean> = {
 		}
 
@@ -306,18 +304,18 @@ export class Wiki {
 		return result
 	}
 
-	async query( params: { list: 'allcategories' } & ReducedRequest<MediaWikiQueryRequest.AllCategories>, limit?: number ): Promise<MediaWikiQueryItem.AllCategories[]>
-	async query( params: { list: 'allimages' } & ReducedRequest<MediaWikiQueryRequest.AllImages>, limit?: number ): Promise<MediaWikiQueryItem.AllImages[]>
-	async query( params: { list: 'allpages' } & ReducedRequest<MediaWikiQueryRequest.AllPages>, limit?: number ): Promise<MediaWikiQueryItem.AllPages[]>
-	async query( params: { list: 'categorymembers' } & ReducedRequest<MediaWikiQueryRequest.CategoryMembers>, limit?: number ): Promise<MediaWikiQueryItem.CategoryMembers[]>
-	async query( params: { list: 'logevents' } & ReducedRequest<MediaWikiQueryRequest.LogEvents>, limit?: number ): Promise<MediaWikiQueryItem.LogEvents[]>
-	async query( params: { list: 'recentchanges' } & ReducedRequest<MediaWikiQueryRequest.RecentChanges>, limit?: number ): Promise<MediaWikiQueryItem.RecentChanges[]>
-	async query( params: { list: 'usercontribs' } & ReducedRequest<MediaWikiQueryRequest.UserContribs>, limit?: number ): Promise<MediaWikiQueryItem.UserContribs[]>
-	async query( params: { list: 'users' } & ReducedRequest<MediaWikiQueryRequest.Users>, limit?: number ): Promise<MediaWikiQueryItem.Users[]>
-	async query( params: { list: string } & ReducedRequest<MediaWikiQueryRequest.QueryRequest>, limit?: number ): Promise<MediaWikiQueryItem.QueryItem[]> {
+	public async query( params: { list: 'allcategories' } & ReducedRequest<MediaWikiQueryRequest.AllCategories>, limit?: number ): Promise<MediaWikiQueryItem.AllCategories[]>
+	public async query( params: { list: 'allimages' } & ReducedRequest<MediaWikiQueryRequest.AllImages>, limit?: number ): Promise<MediaWikiQueryItem.AllImages[]>
+	public async query( params: { list: 'allpages' } & ReducedRequest<MediaWikiQueryRequest.AllPages>, limit?: number ): Promise<MediaWikiQueryItem.AllPages[]>
+	public async query( params: { list: 'categorymembers' } & ReducedRequest<MediaWikiQueryRequest.CategoryMembers>, limit?: number ): Promise<MediaWikiQueryItem.CategoryMembers[]>
+	public async query( params: { list: 'logevents' } & ReducedRequest<MediaWikiQueryRequest.LogEvents>, limit?: number ): Promise<MediaWikiQueryItem.LogEvents[]>
+	public async query( params: { list: 'recentchanges' } & ReducedRequest<MediaWikiQueryRequest.RecentChanges>, limit?: number ): Promise<MediaWikiQueryItem.RecentChanges[]>
+	public async query( params: { list: 'usercontribs' } & ReducedRequest<MediaWikiQueryRequest.UserContribs>, limit?: number ): Promise<MediaWikiQueryItem.UserContribs[]>
+	public async query( params: { list: 'users' } & ReducedRequest<MediaWikiQueryRequest.Users>, limit?: number ): Promise<MediaWikiQueryItem.Users[]>
+	public async query( params: { list: string } & ReducedRequest<MediaWikiQueryRequest.QueryRequest>, limit?: number ): Promise<MediaWikiQueryItem.QueryItem[]> {
 		const result: MediaWikiQueryItem.QueryItem[] = []
 
-		// eslint-disable-next-line no-constant-condition
+		// eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
 		while ( true ) {
 			const req = await this.get<MediaWikiQueryResponses.QueryResponse<string, string, MediaWikiQueryItem.QueryItem>>( {
 				action: 'query',
@@ -339,13 +337,13 @@ export class Wiki {
 			const continuekey = Object.keys( req.continue ).find( i => i !== 'continue' )
 			if ( !continuekey ) break
 			// @ts-expect-error - faulty typing i don't know how to fix
-			params[ continuekey ] = req.continue[ continuekey ]
+			params[ continuekey ] = req.continue[ continuekey ] // eslint-disable-line @typescript-eslint/no-unsafe-assignment
 		}
 
 		return result
 	}
 
-	async *iterPages( titles: string[] ): AsyncGenerator<MediaWikiResponse.Revisions[ 'query' ][ 'pages' ][ 0 ], void, unknown> {
+	public async *iterPages( titles: string[] ): AsyncGenerator<MediaWikiResponse.Revisions[ 'query' ][ 'pages' ][ 0 ], void, unknown> {
 		while ( titles.length !== 0 ) {
 			const res = await this.get<MediaWikiResponse.Revisions>( {
 				action: 'query',
@@ -365,17 +363,17 @@ export class Wiki {
 		}
 	}
 
-	iterQuery( params: { list: 'allcategories' } & ReducedRequest<MediaWikiQueryRequest.AllCategories>, limit?: number ): AsyncGenerator<MediaWikiQueryItem.AllCategories, void, unknown>
-	iterQuery( params: { list: 'allimages' } & ReducedRequest<MediaWikiQueryRequest.AllImages>, limit?: number ): AsyncGenerator<MediaWikiQueryItem.AllImages, void, unknown>
-	iterQuery( params: { list: 'allpages' } & ReducedRequest<MediaWikiQueryRequest.AllPages>, limit?: number ): AsyncGenerator<MediaWikiQueryItem.AllPages, void, unknown>
-	iterQuery( params: { list: 'categorymembers' } & ReducedRequest<MediaWikiQueryRequest.CategoryMembers>, limit?: number ): AsyncGenerator<MediaWikiQueryItem.CategoryMembers, void, unknown>
-	iterQuery( params: { list: 'logevents' } & ReducedRequest<MediaWikiQueryRequest.LogEvents>, limit?: number ): AsyncGenerator<MediaWikiQueryItem.LogEvents, void, unknown>
-	iterQuery( params: { list: 'recentchanges' } & ReducedRequest<MediaWikiQueryRequest.RecentChanges>, limit?: number ): AsyncGenerator<MediaWikiQueryItem.RecentChanges, void, unknown>
-	iterQuery( params: { list: 'usercontribs' } & ReducedRequest<MediaWikiQueryRequest.UserContribs>, limit?: number ): AsyncGenerator<MediaWikiQueryItem.UserContribs, void, unknown>
-	iterQuery( params: { list: 'users' } & ReducedRequest<MediaWikiQueryRequest.Users>, limit?: number ): AsyncGenerator<MediaWikiQueryItem.Users, void, unknown>
-	async *iterQuery( params: { list: string } & ReducedRequest<MediaWikiQueryRequest.QueryRequest>, limit?: number ): AsyncGenerator<MediaWikiQueryItem.QueryItem, void, unknown> {
+	public iterQuery( params: { list: 'allcategories' } & ReducedRequest<MediaWikiQueryRequest.AllCategories>, limit?: number ): AsyncGenerator<MediaWikiQueryItem.AllCategories, void, unknown>
+	public iterQuery( params: { list: 'allimages' } & ReducedRequest<MediaWikiQueryRequest.AllImages>, limit?: number ): AsyncGenerator<MediaWikiQueryItem.AllImages, void, unknown>
+	public iterQuery( params: { list: 'allpages' } & ReducedRequest<MediaWikiQueryRequest.AllPages>, limit?: number ): AsyncGenerator<MediaWikiQueryItem.AllPages, void, unknown>
+	public iterQuery( params: { list: 'categorymembers' } & ReducedRequest<MediaWikiQueryRequest.CategoryMembers>, limit?: number ): AsyncGenerator<MediaWikiQueryItem.CategoryMembers, void, unknown>
+	public iterQuery( params: { list: 'logevents' } & ReducedRequest<MediaWikiQueryRequest.LogEvents>, limit?: number ): AsyncGenerator<MediaWikiQueryItem.LogEvents, void, unknown>
+	public iterQuery( params: { list: 'recentchanges' } & ReducedRequest<MediaWikiQueryRequest.RecentChanges>, limit?: number ): AsyncGenerator<MediaWikiQueryItem.RecentChanges, void, unknown>
+	public iterQuery( params: { list: 'usercontribs' } & ReducedRequest<MediaWikiQueryRequest.UserContribs>, limit?: number ): AsyncGenerator<MediaWikiQueryItem.UserContribs, void, unknown>
+	public iterQuery( params: { list: 'users' } & ReducedRequest<MediaWikiQueryRequest.Users>, limit?: number ): AsyncGenerator<MediaWikiQueryItem.Users, void, unknown>
+	public async *iterQuery( params: { list: string } & ReducedRequest<MediaWikiQueryRequest.QueryRequest>, limit?: number ): AsyncGenerator<MediaWikiQueryItem.QueryItem, void, unknown> {
 		let counter = 0
-		// eslint-disable-next-line no-constant-condition
+		// eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
 		while ( true ) {
 			const req = await this.get<MediaWikiQueryResponses.QueryResponse<string, string, MediaWikiQueryItem.QueryItem>>( {
 				action: 'query',
@@ -398,29 +396,29 @@ export class Wiki {
 			const continuekey = Object.keys( req.continue ).find( i => i !== 'continue' )
 			if ( !continuekey ) break
 			// @ts-expect-error - faulty typing i don't know how to fix
-			params[ continuekey ] = req.continue[ continuekey ]
+			params[ continuekey ] = req.continue[ continuekey ] // eslint-disable-line @typescript-eslint/no-unsafe-assignment
 		}
 	}
 
-	async *whatLinksHere( titles: string[] ): AsyncGenerator<{
-		linkshere: {
+	public async *whatLinksHere( titles: string[] ): AsyncGenerator<{
+		linkshere: Array<{
 			title: string,
 			redirect: boolean
-		}[],
+		}>,
 		missing?: boolean,
 		title: string
 	}, void, unknown> {
 		while ( titles.length !== 0 ) {
 			const res = await this.get<{
 				query: {
-					pages: {
-						linkshere: {
+					pages: Array<{
+						linkshere: Array<{
 							title: string,
 							redirect: boolean
-						}[],
+						}>,
 						missing?: boolean,
 						title: string
-					}[]
+					}>
 				}
 			}>( {
 				action: 'query',
