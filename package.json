@@ -35,6 +35,7 @@
     "fs-extra": "^10.0.0",
     "node-fetch": "^2.6.6",
     "signale": "^1.4.0",
+    "tmp-promise": "^3.0.3",
     "tough-cookie": "^4.0.0"
   },
   "devDependencies": {

@@ -12,6 +12,7 @@ import {
 	Logger
 } from '../../utils'
 import path from 'path'
+import tmp from 'tmp-promise'
 import type {
 	Wiki
 } from './Wiki'
@@ -200,8 +201,8 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		const image = await fetch( url )
 		if ( !image.ok ) return undefined
 
-		fs.ensureDirSync( path.resolve( __dirname, './tmp' ) )
-		const filepath = path.resolve( __dirname, `./tmp/${ filename }` )
+		const tmpdir = await tmp.dir()
+		const filepath = path.resolve( tmpdir.path, filename )
 		const buffer = await image.arrayBuffer()
 		fs.writeFileSync(
 			filepath,
@@ -213,7 +214,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 			file,
 			filename
 		} )
-		fs.removeSync( filepath )
+		await tmpdir.cleanup()
 
 		return res
 	}
