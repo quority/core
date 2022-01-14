@@ -1,4 +1,4 @@
-import type { APIError, BlockRequest, BlockResponse, DeleteRequest, DeleteResponse, EditRequest, EditResponse, LoginRequest, LoginResponse, MoveRequest, MoveResponse, NoActionToken, NoJSONRequest, ProtectRequest, ProtectResponse, UploadRequest, UploadResponse } from '../../types'
+import type { APIError, BlockRequest, BlockResponse, DeleteRequest, DeleteResponse, EditRequest, EditResponse, LoginRequest, LoginResponse, MoveRequest, MoveResponse, NoActionToken, ProtectRequest, ProtectResponse, UploadRequest, UploadResponse } from '../../types'
 import { ErrorManager } from '../../errors'
 import fetch from 'node-fetch'
 import fs from 'fs-extra'
@@ -29,7 +29,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 
 	public async block( params: NoActionToken<BlockRequest> ): Promise<BlockResponse> {
 		const token = await this.getCSRFToken()
-		return this.wiki.post<BlockResponse, NoJSONRequest<BlockRequest>>( {
+		return this.wiki.post<BlockResponse, BlockRequest>( {
 			...params,
 			action: 'block',
 			token

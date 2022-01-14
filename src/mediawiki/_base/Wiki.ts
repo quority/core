@@ -1,4 +1,4 @@
-import type { AllCategoriesRequest, AllCategoriesResponse, AllImagesRequest, AllImagesResponse, AllPagesRequest, AllPagesResponse, CategoryMembersRequest, CategoryMembersResponse, GETRequestJSON, ListQueryResponse, LogEventsRequest, LogEventsResponse, NoActionToken, NoJSONRequest, POSTRequestJSON, PurgeRequest, PurgeResponse, QueryRequest, RecentChangesRequest, RecentChangesResponse, RevisionsResponse, SiteInfoRequest, SiteInfoResponse, TokensRequest, TokensResponse, TokenType, UserContribsRequest, UserContribsResponse, UsersRequest, UsersResponse } from '../../types'
+import type { AllCategoriesRequest, AllCategoriesResponse, AllImagesRequest, AllImagesResponse, AllPagesRequest, AllPagesResponse, CategoryMembersRequest, CategoryMembersResponse, GETRequestJSON, ListQueryResponse, LogEventsRequest, LogEventsResponse, NoActionToken, NoJSONRequest, POSTRequestJSON, PurgeResponse, QueryRequest, RecentChangesRequest, RecentChangesResponse, RevisionsResponse, SiteInfoRequest, SiteInfoResponse, TokensRequest, TokensResponse, TokenType, UserContribsRequest, UserContribsResponse, UsersRequest, UsersResponse } from '../../types'
 import fs from 'fs'
 import { RequestManager } from '../../utils'
 
@@ -21,25 +21,17 @@ export class Wiki {
 	public servername?: string
 	public wikiid?: string
 
-	public constructor( {
-		api, request
-	}: { api: string, request?: RequestManager } ) {
+	public constructor( { api, request }: { api: string, request?: RequestManager } ) {
 		this.api = api.trim()
 		this.request = request ?? new RequestManager()
 	}
 
-	public async get<T, U = NoJSONRequest<GETRequestJSON>>( userparams: U ): Promise<T> {
-		const params = {
-			...userparams,
-			format: 'json',
-			formatversion: 2
-		}
-		type ParamsKey = keyof typeof params
-
-		const qs = {
-		} as Record<ParamsKey, string>
-
-		let prop: ParamsKey
+	private querystring<T extends NoJSONRequest<GETRequestJSON>>( params: T ): Record<keyof T, string>
+	private querystring<T extends NoJSONRequest<POSTRequestJSON>>( params: T ): Record<keyof T, string | fs.ReadStream>
+	private querystring<T extends NoJSONRequest<GETRequestJSON | POSTRequestJSON>>( params: T ): Record<keyof T, string | fs.ReadStream> {
+		const qs = {} as Record<keyof T, string | fs.ReadStream>
+		
+		let prop: keyof T
 		for ( prop in params ) {
 			const value = params[ prop ]
 			if ( typeof value === 'boolean' ) {
@@ -47,10 +39,22 @@ export class Wiki {
 			} else if ( Array.isArray( value ) ) {
 				const values = value as unknown[]
 				qs[ prop ] =  values.join( '|' )
+			} else if ( value instanceof fs.ReadStream ) {
+				qs[ prop ] = value as fs.ReadStream
 			} else {
 				qs[ prop ] = `${ value }`
 			}
 		}
+
+		return qs
+	}
+
+	public async get<T, U extends GETRequestJSON = GETRequestJSON>( userparams: NoJSONRequest<U> ): Promise<T> {
+		const qs = this.querystring( {
+			...userparams,
+			format: 'json',
+			formatversion: 2
+		} )
 
 		const res = await this.request.get<T>( {
 			qs,
@@ -60,7 +64,7 @@ export class Wiki {
 		return res
 	}
 
-	public async post<T, U = NoJSONRequest<POSTRequestJSON>>( userparams: U ): Promise<T> {
+	public async post<T, U extends POSTRequestJSON = POSTRequestJSON>( userparams: NoJSONRequest<U> ): Promise<T> {
 		const params = {
 			...userparams,
 			format: 'json',
@@ -68,8 +72,11 @@ export class Wiki {
 		}
 		type ParamsKey = keyof typeof params
 
-		const qs = {
-		} as Record<ParamsKey, string | fs.ReadStream>
+		const qs = this.querystring( {
+			...userparams,
+			format: 'json',
+			formatversion: 2
+		} )
 
 		let prop: ParamsKey
 		for ( prop in params ) {
@@ -122,7 +129,7 @@ export class Wiki {
 	}
 
 	public getSiteInfo<T extends keyof SiteInfoResponse[ 'query' ]>( ...properties: T[] ): Promise<SiteInfoResponse> {
-		return this.get<SiteInfoResponse, NoJSONRequest<SiteInfoRequest>>( {
+		return this.get<SiteInfoResponse, SiteInfoRequest>( {
 			action: 'query',
 			meta: 'siteinfo',
 			siprop: properties
@@ -158,7 +165,7 @@ export class Wiki {
 	}
 
 	public async getToken<Token extends TokenType>( type: Token ): Promise<TokensResponse<Token>> {
-		const req = await this.get<TokensResponse<Token>, NoJSONRequest<TokensRequest>>( {
+		const req = await this.get<TokensResponse<Token>, TokensRequest>( {
 			action: 'query',
 			meta: 'tokens',
 			type
@@ -267,7 +274,7 @@ export class Wiki {
 		}
 
 		while ( titles.length !== 0 ) {
-			const req = await this.post<PurgeResponse, PurgeRequest>( {
+			const req = await this.post<PurgeResponse>( {
 				action: 'purge',
 				titles: titles.splice( 0, 50 ).join( '|' )
 			} )

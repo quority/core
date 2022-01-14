@@ -364,7 +364,7 @@ interface BaseEditRequest extends POSTRequestJSON {
  */
 export type EditRequest = RequireOnlyOne<BaseEditRequest, 'title' | 'pageid'>
 
-export interface LoginRequest {
+export interface LoginRequest extends POSTRequestJSON {
 	action: 'login'
 
 	/**
