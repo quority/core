@@ -7,9 +7,7 @@ import {
 import assert from 'assert'
 
 describe( 'Wikipedia', () => {
-	const {
-		WIKIPEDIA_API, WIKIPEDIA_PASSWORD, WIKIPEDIA_USERNAME
-	} = process.env as Record<string, string>
+	const { WIKIPEDIA_API, WIKIPEDIA_PASSWORD, WIKIPEDIA_USERNAME } = process.env
 	if ( !WIKIPEDIA_API || !WIKIPEDIA_PASSWORD || !WIKIPEDIA_USERNAME ) {
 		process.exit( 1 )
 	}

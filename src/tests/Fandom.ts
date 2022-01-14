@@ -11,9 +11,7 @@ import type { FandomBot
 const now = Date.now()
 
 describe( 'Fandom', () => {
-	const {
-		FANDOM_PASSWORD, FANDOM_USERNAME, FANDOM_WIKI
-	} = process.env as Record<string, string>
+	const { FANDOM_PASSWORD, FANDOM_USERNAME, FANDOM_WIKI } = process.env
 	if ( !FANDOM_PASSWORD || !FANDOM_USERNAME || !FANDOM_WIKI ) {
 		process.exit( 1 )
 	}
