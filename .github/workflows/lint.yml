@@ -1,11 +1,27 @@
 name: Lint
-on: push
+
+on:
+  push:
+    branches: [ main ]
+  pull_request_target:
+    branches: [ main ]
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
     steps:
     - uses: actions/checkout@v2
-    - name: Install modules
-      run: npm ci
-    - name: Run ESLint
-      run: npm run lint
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm i -g yarn
+    - run: yarn install
+    - run: yarn lint
