@@ -1,39 +1,6 @@
-import type {
-	AllCategoriesRequest,
-	AllCategoriesResponse,
-	AllImagesRequest,
-	AllImagesResponse,
-	AllPagesRequest,
-	AllPagesResponse,
-	CategoryMembersRequest,
-	CategoryMembersResponse,
-	GETRequestJSON,
-	ListQueryResponse,
-	LogEventsRequest,
-	LogEventsResponse,
-	NoActionToken,
-	NoJSONRequest,
-	POSTRequestJSON,
-	PurgeRequest,
-	PurgeResponse,
-	QueryRequest,
-	RecentChangesRequest,
-	RecentChangesResponse,
-	RevisionsResponse,
-	SiteInfoRequest,
-	SiteInfoResponse,
-	TokensRequest,
-	TokensResponse,
-	TokenType,
-	UserContribsRequest,
-	UserContribsResponse,
-	UsersRequest,
-	UsersResponse
-} from '../../types'
+import type { AllCategoriesRequest, AllCategoriesResponse, AllImagesRequest, AllImagesResponse, AllPagesRequest, AllPagesResponse, CategoryMembersRequest, CategoryMembersResponse, GETRequestJSON, ListQueryResponse, LogEventsRequest, LogEventsResponse, NoActionToken, NoJSONRequest, POSTRequestJSON, PurgeRequest, PurgeResponse, QueryRequest, RecentChangesRequest, RecentChangesResponse, RevisionsResponse, SiteInfoRequest, SiteInfoResponse, TokensRequest, TokensResponse, TokenType, UserContribsRequest, UserContribsResponse, UsersRequest, UsersResponse } from '../../types'
 import fs from 'fs'
-import {
-	RequestManager
-} from '../../utils'
+import { RequestManager } from '../../utils'
 
 export type Loaded<T extends Wiki = Wiki> = Required<T>
 

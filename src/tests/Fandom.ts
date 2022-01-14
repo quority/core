@@ -2,11 +2,8 @@
 import 'dotenv/config'
 import 'mocha'
 import assert from 'assert'
-import {
-	Fandom
-} from '../main'
-import type { FandomBot
-} from '../main'
+import { Fandom } from '../main'
+import type { FandomBot } from '../main'
 
 const now = Date.now()
 

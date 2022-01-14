@@ -1,17 +1,8 @@
-import {
-	FandomBot
-} from './FandomBot'
-import {
-	FandomWiki
-} from './FandomWiki'
-import type {
-	ICookieStoreOptions } from '../../utils'
-import {
-	InvalidInterwikiError
-} from '../../errors'
-import {
-	RequestManager
-} from '../../utils'
+import { FandomBot } from './FandomBot'
+import { FandomWiki } from './FandomWiki'
+import type { ICookieStoreOptions } from '../../utils'
+import { InvalidInterwikiError } from '../../errors'
+import { RequestManager } from '../../utils'
 
 export class Fandom {
 	public readonly request: RequestManager

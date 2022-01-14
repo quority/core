@@ -1,9 +1,5 @@
-import {
-	Bot
-} from '../_base'
-import type {
-	FandomWiki
-} from './FandomWiki'
+import { Bot } from '../_base'
+import type { FandomWiki } from './FandomWiki'
 
 export class FandomBot extends Bot<FandomWiki> {
 	#_wikis = new Set<string>()

@@ -1,6 +1,4 @@
-import {
-	ApiError
-} from './ApiError'
+import { ApiError } from './ApiError'
 
 export class FileExistsNoChangeError extends ApiError {
 	public static override readonly code = 'fileexists-no-change'
