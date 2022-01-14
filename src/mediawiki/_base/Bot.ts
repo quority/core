@@ -8,7 +8,6 @@ import {
 } from '../../errors'
 import fetch from 'node-fetch'
 import fs from 'fs-extra'
-import path from 'path'
 import tmp from 'tmp-promise'
 import type {
 	Wiki
@@ -197,8 +196,9 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		const image = await fetch( url )
 		if ( !image.ok ) return undefined
 
-		const tmpdir = await tmp.dir()
-		const filepath = path.resolve( tmpdir.path, filename )
+		const tmpfile = await tmp.file()
+		console.log( tmpfile.path )
+		const filepath = tmpfile.path
 		const buffer = await image.buffer()
 		fs.writeFileSync(
 			filepath,
@@ -210,7 +210,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 			file,
 			filename
 		} )
-		await tmpdir.cleanup()
+		await tmpfile.cleanup()
 
 		return res
 	}
