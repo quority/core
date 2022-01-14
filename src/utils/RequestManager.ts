@@ -1,20 +1,14 @@
-import {
-	CookieJar
-} from './CookieJar'
+import { CookieJar } from './CookieJar'
 import fetch from 'node-fetch'
 import FormData from 'form-data'
 import type fs from 'fs'
-import type {
-	Response
-} from 'node-fetch'
+import type { ICookieJarOptions } from './CookieJar'
+import type { Response } from 'node-fetch'
 
 export class RequestManager {
 	#jar: CookieJar
 
-	public constructor( {
-		jarOptions
-	}: { jarOptions?: ConstructorParameters<typeof CookieJar>[0] } = {
-	} ) {
+	public constructor( { jarOptions }: { jarOptions?: ICookieJarOptions } = {} ) {
 		this.#jar = new CookieJar( jarOptions )
 	}
 
@@ -26,9 +20,7 @@ export class RequestManager {
 		this.#jar.clear( url )
 	}
 
-	public async get<T>( {
-		url, qs
-	}: { url: string, qs: Record<string, string> } ): Promise<T> {
+	public async get<T>( { url, qs }: { url: string, qs: Record<string, string> } ): Promise<T> {
 		const params = new URLSearchParams( qs )
 		const req = await fetch( `${ url }?${ params }`, {
 			headers: {
@@ -37,19 +29,18 @@ export class RequestManager {
 			method: 'GET'
 		} )
 
-		const cookies = req.headers.raw()[ 'set-cookie' ] || []
+		const cookies = req.headers.raw()[ 'set-cookie' ] ?? []
 		for ( const cookie of cookies ) {
 			this.#jar.set( {
-				cookie, url
+				cookie,
+				url
 			} )
 		}
 
 		return req.json() as unknown as T
 	}
 
-	public async post<T>( {
-		url, form
-	}: { url: string, form: Record<string, string | fs.ReadStream> } ): Promise<T> {
+	public async post<T>( { url, form }: { url: string, form: Record<string, string | fs.ReadStream> } ): Promise<T> {
 		const formData = new FormData()
 		for ( const prop in form ) {
 			formData.append( prop, form[ prop ] )
@@ -66,7 +57,8 @@ export class RequestManager {
 		const cookies = req.headers.raw()[ 'set-cookie' ] || []
 		for ( const cookie of cookies ) {
 			this.#jar.set( {
-				cookie, url
+				cookie,
+				url
 			} )
 		}
 
