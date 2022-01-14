@@ -27,7 +27,7 @@ export class Fandom {
 			: undefined
 		this.request = new RequestManager( {
 			jarOptions: {
-				prettify: prettyCookies,
+				prettify: prettyCookies ?? false,
 				store
 			}
 		} )
@@ -57,9 +57,9 @@ export class Fandom {
 
 	static url2interwiki( url: string ): string {
 		const nolangRegex = /https?:\/\/([a-z0-9-]+)\.fandom\.com\/(wiki|api|index)/
-		const nolang = url.match( nolangRegex )
+		const nolang = url.match( nolangRegex )?.[ 1 ]
 		if ( nolang ) {
-			return nolang[1]
+			return nolang
 		}
 
 		const langRegex = /https?:\/\/([a-z0-9-]+)\.fandom\.com\/([a-z-]+)\/(wiki|api|index)/
@@ -98,7 +98,7 @@ export class Fandom {
 			list: 'users',
 			ususers: username
 		} )
-		return query[0].userid
+		return query[0]?.userid
 	}
 
 	async getUsersIds( usernames: string[] ): Promise<Record<string, number | undefined>> {

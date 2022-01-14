@@ -12,6 +12,10 @@ describe( 'Fandom', () => {
 	const {
 		FANDOM_PASSWORD, FANDOM_USERNAME, FANDOM_WIKI
 	} = process.env as Record<string, string>
+	if ( !FANDOM_PASSWORD || !FANDOM_USERNAME || !FANDOM_WIKI ) {
+		process.exit( 1 )
+	}
+
 	const fandom = new Fandom()
 	const wiki = fandom.getWiki( FANDOM_WIKI.trim() )
 	let bot: FandomBot

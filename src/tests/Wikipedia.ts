@@ -10,6 +10,10 @@ describe( 'Wikipedia', () => {
 	const {
 		WIKIPEDIA_API, WIKIPEDIA_PASSWORD, WIKIPEDIA_USERNAME
 	} = process.env as Record<string, string>
+	if ( !WIKIPEDIA_API || !WIKIPEDIA_PASSWORD || !WIKIPEDIA_USERNAME ) {
+		process.exit( 1 )
+	}
+
 	const wiki = new Wiki( {
 		api: WIKIPEDIA_API
 	} )

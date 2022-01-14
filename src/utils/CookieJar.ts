@@ -27,23 +27,25 @@ export class CookieJar {
 
 	constructor( {
 		prettify, store
-	}: { prettify?: boolean, store?: ICookieStoreOptions } = {
+	}: { prettify?: boolean, store?: ICookieStoreOptions | undefined } = {
 	} ) {
 		this.#prettify = prettify ?? false
 		this.#storage = {
 		}
-		this.#store = store
+		if ( store ) this.#store = store
 
 		if ( !this.#store || !fs.existsSync( this.#store.path ) ) return
 		const jsonCookies: ICookieStorageJSON = fs.readJsonSync( this.#store.path )
 
 		for ( const host in jsonCookies ) {
 			this.#storage[ host ] = new Map()
-			for ( const cookiedata of jsonCookies[ host ] ) {
+			const hostCookies = jsonCookies[ host ]
+			if ( !hostCookies ) continue
+			for ( const cookiedata of hostCookies ) {
 				const cookie = tough.Cookie.fromJSON( cookiedata )
 				if ( !cookie ) continue
 				if ( cookie.expiryTime() < Date.now() ) continue
-				this.#storage[ host ].set( cookie.key, cookie )
+				this.#storage[ host ]?.set( cookie.key, cookie )
 			}
 		}
 		this.expire()
@@ -85,8 +87,9 @@ export class CookieJar {
 	get( url: string ): string {
 		const host = CookieJar.getHost( url )
 		this.expire( host )
-		if ( !this.#storage[ host ] ) return ''
-		return [ ...this.#storage[ host ].values() ].join( ';' )
+		const storage = this.#storage[ host ]
+		if ( !storage ) return ''
+		return [ ...storage.values() ].join( ';' )
 	}
 
 	set( {
@@ -98,7 +101,7 @@ export class CookieJar {
 
 		const host = CookieJar.getHost( url )
 		if ( !this.#storage[ host ] ) this.#storage[ host ] = new Map()
-		this.#storage[ host ].set( toughcookie.key, toughcookie )
+		this.#storage[ host ]?.set( toughcookie.key, toughcookie )
 
 		this.save()
 	}
@@ -131,8 +134,9 @@ export class CookieJar {
 		for ( const host in this.#storage ) {
 			jsonCookies[ host ] = []
 			const cookies = this.#storage[ host ]
+			if ( !cookies ) continue
 			for ( const cookie of cookies.values() ) {
-				jsonCookies[ host ].push( cookie.toJSON() )
+				jsonCookies[ host ]?.push( cookie.toJSON() )
 			}
 		}
 

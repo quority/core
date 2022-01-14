@@ -26,6 +26,7 @@ export class ErrorManager {
 
 	static getError( code: string, ...args: unknown[] ): errors.ApiError {
 		const error = ErrorManager.errors[ code ] ?? ErrorManager.errors.unknown
+		// @ts-expect-error - typings issue
 		return new error( ...args )
 	}
 

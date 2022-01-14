@@ -170,12 +170,13 @@ export class Wiki {
 				if ( page.missing === true ) {
 					pages[ page.title ] = ''
 				}
-
-				pages[ page.title ] = page.revisions[0].slots.main.content
+				
+				const content = page.revisions[ 0 ]?.slots.main.content
+				if ( content ) pages[ page.title ] = content
 			}
 		}
 
-		return Array.isArray( _titles ) ? pages : Object.values( pages )[ 0 ]
+		return Array.isArray( _titles ) ? pages : Object.values( pages )[ 0 ] ?? {}
 	}
 
 	async getToken<Token extends TokenType>( type: Token ): Promise<MediaWikiMetaResponse.Tokens<Token>> {
@@ -217,9 +218,12 @@ export class Wiki {
 				}
 			} >( params )
 
-			for ( const item of req.query.pages[ 0 ].transcludedin ) {
-				if ( item.ns !== 0 ) continue
-				result.push( item.title )
+			const results = req.query.pages[ 0 ]?.transcludedin
+			if ( results ) {
+				for ( const item of results ) {
+					if ( item.ns !== 0 ) continue
+					result.push( item.title )
+				}
 			}
 
 			if ( !req.continue ) break
@@ -320,10 +324,13 @@ export class Wiki {
 				...params
 			} )
 
-			for ( const item of req.query[ params.list ] ) {
-				result.push( item )
-				if ( limit && result.length === limit ) {
-					return result
+			const results = req.query[ params.list ]
+			if ( results ) {
+				for ( const item of results ) {
+					result.push( item )
+					if ( limit && result.length === limit ) {
+						return result
+					}
 				}
 			}
 
@@ -375,11 +382,14 @@ export class Wiki {
 				...params
 			} )
 
-			for ( const item of req.query[ params.list ] ) {
-				yield item
-				counter++
-				if ( limit && counter === limit ) {
-					return
+			const results = req.query[ params.list ]
+			if ( results ) {
+				for ( const item of results ) {
+					yield item
+					counter++
+					if ( limit && counter === limit ) {
+						return
+					}
 				}
 			}
 

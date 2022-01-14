@@ -13,11 +13,10 @@ export class FandomWiki extends Wiki {
 	id?: number
 
 	constructor( {
-		disableLogger, interwiki, request
-	}: { disableLogger?: boolean, interwiki: string, request: RequestManager } ) {
+		interwiki, request
+	}: { interwiki: string, request: RequestManager } ) {
 		super( {
 			api: Fandom.interwiki2api( interwiki ),
-			disableLogger,
 			request
 		} )
 		Logger.community( `Initializing wiki "${ interwiki }".` )
@@ -30,7 +29,7 @@ export class FandomWiki extends Wiki {
 		return new URL( title, base ).href
 	}
 
-	async load(): Promise<Loaded<this>> {
+	override async load(): Promise<Loaded<this>> {
 		const siteinfo = await this.getSiteInfo( 'general', 'variables' )
 
 		this.mainpage = siteinfo.query.general.mainpage

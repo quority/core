@@ -3,7 +3,7 @@ import {
 } from './ApiError'
 
 export class SelfMoveError extends ApiError {
-	static readonly code = 'selfmove'
+	static override readonly code = 'selfmove'
 
 	constructor() {
 		super( 'Can\'t move a page to itself.' )
