@@ -30,7 +30,7 @@ export class Wiki {
 	private querystring<T extends NoJSONRequest<POSTRequestJSON>>( params: T ): Record<keyof T, string | fs.ReadStream>
 	private querystring<T extends NoJSONRequest<GETRequestJSON | POSTRequestJSON>>( params: T ): Record<keyof T, string | fs.ReadStream> {
 		const qs = {} as Record<keyof T, string | fs.ReadStream>
-		
+
 		let prop: keyof T
 		for ( prop in params ) {
 			const value = params[ prop ]
@@ -40,7 +40,7 @@ export class Wiki {
 				const values = value as unknown[]
 				qs[ prop ] =  values.join( '|' )
 			} else if ( value instanceof fs.ReadStream ) {
-				qs[ prop ] = value as fs.ReadStream
+				qs[ prop ] = value
 			} else {
 				qs[ prop ] = `${ value }`
 			}
@@ -49,34 +49,33 @@ export class Wiki {
 		return qs
 	}
 
-	public async get<T, U extends GETRequestJSON = GETRequestJSON>( userparams: NoJSONRequest<U> ): Promise<T> {
-		const qs = this.querystring( {
+	protected raw<Method extends 'GET' | 'POST', T, U extends Method extends 'GET' ? GETRequestJSON : POSTRequestJSON>( userparams: NoJSONRequest<U>, method: Method ): Promise<T> {
+		const params = {
 			...userparams,
 			format: 'json',
 			formatversion: 2
-		} )
+		}
+		const qs = this.querystring( params )
 
-		const res = await this.request.get<T>( {
-			qs,
-			url: this.api
-		} )
-
-		return res
+		if ( method === 'GET' ) {
+			return this.request.get( {
+				qs: qs as Record<string, string>,
+				url: this.api
+			} )
+		} else {
+			return this.request.post( {
+				form: qs,
+				url: this.api
+			} )
+		}
 	}
 
-	public async post<T, U extends POSTRequestJSON = POSTRequestJSON>( userparams: NoJSONRequest<U> ): Promise<T> {
-		const qs = this.querystring( {
-			...userparams,
-			format: 'json',
-			formatversion: 2
-		} )
+	public get<T, U extends GETRequestJSON = GETRequestJSON>( userparams: NoJSONRequest<U> ): Promise<T> {
+		return this.raw( userparams, 'GET' )
+	}
 
-		const res = await this.request.post<T>( {
-			form: qs,
-			url: this.api
-		} )
-
-		return res
+	public post<T, U extends POSTRequestJSON = POSTRequestJSON>( userparams: NoJSONRequest<U> ): Promise<T> {
+		return this.raw( userparams, 'POST' )
 	}
 
 	public async exists(): Promise<boolean> {
