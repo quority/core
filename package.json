@@ -11,7 +11,7 @@
   "types": "dist/main.d.ts",
   "scripts": {
     "build": "yarn tsc --listEmittedFiles --incremental",
-    "rebuil": "rimraf tsconfig.tsbuildinfo dist && yarn tsc --listEmittedFiles --incremental",
+    "re-build": "rimraf tsconfig.tsbuildinfo dist && yarn tsc --listEmittedFiles --incremental",
     "lint": "eslint src/ --ext .ts --cache",
     "lint:fix": "eslint src/ --fix --ext .ts --cache",
     "prepare": "husky install .github/husky",
