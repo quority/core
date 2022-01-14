@@ -1,9 +1,9 @@
+import type { RequestInit, Response } from 'node-fetch'
 import { CookieJar } from './CookieJar'
 import fetch from 'node-fetch'
 import FormData from 'form-data'
 import type fs from 'fs'
 import type { ICookieJarOptions } from './CookieJar'
-import type { Response } from 'node-fetch'
 
 export class RequestManager {
 	#jar: CookieJar
@@ -22,20 +22,10 @@ export class RequestManager {
 
 	public async get<T>( { url, qs }: { url: string, qs: Record<string, string> } ): Promise<T> {
 		const params = new URLSearchParams( qs )
-		const req = await fetch( `${ url }?${ params }`, {
-			headers: {
-				cookie: this.#jar.get( url )
-			},
-			method: 'GET'
-		} )
+		const req = await this.raw( `${ url }?${ params }` )
 
 		const cookies = req.headers.raw()[ 'set-cookie' ] ?? []
-		for ( const cookie of cookies ) {
-			this.#jar.set( {
-				cookie,
-				url
-			} )
-		}
+		this.addCookies( url, cookies )
 
 		return req.json() as unknown as T
 	}
@@ -46,31 +36,34 @@ export class RequestManager {
 			formData.append( prop, form[ prop ] )
 		}
 
-		const req = await fetch( url, {
+		const req = await this.raw( url, {
 			body: formData,
-			headers: {
-				cookie: this.#jar.get( url )
-			},
 			method: 'POST'
 		} )
 
 		const cookies = req.headers.raw()[ 'set-cookie' ] || []
+		this.addCookies( url, cookies )
+
+		return req.json() as unknown as T
+	}
+
+	public raw( url: string, fetchOptions: RequestInit = {} ): Promise<Response> {
+		fetchOptions.method ??= 'GET'
+
+		return fetch( url, {
+			...fetchOptions,
+			headers: {
+				cookie: this.#jar.get( url )
+			}
+		} )
+	}
+
+	private addCookies( url: string, cookies: string[] ): void {
 		for ( const cookie of cookies ) {
 			this.#jar.set( {
 				cookie,
 				url
 			} )
 		}
-
-		return req.json() as unknown as T
-	}
-
-	public raw( url: string ): Promise<Response> {
-		return fetch( url, {
-			headers: {
-				cookie: this.#jar.get( url )
-			},
-			method: 'GET'
-		} )
 	}
 }
