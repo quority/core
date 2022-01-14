@@ -199,10 +199,10 @@ export class Bot<WikiType extends Wiki = Wiki> {
 
 		const tmpdir = await tmp.dir()
 		const filepath = path.resolve( tmpdir.path, filename )
-		const buffer = await image.arrayBuffer()
+		const buffer = await image.buffer()
 		fs.writeFileSync(
 			filepath,
-			Buffer.from( buffer )
+			buffer
 		)
 
 		const file = fs.createReadStream( filepath )
