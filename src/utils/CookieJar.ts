@@ -20,18 +20,19 @@ export interface ICookieStorageJSON {
 	[ url: string ]: Array<Record<string, unknown>>
 }
 
+export interface ICookieJarOptions {
+	prettify?: boolean
+	store?: ICookieStoreOptions | undefined
+}
+
 export class CookieJar {
 	#storage: ICookieStorage
 	#store?: ICookieStoreOptions
 	#prettify: boolean
 
-	public constructor( {
-		prettify, store
-	}: { prettify?: boolean, store?: ICookieStoreOptions | undefined } = {
-	} ) {
-		this.#prettify = prettify ?? false
-		this.#storage = {
-		}
+	public constructor( { prettify = false, store }: ICookieJarOptions = {} ) {
+		this.#prettify = prettify
+		this.#storage = {}
 		if ( store ) this.#store = store
 
 		if ( !this.#store || !fs.existsSync( this.#store.path ) ) return
@@ -58,8 +59,7 @@ export class CookieJar {
 	}
 
 	public clearAll(): void {
-		this.#storage = {
-		}
+		this.#storage = {}
 	}
 
 	public expire( url?: string ): void {
@@ -94,9 +94,7 @@ export class CookieJar {
 		return [ ...storage.values() ].join( ';' )
 	}
 
-	public set( {
-		cookie, url
-	}: { cookie: string, url: string } ): void {
+	public set( { cookie, url }: { cookie: string, url: string } ): void {
 		const toughcookie = tough.parse( cookie )
 
 		if ( !toughcookie || !this.allowCookie( toughcookie ) ) return
@@ -116,9 +114,7 @@ export class CookieJar {
 	}
 
 	private static getHost( url: string ): string {
-		const {
-			host, pathname
-		} = new URL( url )
+		const { host, pathname } = new URL( url )
 		const lang = pathname.match( /\/([a-z-]+)\// )?.[ 1 ]
 
 		if ( lang ) {
@@ -131,8 +127,7 @@ export class CookieJar {
 		if ( !this.#store ) return
 
 		fs.ensureFileSync( this.#store.path )
-		const jsonCookies: ICookieStorageJSON = {
-		}
+		const jsonCookies: ICookieStorageJSON = {}
 		for ( const host in this.#storage ) {
 			jsonCookies[ host ] = []
 			const cookies = this.#storage[ host ]
