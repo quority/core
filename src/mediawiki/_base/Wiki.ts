@@ -1,7 +1,3 @@
-import {
-	Logger,
-	RequestManager
-} from '../../utils'
 import type {
 	MediaWikiMetaRequest,
 	MediaWikiMetaResponse,
@@ -16,6 +12,9 @@ import type {
 	TokenType
 } from '../../types'
 import fs from 'fs'
+import {
+	RequestManager
+} from '../../utils'
 
 export type Loaded<T extends Wiki = Wiki> = Required<T>
 
@@ -37,13 +36,10 @@ export class Wiki {
 	public wikiid?: string
 
 	public constructor( {
-		api, disableLogger = true, request
-	}: { api: string, disableLogger?: boolean, request?: RequestManager } ) {
+		api, request
+	}: { api: string, request?: RequestManager } ) {
 		this.api = api.trim()
 		this.request = request ?? new RequestManager()
-		if ( disableLogger ) {
-			Logger.disable()
-		}
 	}
 
 	public async get<T, U = RequestGETParameters>( userparams: U ): Promise<T> {
@@ -132,7 +128,7 @@ export class Wiki {
 			try {
 				result[ iw.prefix ] = iw.url
 			} catch ( e ) {
-				Logger.error( `An error occurred when processing "${ iw.prefix }" interwiki: ${ iw.url }. It will be skipped.` )
+				continue
 			}
 		}
 

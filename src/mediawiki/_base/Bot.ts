@@ -8,9 +8,6 @@ import {
 } from '../../errors'
 import fetch from 'node-fetch'
 import fs from 'fs-extra'
-import {
-	Logger
-} from '../../utils'
 import path from 'path'
 import tmp from 'tmp-promise'
 import type {
@@ -102,7 +99,6 @@ export class Bot<WikiType extends Wiki = Wiki> {
 			if ( isLoggedIn ) return
 		}
 		this.#wiki.request.clear( this.#wiki.api )
-		Logger.account( `Logging in into account "${ this.#username }" for "${ this.#wiki.api }".` )
 
 		const tokenreq = await this.#wiki.getToken( 'login' )
 		const lgtoken = tokenreq.query.tokens.logintoken

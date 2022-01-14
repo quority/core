@@ -3,9 +3,6 @@ import {
 } from './Fandom'
 import type {
 	Loaded } from '../_base'
-import {
-	Logger
-} from '../../utils'
 import type { RequestManager
 } from '../../utils'
 import { Wiki
@@ -22,7 +19,6 @@ export class FandomWiki extends Wiki {
 			api: Fandom.interwiki2api( interwiki ),
 			request
 		} )
-		Logger.community( `Initializing wiki "${ interwiki }".` )
 
 		this.interwiki = interwiki
 	}
