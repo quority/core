@@ -65,33 +65,11 @@ export class Wiki {
 	}
 
 	public async post<T, U extends POSTRequestJSON = POSTRequestJSON>( userparams: NoJSONRequest<U> ): Promise<T> {
-		const params = {
-			...userparams,
-			format: 'json',
-			formatversion: 2
-		}
-		type ParamsKey = keyof typeof params
-
 		const qs = this.querystring( {
 			...userparams,
 			format: 'json',
 			formatversion: 2
 		} )
-
-		let prop: ParamsKey
-		for ( prop in params ) {
-			const value = params[ prop ]
-			if ( value instanceof fs.ReadStream ) {
-				qs[ prop ] = value as fs.ReadStream
-			} else if ( typeof value === 'boolean' ) {
-				qs[ prop ] = value ? '1' : '0'
-			} else if ( Array.isArray( value ) ) {
-				const values = value as unknown[]
-				qs[ prop ] = values.join( '|' )
-			} else {
-				qs[ prop ] = `${ value }`
-			}
-		}
 
 		const res = await this.request.post<T>( {
 			form: qs,
