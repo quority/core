@@ -1,29 +1,26 @@
 import { FandomBot } from './FandomBot'
 import { FandomWiki } from './FandomWiki'
-import type { ICookieStoreOptions } from '../../utils'
+import type { ICookieJarOptions } from '../../utils'
 import { InvalidInterwikiError } from '../../errors'
 import { RequestManager } from '../../utils'
 
 export class Fandom {
+	public static request?: RequestManager
+
 	public readonly request: RequestManager
 
-	public constructor( {
-		cookies,
-		prettyCookies
-	}: { cookies?: string, prettyCookies?: boolean } = {
-	} ) {
-		const store: ICookieStoreOptions | undefined = cookies
-			? {
-				path: cookies, regex: [
-					/^wikicities_/, /^wikia_/
-				]
+	public constructor( { cookies, prettyCookies = false }: { cookies?: string, prettyCookies?: boolean } = {} ) {
+		const jarOptions: ICookieJarOptions = {
+			prettify: prettyCookies
+		}
+		if ( cookies ) {
+			jarOptions.store = {
+				path: cookies,
+				regex: [ /^wiki(a|cities)_/ ]
 			}
-			: undefined
+		}
 		this.request = new RequestManager( {
-			jarOptions: {
-				prettify: prettyCookies ?? false,
-				store
-			}
+			jarOptions
 		} )
 	}
 
@@ -39,6 +36,14 @@ export class Fandom {
 			return `https://${ interwiki }.fandom.com`
 		}
 		throw new InvalidInterwikiError( interwiki )
+	}
+
+	public static getWiki( interwiki: string ): FandomWiki {
+		if ( !this.request ) this.request = new RequestManager()
+		return new FandomWiki( {
+			interwiki,
+			request: this.request
+		} )
 	}
 
 	public static interwiki2api( interwiki: string ): string {
