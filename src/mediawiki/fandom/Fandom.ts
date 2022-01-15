@@ -73,36 +73,36 @@ export class Fandom {
 		throw new InvalidInterwikiError( url )
 	}
 
-	public async getUserAvatar( username: string ): Promise<string | undefined> {
+	public async getUserAvatar( username: string ): Promise<string | null> {
 		const userId = await this.getUserId( username )
-		if ( !userId ) return undefined
+		if ( !userId ) return null
 
 		const req = await this.request.raw( `https://services.fandom.com/user-attribute/user/${ userId }/attr/avatar` )
 		const res = await req.json() as unknown as { value?: string }
 
-		return res.value
+		return res.value ?? null
 	}
 
-	public async getUserDiscordTag( username: string ): Promise<string | undefined> {
+	public async getUserDiscordTag( username: string ): Promise<string | null> {
 		const userId = await this.getUserId( username )
-		if ( !userId ) return undefined
+		if ( !userId ) return null
 
 		const req = await this.request.raw( `https://services.fandom.com/user-attribute/user/${ userId }/attr/discordHandle` )
 		const res = await req.json() as unknown as { value?: string }
 
-		return res.value
+		return res.value ?? null
 	}
 
-	public async getUserId( username: string ): Promise<number | undefined> {
+	public async getUserId( username: string ): Promise<number | null> {
 		const wiki = this.getWiki( 'community' )
 		const query = await wiki.queryList( {
 			list: 'users',
 			ususers: username
 		} )
-		return query[ 0 ]?.userid
+		return query[ 0 ]?.userid ?? null
 	}
 
-	public async getUsersIds( usernames: string[] ): Promise<Record<string, number | undefined>> {
+	public async getUsersIds( usernames: string[] ): Promise<Record<string, number>> {
 		const wiki = this.getWiki( 'community' )
 		const query = await wiki.queryList( {
 			list: 'users',
@@ -111,8 +111,7 @@ export class Fandom {
 		return query.reduce( ( result, user ) => {
 			result[ user.name ] = user.userid
 			return result
-		}, {
-		} as Record<string, number> )
+		}, {} as Record<string, number> )
 	}
 
 	public getWiki( interwiki: string ): FandomWiki {
