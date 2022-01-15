@@ -12,9 +12,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 
 	#csrf?: string
 
-	public constructor( {
-		password, username, wiki
-	}: { password: string, username: string, wiki: WikiType } ) {
+	public constructor( { password, username, wiki }: { password: string, username: string, wiki: WikiType } ) {
 		this.#password = password.trim()
 		this.#username = username.trim()
 		this.#wiki = wiki
@@ -28,21 +26,18 @@ export class Bot<WikiType extends Wiki = Wiki> {
 	}
 
 	public async block( params: NoActionToken<BlockRequest> ): Promise<BlockResponse> {
-		const token = await this.getCSRFToken()
 		return this.wiki.post<BlockResponse, BlockRequest>( {
 			...params,
 			action: 'block',
-			token
+			token: await this.getCSRFToken()
 		} )
 	}
 
 	public async delete( params: NoActionToken<DeleteRequest> ): Promise<DeleteResponse> {
-		const token = await this.getCSRFToken()
-
 		const req = await this.#wiki.post<DeleteResponse | APIError>( {
 			...params,
 			action: 'delete',
-			token
+			token: await this.getCSRFToken()
 		} )
 
 		if ( 'error' in req ) {
@@ -54,13 +49,11 @@ export class Bot<WikiType extends Wiki = Wiki> {
 	}
 
 	public async edit( params: NoActionToken<EditRequest> ): Promise<EditResponse> {
-		const token = await this.getCSRFToken()
-
 		const req = await this.#wiki.post<EditResponse | APIError>( {
 			...params,
 			action: 'edit',
 			assert: params.bot ? 'bot' : 'user',
-			token
+			token: await this.getCSRFToken()
 		} )
 
 		if ( 'error' in req ) {
@@ -116,11 +109,10 @@ export class Bot<WikiType extends Wiki = Wiki> {
 	}
 
 	public async move( params: NoActionToken<MoveRequest> ): Promise<MoveResponse> {
-		const token = await this.getCSRFToken()
 		const req = await this.#wiki.post<MoveResponse | APIError>( {
 			...params,
 			action: 'move',
-			token
+			token: await this.getCSRFToken()
 		} )
 
 		if ( 'error' in req ) {
@@ -132,12 +124,10 @@ export class Bot<WikiType extends Wiki = Wiki> {
 	}
 
 	public async protect( params: NoActionToken<ProtectRequest> ): Promise<ProtectResponse> {
-		const token = await this.getCSRFToken()
-
 		return this.wiki.post( {
 			...params,
 			action: 'protect',
-			token
+			token: await this.getCSRFToken()
 		} )
 	}
 
@@ -150,21 +140,18 @@ export class Bot<WikiType extends Wiki = Wiki> {
 	}
 
 	public async unblock( params: NoActionToken<BlockRequest> ): Promise<BlockResponse> {
-		const token = await this.getCSRFToken()
 		return this.wiki.post( {
 			...params,
 			action: 'unblock',
-			token
+			token: await this.getCSRFToken()
 		} )
 	}
 
 	public async upload( params: NoActionToken<UploadRequest> ): Promise<UploadResponse> {
-		const token = await this.getCSRFToken()
-
 		const req = await this.#wiki.post<UploadResponse | APIError>( {
 			...params,
 			action: 'upload',
-			token
+			token: await this.getCSRFToken()
 		} )
 
 		if ( 'error' in req ) {
