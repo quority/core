@@ -232,86 +232,12 @@ export class Wiki {
 	public async queryList( params: { list: 'usercontribs' } & NoActionToken<UserContribsRequest>, limit?: number ): Promise<UserContribsResponse[ 'query' ][ 'usercontribs' ]>
 	public async queryList( params: { list: 'users' } & NoActionToken<UsersRequest>, limit?: number ): Promise<UsersResponse[ 'query' ][ 'users' ]>
 	public async queryList( params: { list: string } & NoActionToken<QueryRequest>, limit?: number ): Promise<ListQueryResponse[ 'query' ][ string ]> {
+		const generator = this.iterQueryList( params, limit )
 		const result: ListQueryResponse[ 'query' ][ string ] = []
-
-		// eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
-		while ( true ) {
-			const req = await this.get<ListQueryResponse>( {
-				action: 'query',
-				...params
-			} )
-
-			const [ results ] = Object.values( req.query )
-			if ( results ) {
-				for ( const item of results ) {
-					result.push( item )
-					if ( limit && result.length === limit ) {
-						return result
-					}
-				}
-			}
-
-			if ( !req.continue ) break
-
-			const continuekey = Object.keys( req.continue ).find( i => i !== 'continue' )
-			if ( !continuekey ) break
-			// @ts-expect-error - faulty typing i don't know how to fix
-			params[ continuekey ] = req.continue[ continuekey ] // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+		for await ( const item of generator ) {
+			result.push( item )
 		}
-
 		return result
-	}
-
-	public async queryProp( params: { prop: 'transcludedin' } & NoActionToken<TranscludedInRequest>, limit?: number ): Promise<TranscludedInResponse[ 'query' ][ 'pages' ]>
-	public async queryProp( params: { prop: string } & NoActionToken<QueryRequest>, limit?: number ): Promise<ListQueryResponse[ 'query' ][ string ]> {
-		const result: ListQueryResponse[ 'query' ][ string ] = []
-
-		// eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
-		while ( true ) {
-			const req = await this.get<ListQueryResponse>( {
-				action: 'query',
-				...params
-			} )
-
-			const [ results ] = Object.values( req.query )
-			if ( results ) {
-				for ( const item of results ) {
-					result.push( item )
-					if ( limit && result.length === limit ) {
-						return result
-					}
-				}
-			}
-
-			if ( !req.continue ) break
-
-			const continuekey = Object.keys( req.continue ).find( i => i !== 'continue' )
-			if ( !continuekey ) break
-			// @ts-expect-error - faulty typing i don't know how to fix
-			params[ continuekey ] = req.continue[ continuekey ] // eslint-disable-line @typescript-eslint/no-unsafe-assignment
-		}
-
-		return result
-	}
-
-	public async *iterPages( titles: string[] ): AsyncGenerator<RevisionsResponse[ 'query' ][ 'pages' ][ 0 ], void, unknown> {
-		while ( titles.length !== 0 ) {
-			const res = await this.get<RevisionsResponse>( {
-				action: 'query',
-				prop: 'revisions',
-				rvprop: 'content',
-				rvslots: 'main',
-				titles: titles.splice( 0, 50 ).join( '|' )
-			} )
-
-			for ( const page of res.query.pages ) {
-				if ( page.missing === true ) {
-					continue
-				}
-
-				yield page
-			}
-		}
 	}
 
 	public iterQueryList( params: { list: 'allcategories' } & NoActionToken<AllCategoriesRequest>, limit?: number ): AsyncGenerator<AllCategoriesResponse[ 'query' ][ 'allcategories' ][ 0 ], void, unknown>
@@ -322,6 +248,7 @@ export class Wiki {
 	public iterQueryList( params: { list: 'recentchanges' } & NoActionToken<RecentChangesRequest>, limit?: number ): AsyncGenerator<RecentChangesResponse[ 'query' ][ 'recentchanges' ][ 0 ], void, unknown>
 	public iterQueryList( params: { list: 'usercontribs' } & NoActionToken<UserContribsRequest>, limit?: number ): AsyncGenerator<UserContribsResponse[ 'query' ][ 'usercontribs' ][ 0 ], void, unknown>
 	public iterQueryList( params: { list: 'users' } & NoActionToken<UsersRequest>, limit?: number ): AsyncGenerator<UsersResponse[ 'query' ][ 'users' ][ 0 ], void, unknown>
+	public iterQueryList( params: { list: string } & NoActionToken<QueryRequest>, limit?: number ): AsyncGenerator<ListQueryResponse[ 'query' ][ string ][ 0 ], void, unknown>
 	public async *iterQueryList( params: { list: string } & NoActionToken<QueryRequest>, limit?: number ): AsyncGenerator<ListQueryResponse[ 'query' ][ string ][ 0 ], void, unknown> {
 		let counter = 0
 		// eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
@@ -348,6 +275,67 @@ export class Wiki {
 			if ( !continuekey ) break
 			// @ts-expect-error - faulty typing i don't know how to fix
 			params[ continuekey ] = req.continue[ continuekey ] // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+		}
+	}
+
+	public async queryProp( params: { prop: 'transcludedin' } & NoActionToken<TranscludedInRequest>, limit?: number ): Promise<TranscludedInResponse[ 'query' ][ 'pages' ]>
+	public async queryProp( params: { prop: string } & NoActionToken<QueryRequest>, limit?: number ): Promise<ListQueryResponse[ 'query' ][ string ]> {
+		const generator = this.iterQueryProp( params, limit )
+		const result: ListQueryResponse[ 'query' ][ string ] = []
+		for await ( const item of generator ) {
+			result.push( item )
+		}
+		return result
+	}
+
+	public iterQueryProp( params: { prop: 'transcludedin' } & NoActionToken<TranscludedInRequest>, limit?: number ): AsyncGenerator<TranscludedInResponse[ 'query' ][ 'pages' ][ 0 ], void, unknown>
+	public iterQueryProp( params: { prop: string } & NoActionToken<QueryRequest>, limit?: number ): AsyncGenerator<ListQueryResponse[ 'query' ][ string ][ 0 ], void, unknown>
+	public async *iterQueryProp( params: { prop: string } & NoActionToken<QueryRequest>, limit?: number ): AsyncGenerator<ListQueryResponse[ 'query' ][ string ][ 0 ], void, unknown> {
+		let counter = 0
+		// eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
+		while ( true ) {
+			const req = await this.get<ListQueryResponse>( {
+				action: 'query',
+				...params
+			} )
+
+			const [ results ] = Object.values( req.query )
+			if ( results ) {
+				for ( const item of results ) {
+					yield item
+					counter++
+					if ( limit && counter === limit ) {
+						return
+					}
+				}
+			}
+
+			if ( !req.continue ) break
+
+			const continuekey = Object.keys( req.continue ).find( i => i !== 'continue' )
+			if ( !continuekey ) break
+			// @ts-expect-error - faulty typing i don't know how to fix
+			params[ continuekey ] = req.continue[ continuekey ] // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+		}
+	}
+
+	public async *iterPages( titles: string[] ): AsyncGenerator<RevisionsResponse[ 'query' ][ 'pages' ][ 0 ], void, unknown> {
+		while ( titles.length !== 0 ) {
+			const res = await this.get<RevisionsResponse>( {
+				action: 'query',
+				prop: 'revisions',
+				rvprop: 'content',
+				rvslots: 'main',
+				titles: titles.splice( 0, 50 ).join( '|' )
+			} )
+
+			for ( const page of res.query.pages ) {
+				if ( page.missing === true ) {
+					continue
+				}
+
+				yield page
+			}
 		}
 	}
 

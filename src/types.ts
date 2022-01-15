@@ -945,7 +945,7 @@ export interface RecentChangesRequest extends QueryRequest {
 }
 
 export interface TranscludedInRequest extends QueryRequest {
-	titles: string[]
+	titles: string | string[]
 
 	/**
 	 * When more results are available, use this to continue.
