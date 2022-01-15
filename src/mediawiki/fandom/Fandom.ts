@@ -90,7 +90,7 @@ export class Fandom {
 
 	public async getUserId( username: string ): Promise<number | undefined> {
 		const wiki = this.getWiki( 'community' )
-		const query = await wiki.query( {
+		const query = await wiki.queryList( {
 			list: 'users',
 			ususers: username
 		} )
@@ -99,7 +99,7 @@ export class Fandom {
 
 	public async getUsersIds( usernames: string[] ): Promise<Record<string, number | undefined>> {
 		const wiki = this.getWiki( 'community' )
-		const query = await wiki.query( {
+		const query = await wiki.queryList( {
 			list: 'users',
 			ususers: usernames
 		} )

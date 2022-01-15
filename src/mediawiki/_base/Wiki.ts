@@ -1,4 +1,4 @@
-import type { AllCategoriesRequest, AllCategoriesResponse, AllImagesRequest, AllImagesResponse, AllPagesRequest, AllPagesResponse, CategoryMembersRequest, CategoryMembersResponse, GETRequestJSON, ListQueryResponse, LogEventsRequest, LogEventsResponse, NoActionToken, NoJSONRequest, POSTRequestJSON, PurgeResponse, QueryRequest, RecentChangesRequest, RecentChangesResponse, Request, RequireOnlyOne, RevisionsResponse, SiteInfoRequest, SiteInfoResponse, TokensRequest, TokensResponse, TokenType, TranscludedInRequest, TranscludedInResponse, UserContribsRequest, UserContribsResponse, UsersRequest, UsersResponse } from '../../types'
+import type { AllCategoriesRequest, AllCategoriesResponse, AllImagesRequest, AllImagesResponse, AllPagesRequest, AllPagesResponse, CategoryMembersRequest, CategoryMembersResponse, GETRequestJSON, ListQueryResponse, LogEventsRequest, LogEventsResponse, NoActionToken, NoJSONRequest, POSTRequestJSON, PurgeResponse, QueryRequest, RecentChangesRequest, RecentChangesResponse, Request, RevisionsResponse, SiteInfoRequest, SiteInfoResponse, TokensRequest, TokensResponse, TokenType, TranscludedInRequest, TranscludedInResponse, UserContribsRequest, UserContribsResponse, UsersRequest, UsersResponse } from '../../types'
 import fs from 'fs'
 import { RequestManager } from '../../utils'
 
@@ -223,16 +223,47 @@ export class Wiki {
 		return result
 	}
 
-	public async query( params: { list: 'allcategories', prop?: undefined } & NoActionToken<AllCategoriesRequest>, limit?: number ): Promise<AllCategoriesResponse[ 'query' ][ 'allcategories' ]>
-	public async query( params: { list: 'allimages', prop?: undefined } & NoActionToken<AllImagesRequest>, limit?: number ): Promise<AllImagesResponse[ 'query' ][ 'allimages' ]>
-	public async query( params: { list: 'allpages', prop?: undefined } & NoActionToken<AllPagesRequest>, limit?: number ): Promise<AllPagesResponse[ 'query' ][ 'allpages' ]>
-	public async query( params: { list: 'categorymembers', prop?: undefined } & NoActionToken<CategoryMembersRequest>, limit?: number ): Promise<CategoryMembersResponse[ 'query' ][ 'categorymembers' ]>
-	public async query( params: { list: 'logevents', prop?: undefined } & NoActionToken<LogEventsRequest>, limit?: number ): Promise<LogEventsResponse[ 'query' ][ 'logevents' ]>
-	public async query( params: { list: 'recentchanges', prop?: undefined } & NoActionToken<RecentChangesRequest>, limit?: number ): Promise<RecentChangesResponse[ 'query' ][ 'recentchanges' ]>
-	public async query( params: { list?: undefined, prop: 'transcludedin' } & NoActionToken<TranscludedInRequest>, limit?: number ): Promise<TranscludedInResponse[ 'query' ][ 'pages' ]>
-	public async query( params: { list: 'usercontribs', prop?: undefined } & NoActionToken<UserContribsRequest>, limit?: number ): Promise<UserContribsResponse[ 'query' ][ 'usercontribs' ]>
-	public async query( params: { list: 'users', prop?: undefined } & NoActionToken<UsersRequest>, limit?: number ): Promise<UsersResponse[ 'query' ][ 'users' ]>
-	public async query( params: RequireOnlyOne<{ list: string; prop: string }, 'list' | 'prop'> & NoActionToken<QueryRequest>, limit?: number ): Promise<ListQueryResponse[ 'query' ][ string ]> {
+	public async queryList( params: { list: 'allcategories' } & NoActionToken<AllCategoriesRequest>, limit?: number ): Promise<AllCategoriesResponse[ 'query' ][ 'allcategories' ]>
+	public async queryList( params: { list: 'allimages' } & NoActionToken<AllImagesRequest>, limit?: number ): Promise<AllImagesResponse[ 'query' ][ 'allimages' ]>
+	public async queryList( params: { list: 'allpages' } & NoActionToken<AllPagesRequest>, limit?: number ): Promise<AllPagesResponse[ 'query' ][ 'allpages' ]>
+	public async queryList( params: { list: 'categorymembers' } & NoActionToken<CategoryMembersRequest>, limit?: number ): Promise<CategoryMembersResponse[ 'query' ][ 'categorymembers' ]>
+	public async queryList( params: { list: 'logevents' } & NoActionToken<LogEventsRequest>, limit?: number ): Promise<LogEventsResponse[ 'query' ][ 'logevents' ]>
+	public async queryList( params: { list: 'recentchanges' } & NoActionToken<RecentChangesRequest>, limit?: number ): Promise<RecentChangesResponse[ 'query' ][ 'recentchanges' ]>
+	public async queryList( params: { list: 'usercontribs' } & NoActionToken<UserContribsRequest>, limit?: number ): Promise<UserContribsResponse[ 'query' ][ 'usercontribs' ]>
+	public async queryList( params: { list: 'users' } & NoActionToken<UsersRequest>, limit?: number ): Promise<UsersResponse[ 'query' ][ 'users' ]>
+	public async queryList( params: { list: string } & NoActionToken<QueryRequest>, limit?: number ): Promise<ListQueryResponse[ 'query' ][ string ]> {
+		const result: ListQueryResponse[ 'query' ][ string ] = []
+
+		// eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
+		while ( true ) {
+			const req = await this.get<ListQueryResponse>( {
+				action: 'query',
+				...params
+			} )
+
+			const [ results ] = Object.values( req.query )
+			if ( results ) {
+				for ( const item of results ) {
+					result.push( item )
+					if ( limit && result.length === limit ) {
+						return result
+					}
+				}
+			}
+
+			if ( !req.continue ) break
+
+			const continuekey = Object.keys( req.continue ).find( i => i !== 'continue' )
+			if ( !continuekey ) break
+			// @ts-expect-error - faulty typing i don't know how to fix
+			params[ continuekey ] = req.continue[ continuekey ] // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+		}
+
+		return result
+	}
+
+	public async queryProp( params: { prop: 'transcludedin' } & NoActionToken<TranscludedInRequest>, limit?: number ): Promise<TranscludedInResponse[ 'query' ][ 'pages' ]>
+	public async queryProp( params: { prop: string } & NoActionToken<QueryRequest>, limit?: number ): Promise<ListQueryResponse[ 'query' ][ string ]> {
 		const result: ListQueryResponse[ 'query' ][ string ] = []
 
 		// eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
@@ -283,15 +314,15 @@ export class Wiki {
 		}
 	}
 
-	public iterQuery( params: { list: 'allcategories' } & NoActionToken<AllCategoriesRequest>, limit?: number ): AsyncGenerator<AllCategoriesResponse[ 'query' ][ 'allcategories' ][ 0 ], void, unknown>
-	public iterQuery( params: { list: 'allimages' } & NoActionToken<AllImagesRequest>, limit?: number ): AsyncGenerator<AllImagesResponse[ 'query' ][ 'allimages' ][ 0 ], void, unknown>
-	public iterQuery( params: { list: 'allpages' } & NoActionToken<AllPagesRequest>, limit?: number ): AsyncGenerator<AllPagesResponse[ 'query' ][ 'allpages' ][ 0 ], void, unknown>
-	public iterQuery( params: { list: 'categorymembers' } & NoActionToken<CategoryMembersRequest>, limit?: number ): AsyncGenerator<CategoryMembersResponse[ 'query' ][ 'categorymembers' ][ 0 ], void, unknown>
-	public iterQuery( params: { list: 'logevents' } & NoActionToken<LogEventsRequest>, limit?: number ): AsyncGenerator<LogEventsResponse[ 'query' ][ 'logevents' ][ 0 ], void, unknown>
-	public iterQuery( params: { list: 'recentchanges' } & NoActionToken<RecentChangesRequest>, limit?: number ): AsyncGenerator<RecentChangesResponse[ 'query' ][ 'recentchanges' ][ 0 ], void, unknown>
-	public iterQuery( params: { list: 'usercontribs' } & NoActionToken<UserContribsRequest>, limit?: number ): AsyncGenerator<UserContribsResponse[ 'query' ][ 'usercontribs' ][ 0 ], void, unknown>
-	public iterQuery( params: { list: 'users' } & NoActionToken<UsersRequest>, limit?: number ): AsyncGenerator<UsersResponse[ 'query' ][ 'users' ][ 0 ], void, unknown>
-	public async *iterQuery( params: { list: string } & NoActionToken<QueryRequest>, limit?: number ): AsyncGenerator<ListQueryResponse[ 'query' ][ string ][ 0 ], void, unknown> {
+	public iterQueryList( params: { list: 'allcategories' } & NoActionToken<AllCategoriesRequest>, limit?: number ): AsyncGenerator<AllCategoriesResponse[ 'query' ][ 'allcategories' ][ 0 ], void, unknown>
+	public iterQueryList( params: { list: 'allimages' } & NoActionToken<AllImagesRequest>, limit?: number ): AsyncGenerator<AllImagesResponse[ 'query' ][ 'allimages' ][ 0 ], void, unknown>
+	public iterQueryList( params: { list: 'allpages' } & NoActionToken<AllPagesRequest>, limit?: number ): AsyncGenerator<AllPagesResponse[ 'query' ][ 'allpages' ][ 0 ], void, unknown>
+	public iterQueryList( params: { list: 'categorymembers' } & NoActionToken<CategoryMembersRequest>, limit?: number ): AsyncGenerator<CategoryMembersResponse[ 'query' ][ 'categorymembers' ][ 0 ], void, unknown>
+	public iterQueryList( params: { list: 'logevents' } & NoActionToken<LogEventsRequest>, limit?: number ): AsyncGenerator<LogEventsResponse[ 'query' ][ 'logevents' ][ 0 ], void, unknown>
+	public iterQueryList( params: { list: 'recentchanges' } & NoActionToken<RecentChangesRequest>, limit?: number ): AsyncGenerator<RecentChangesResponse[ 'query' ][ 'recentchanges' ][ 0 ], void, unknown>
+	public iterQueryList( params: { list: 'usercontribs' } & NoActionToken<UserContribsRequest>, limit?: number ): AsyncGenerator<UserContribsResponse[ 'query' ][ 'usercontribs' ][ 0 ], void, unknown>
+	public iterQueryList( params: { list: 'users' } & NoActionToken<UsersRequest>, limit?: number ): AsyncGenerator<UsersResponse[ 'query' ][ 'users' ][ 0 ], void, unknown>
+	public async *iterQueryList( params: { list: string } & NoActionToken<QueryRequest>, limit?: number ): AsyncGenerator<ListQueryResponse[ 'query' ][ string ][ 0 ], void, unknown> {
 		let counter = 0
 		// eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
 		while ( true ) {
@@ -300,7 +331,7 @@ export class Wiki {
 				...params
 			} )
 
-			const results = req.query[ params.list ]
+			const [ results ] = Object.values( req.query )
 			if ( results ) {
 				for ( const item of results ) {
 					yield item
