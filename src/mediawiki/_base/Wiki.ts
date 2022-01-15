@@ -1,4 +1,4 @@
-import type { AllCategoriesRequest, AllCategoriesResponse, AllImagesRequest, AllImagesResponse, AllPagesRequest, AllPagesResponse, CategoryMembersRequest, CategoryMembersResponse, GETRequestJSON, ListQueryResponse, LogEventsRequest, LogEventsResponse, NoActionToken, NoJSONRequest, POSTRequestJSON, PurgeResponse, QueryRequest, RecentChangesRequest, RecentChangesResponse, RevisionsResponse, SiteInfoRequest, SiteInfoResponse, TokensRequest, TokensResponse, TokenType, UserContribsRequest, UserContribsResponse, UsersRequest, UsersResponse } from '../../types'
+import type { AllCategoriesRequest, AllCategoriesResponse, AllImagesRequest, AllImagesResponse, AllPagesRequest, AllPagesResponse, CategoryMembersRequest, CategoryMembersResponse, GETRequestJSON, ListQueryResponse, LogEventsRequest, LogEventsResponse, NoActionToken, NoJSONRequest, POSTRequestJSON, PurgeResponse, QueryRequest, RecentChangesRequest, RecentChangesResponse, Request, RequireOnlyOne, RevisionsResponse, SiteInfoRequest, SiteInfoResponse, TokensRequest, TokensResponse, TokenType, TranscludedInRequest, TranscludedInResponse, UserContribsRequest, UserContribsResponse, UsersRequest, UsersResponse } from '../../types'
 import fs from 'fs'
 import { RequestManager } from '../../utils'
 
@@ -49,7 +49,7 @@ export class Wiki {
 		return qs
 	}
 
-	protected raw<T, U extends GETRequestJSON | POSTRequestJSON>( userparams: NoJSONRequest<U>, method: 'GET' | 'POST' ): Promise<T> {
+	protected raw<T, U extends Request>( userparams: NoJSONRequest<U>, method: 'GET' | 'POST' ): Promise<T> {
 		const params = {
 			...userparams,
 			format: 'json',
@@ -70,7 +70,7 @@ export class Wiki {
 		}
 	}
 
-	public get<T, U extends GETRequestJSON = GETRequestJSON>( userparams: NoJSONRequest<U> ): Promise<T> {
+	public get<T, U extends Request = GETRequestJSON>( userparams: NoJSONRequest<U> ): Promise<T> {
 		return this.raw( userparams, 'GET' )
 	}
 
@@ -151,51 +151,6 @@ export class Wiki {
 		return req
 	}
 
-	public async getTransclusions( title: string ): Promise<string[]> {
-		const result: string[] = []
-
-		const params: Record<string, string | number> = {
-			action: 'query',
-			prop: 'transcludedin',
-			tilimit: 'max',
-			tinamespace: '0',
-			tiprop: 'title',
-			tishow: '!redirect',
-			titles: title
-		}
-
-		// eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
-		while ( true ) {
-			const req = await this.get< {
-				continue?: {
-					ticontinue: string
-				}
-				query: {
-					pages: Array<{
-						transcludedin: Array<{
-							ns: number
-							title: string
-						}>
-					}>
-				}
-			} >( params )
-
-			const results = req.query.pages[ 0 ]?.transcludedin
-			if ( results ) {
-				for ( const item of results ) {
-					if ( item.ns !== 0 ) continue
-					result.push( item.title )
-				}
-			}
-
-			if ( !req.continue ) break
-
-			params.ticontinue = req.continue.ticontinue
-		}
-
-		return result
-	}
-
 	public getURL( title: string ): string {
 		const base = new URL( this.api ).origin
 		const articlepath = new URL( this.articlepath ?? '/wiki/$1', base ).href
@@ -268,15 +223,16 @@ export class Wiki {
 		return result
 	}
 
-	public async query( params: { list: 'allcategories' } & NoActionToken<AllCategoriesRequest>, limit?: number ): Promise<AllCategoriesResponse[ 'query' ][ 'allcategories' ]>
-	public async query( params: { list: 'allimages' } & NoActionToken<AllImagesRequest>, limit?: number ): Promise<AllImagesResponse[ 'query' ][ 'allimages' ]>
-	public async query( params: { list: 'allpages' } & NoActionToken<AllPagesRequest>, limit?: number ): Promise<AllPagesResponse[ 'query' ][ 'allpages' ]>
-	public async query( params: { list: 'categorymembers' } & NoActionToken<CategoryMembersRequest>, limit?: number ): Promise<CategoryMembersResponse[ 'query' ][ 'categorymembers' ]>
-	public async query( params: { list: 'logevents' } & NoActionToken<LogEventsRequest>, limit?: number ): Promise<LogEventsResponse[ 'query' ][ 'logevents' ]>
-	public async query( params: { list: 'recentchanges' } & NoActionToken<RecentChangesRequest>, limit?: number ): Promise<RecentChangesResponse[ 'query' ][ 'recentchanges' ]>
-	public async query( params: { list: 'usercontribs' } & NoActionToken<UserContribsRequest>, limit?: number ): Promise<UserContribsResponse[ 'query' ][ 'usercontribs' ]>
-	public async query( params: { list: 'users' } & NoActionToken<UsersRequest>, limit?: number ): Promise<UsersResponse[ 'query' ][ 'users' ]>
-	public async query( params: { list: string } & NoActionToken<QueryRequest>, limit?: number ): Promise<ListQueryResponse[ 'query' ][ string ]> {
+	public async query( params: { list: 'allcategories', prop?: undefined } & NoActionToken<AllCategoriesRequest>, limit?: number ): Promise<AllCategoriesResponse[ 'query' ][ 'allcategories' ]>
+	public async query( params: { list: 'allimages', prop?: undefined } & NoActionToken<AllImagesRequest>, limit?: number ): Promise<AllImagesResponse[ 'query' ][ 'allimages' ]>
+	public async query( params: { list: 'allpages', prop?: undefined } & NoActionToken<AllPagesRequest>, limit?: number ): Promise<AllPagesResponse[ 'query' ][ 'allpages' ]>
+	public async query( params: { list: 'categorymembers', prop?: undefined } & NoActionToken<CategoryMembersRequest>, limit?: number ): Promise<CategoryMembersResponse[ 'query' ][ 'categorymembers' ]>
+	public async query( params: { list: 'logevents', prop?: undefined } & NoActionToken<LogEventsRequest>, limit?: number ): Promise<LogEventsResponse[ 'query' ][ 'logevents' ]>
+	public async query( params: { list: 'recentchanges', prop?: undefined } & NoActionToken<RecentChangesRequest>, limit?: number ): Promise<RecentChangesResponse[ 'query' ][ 'recentchanges' ]>
+	public async query( params: { list?: undefined, prop: 'transcludedin' } & NoActionToken<TranscludedInRequest>, limit?: number ): Promise<TranscludedInResponse[ 'query' ][ 'pages' ]>
+	public async query( params: { list: 'usercontribs', prop?: undefined } & NoActionToken<UserContribsRequest>, limit?: number ): Promise<UserContribsResponse[ 'query' ][ 'usercontribs' ]>
+	public async query( params: { list: 'users', prop?: undefined } & NoActionToken<UsersRequest>, limit?: number ): Promise<UsersResponse[ 'query' ][ 'users' ]>
+	public async query( params: RequireOnlyOne<{ list: string; prop: string }, 'list' | 'prop'> & NoActionToken<QueryRequest>, limit?: number ): Promise<ListQueryResponse[ 'query' ][ string ]> {
 		const result: ListQueryResponse[ 'query' ][ string ] = []
 
 		// eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
@@ -286,7 +242,7 @@ export class Wiki {
 				...params
 			} )
 
-			const results = req.query[ params.list ]
+			const [ results ] = Object.values( req.query )
 			if ( results ) {
 				for ( const item of results ) {
 					result.push( item )

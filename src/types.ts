@@ -41,11 +41,11 @@ export interface POSTRequestJSON extends POSTRequest {
 	formatversion: 2
 }
 
-export type NoJSONRequest<T extends GETRequestJSON | POSTRequestJSON> = Omit<T, 'format' | 'formatversion>'>
+export type NoJSONRequest<T extends Request> = Omit<T, 'format' | 'formatversion>'>
 
 export type NoActionToken<T> = Omit<T, 'action' | 'token'>
 
-export interface QueryRequest extends GETRequestJSON {
+export interface QueryRequest extends Request {
 	action: 'query'
 }
 
@@ -944,6 +944,33 @@ export interface RecentChangesRequest extends QueryRequest {
 	rctype?: Array<'edit' | 'new' | 'log' | 'categorize'>
 }
 
+export interface TranscludedInRequest extends QueryRequest {
+	/**
+	 * When more results are available, use this to continue.
+	 */
+	ticontinue?: string
+
+	/**
+	 * How many to return.
+	 */
+	tilimit?: number | 'max'
+
+	/**
+	 * Only include pages in these namespaces.
+	 */
+	tinamespace?: number | number[]
+
+	/**
+	 * Which properties to get.
+	 */
+	tiprop?: Array<'pageid' | 'title' | 'redirect'>
+
+	/**
+	 * Show only items that meet these criteria.
+	 */
+	tishow?: 'redirect' | '!redirect'
+}
+
 interface BaseUserContribsRequest extends QueryRequest {
 	list: 'usercontribs'
 
@@ -1421,6 +1448,22 @@ export type RecentChangesResponse = ListQueryResponse<
 		user: string
 		oldlen: number
 		newlen: number
+	}
+>
+
+export type TranscludedInResponse = ListQueryResponse<
+	'ti',
+	'pages',
+	{
+		ns: number
+		pageid: number
+		title: string
+		transcludedin: Array<{
+			ns: number
+			pageid: number
+			redirect: boolean
+			title: string
+		}>
 	}
 >
 
