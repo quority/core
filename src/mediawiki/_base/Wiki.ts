@@ -1,4 +1,4 @@
-import type { AllCategoriesRequest, AllCategoriesResponse, AllImagesRequest, AllImagesResponse, AllPagesRequest, AllPagesResponse, CategoryMembersRequest, CategoryMembersResponse, GETRequestJSON, ListQueryResponse, LogEventsRequest, LogEventsResponse, NoActionToken, NoJSONRequest, POSTRequestJSON, PurgeResponse, QueryRequest, RecentChangesRequest, RecentChangesResponse, Request, RevisionsResponse, SiteInfoRequest, SiteInfoResponse, TokensRequest, TokensResponse, TokenType, TranscludedInRequest, TranscludedInResponse, UserContribsRequest, UserContribsResponse, UsersRequest, UsersResponse } from '../../types'
+import type { AllCategoriesRequest, AllCategoriesResponse, AllImagesRequest, AllImagesResponse, AllPagesRequest, AllPagesResponse, CategoryMembersRequest, CategoryMembersResponse, GETRequestJSON, LinksHereRequest, LinksHereResponse, ListQueryResponse, LogEventsRequest, LogEventsResponse, NoActionToken, NoJSONRequest, POSTRequestJSON, PurgeResponse, QueryRequest, RecentChangesRequest, RecentChangesResponse, Request, RevisionsResponse, SiteInfoRequest, SiteInfoResponse, TokensRequest, TokensResponse, TokenType, TranscludedInRequest, TranscludedInResponse, UserContribsRequest, UserContribsResponse, UsersRequest, UsersResponse } from '../../types'
 import fs from 'fs'
 import { RequestManager } from '../../utils'
 
@@ -278,6 +278,7 @@ export class Wiki {
 		}
 	}
 
+	public async queryProp( params: { prop: 'linkshere' } & NoActionToken<LinksHereRequest>, limit?: number ): Promise<LinksHereResponse[ 'query' ][ 'pages' ]>
 	public async queryProp( params: { prop: 'transcludedin' } & NoActionToken<TranscludedInRequest>, limit?: number ): Promise<TranscludedInResponse[ 'query' ][ 'pages' ]>
 	public async queryProp( params: { prop: string } & NoActionToken<QueryRequest>, limit?: number ): Promise<ListQueryResponse[ 'query' ][ string ]> {
 		const generator = this.iterQueryProp( params, limit )
@@ -288,6 +289,7 @@ export class Wiki {
 		return result
 	}
 
+	public iterQueryProp( params: { prop: 'linkshere' } & NoActionToken<LinksHereRequest>, limit?: number ): AsyncGenerator<LinksHereResponse[ 'query' ][ 'pages' ][ 0 ], void, unknown>
 	public iterQueryProp( params: { prop: 'transcludedin' } & NoActionToken<TranscludedInRequest>, limit?: number ): AsyncGenerator<TranscludedInResponse[ 'query' ][ 'pages' ][ 0 ], void, unknown>
 	public iterQueryProp( params: { prop: string } & NoActionToken<QueryRequest>, limit?: number ): AsyncGenerator<ListQueryResponse[ 'query' ][ string ][ 0 ], void, unknown>
 	public async *iterQueryProp( params: { prop: string } & NoActionToken<QueryRequest>, limit?: number ): AsyncGenerator<ListQueryResponse[ 'query' ][ string ][ 0 ], void, unknown> {
@@ -326,42 +328,6 @@ export class Wiki {
 				prop: 'revisions',
 				rvprop: 'content',
 				rvslots: 'main',
-				titles: titles.splice( 0, 50 ).join( '|' )
-			} )
-
-			for ( const page of res.query.pages ) {
-				if ( page.missing === true ) {
-					continue
-				}
-
-				yield page
-			}
-		}
-	}
-
-	public async *whatLinksHere( titles: string[] ): AsyncGenerator<{
-		linkshere: Array<{
-			title: string,
-			redirect: boolean
-		}>,
-		missing?: boolean,
-		title: string
-	}, void, unknown> {
-		while ( titles.length !== 0 ) {
-			const res = await this.get<{
-				query: {
-					pages: Array<{
-						linkshere: Array<{
-							title: string,
-							redirect: boolean
-						}>,
-						missing?: boolean,
-						title: string
-					}>
-				}
-			}>( {
-				action: 'query',
-				prop: 'linkshere',
 				titles: titles.splice( 0, 50 ).join( '|' )
 			} )
 

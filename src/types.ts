@@ -820,6 +820,35 @@ interface BaseCategoryMembersRequest extends QueryRequest {
  */
 export type CategoryMembersRequest = RequireOnlyOne<BaseCategoryMembersRequest, 'cmpageid' | 'cmtitle'>
 
+export interface LinksHereRequest extends QueryRequest {
+	titles: string | string[]
+
+	/**
+	 * When more results are available, use this to continue.
+	 */
+	lhcontinue?: string
+
+	/**
+	 * How many to return.
+	 */
+	lhlimit?: number | 'max'
+
+	/**
+	 * Only include pages in these namespaces.
+	 */
+	lhnamespace?: number | number[]
+
+	/**
+	 * Which properties to get.
+	 */
+	lhprop?: Array<'pageid' | 'title' | 'redirect'>
+
+	/**
+	 * Show only items that meet these criteria.
+	 */
+	lhshow?: 'redirect' | '!redirect'
+}
+
 /**
  * Options for `list=logevents`
  */
@@ -1416,6 +1445,22 @@ export type CategoryMembersResponse = ListQueryResponse<
 		pageid: number
 		ns: number
 		title: string
+	}
+>
+
+export type LinksHereResponse = ListQueryResponse<
+	'lh',
+	'pages',
+	{
+		ns: number
+		pageid: number
+		title: string
+		linkshere: Array<{
+			ns: number
+			pageid: number
+			redirect: boolean
+			title: string
+		}>
 	}
 >
 
