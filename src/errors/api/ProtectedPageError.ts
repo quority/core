@@ -1,6 +1,4 @@
-import {
-	ApiError
-} from './ApiError'
+import { ApiError } from './ApiError'
 
 export class ProtectedPageError extends ApiError {
 	public static override readonly code = 'protectedpage'

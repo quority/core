@@ -2,18 +2,13 @@
 import 'dotenv/config'
 import 'mocha'
 import assert from 'assert'
-import {
-	Fandom
-} from '../main'
-import type { FandomBot
-} from '../main'
+import { Fandom } from '../main'
+import type { FandomBot } from '../main'
 
 const now = Date.now()
 
 describe( 'Fandom', () => {
-	const {
-		FANDOM_PASSWORD, FANDOM_USERNAME, FANDOM_WIKI
-	} = process.env as Record<string, string>
+	const { FANDOM_PASSWORD, FANDOM_USERNAME, FANDOM_WIKI } = process.env
 	if ( !FANDOM_PASSWORD || !FANDOM_USERNAME || !FANDOM_WIKI ) {
 		process.exit( 1 )
 	}

@@ -1,12 +1,7 @@
-import {
-	Fandom
-} from './Fandom'
-import type {
-	Loaded } from '../_base'
-import type { RequestManager
-} from '../../utils'
-import { Wiki
-} from '../_base'
+import { Fandom } from './Fandom'
+import type { Loaded } from '../_base'
+import type { RequestManager } from '../../utils'
+import { Wiki } from '../_base'
 
 export class FandomWiki extends Wiki {
 	public readonly interwiki: string

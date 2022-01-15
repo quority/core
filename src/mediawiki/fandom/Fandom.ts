@@ -1,38 +1,26 @@
-import {
-	FandomBot
-} from './FandomBot'
-import {
-	FandomWiki
-} from './FandomWiki'
-import type {
-	ICookieStoreOptions } from '../../utils'
-import {
-	InvalidInterwikiError
-} from '../../errors'
-import {
-	RequestManager
-} from '../../utils'
+import { FandomBot } from './FandomBot'
+import { FandomWiki } from './FandomWiki'
+import type { ICookieJarOptions } from '../../utils'
+import { InvalidInterwikiError } from '../../errors'
+import { RequestManager } from '../../utils'
 
 export class Fandom {
+	public static request?: RequestManager
+
 	public readonly request: RequestManager
 
-	public constructor( {
-		cookies,
-		prettyCookies
-	}: { cookies?: string, prettyCookies?: boolean } = {
-	} ) {
-		const store: ICookieStoreOptions | undefined = cookies
-			? {
-				path: cookies, regex: [
-					/^wikicities_/, /^wikia_/
-				]
+	public constructor( { cookies, prettyCookies = false }: { cookies?: string, prettyCookies?: boolean } = {} ) {
+		const jarOptions: ICookieJarOptions = {
+			prettify: prettyCookies
+		}
+		if ( cookies ) {
+			jarOptions.store = {
+				path: cookies,
+				regex: [ /^wiki(a|cities)_/ ]
 			}
-			: undefined
+		}
 		this.request = new RequestManager( {
-			jarOptions: {
-				prettify: prettyCookies ?? false,
-				store
-			}
+			jarOptions
 		} )
 	}
 
@@ -48,6 +36,14 @@ export class Fandom {
 			return `https://${ interwiki }.fandom.com`
 		}
 		throw new InvalidInterwikiError( interwiki )
+	}
+
+	public static getWiki( interwiki: string ): FandomWiki {
+		if ( !this.request ) this.request = new RequestManager()
+		return new FandomWiki( {
+			interwiki,
+			request: this.request
+		} )
 	}
 
 	public static interwiki2api( interwiki: string ): string {
@@ -77,46 +73,45 @@ export class Fandom {
 		throw new InvalidInterwikiError( url )
 	}
 
-	public async getUserAvatar( username: string ): Promise<string | undefined> {
+	public async getUserAvatar( username: string ): Promise<string | null> {
 		const userId = await this.getUserId( username )
-		if ( !userId ) return undefined
+		if ( !userId ) return null
 
 		const req = await this.request.raw( `https://services.fandom.com/user-attribute/user/${ userId }/attr/avatar` )
 		const res = await req.json() as unknown as { value?: string }
 
-		return res.value
+		return res.value ?? null
 	}
 
-	public async getUserDiscordTag( username: string ): Promise<string | undefined> {
+	public async getUserDiscordTag( username: string ): Promise<string | null> {
 		const userId = await this.getUserId( username )
-		if ( !userId ) return undefined
+		if ( !userId ) return null
 
 		const req = await this.request.raw( `https://services.fandom.com/user-attribute/user/${ userId }/attr/discordHandle` )
 		const res = await req.json() as unknown as { value?: string }
 
-		return res.value
+		return res.value ?? null
 	}
 
-	public async getUserId( username: string ): Promise<number | undefined> {
+	public async getUserId( username: string ): Promise<number | null> {
 		const wiki = this.getWiki( 'community' )
-		const query = await wiki.query( {
+		const query = await wiki.queryList( {
 			list: 'users',
 			ususers: username
 		} )
-		return query[ 0 ]?.userid
+		return query[ 0 ]?.userid ?? null
 	}
 
-	public async getUsersIds( usernames: string[] ): Promise<Record<string, number | undefined>> {
+	public async getUsersIds( usernames: string[] ): Promise<Record<string, number>> {
 		const wiki = this.getWiki( 'community' )
-		const query = await wiki.query( {
+		const query = await wiki.queryList( {
 			list: 'users',
 			ususers: usernames
 		} )
 		return query.reduce( ( result, user ) => {
 			result[ user.name ] = user.userid
 			return result
-		}, {
-		} as Record<string, number> )
+		}, {} as Record<string, number> )
 	}
 
 	public getWiki( interwiki: string ): FandomWiki {

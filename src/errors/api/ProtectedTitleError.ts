@@ -1,6 +1,4 @@
-import {
-	ApiError
-} from './ApiError'
+import { ApiError } from './ApiError'
 
 /**
  * Error when you attempt to create a page that is protecte from creation.

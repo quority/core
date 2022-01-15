@@ -1,6 +1,4 @@
-import {
-	ApiError
-} from './ApiError'
+import { ApiError } from './ApiError'
 
 export class BadTokenError extends ApiError {
 	public static override readonly code = 'badtoken'

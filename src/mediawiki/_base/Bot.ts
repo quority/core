@@ -1,18 +1,9 @@
-import type {
-	MediaWikiRequest,
-	MediaWikiResponse,
-	ReducedRequest
-} from '../../types'
-import {
-	ErrorManager
-} from '../../errors'
+import type { APIError, BlockRequest, BlockResponse, DeleteRequest, DeleteResponse, EditRequest, EditResponse, LoginRequest, LoginResponse, MoveRequest, MoveResponse, NoActionToken, ProtectRequest, ProtectResponse, UploadRequest, UploadResponse } from '../../types'
+import { ErrorManager } from '../../errors'
 import fetch from 'node-fetch'
 import fs from 'fs-extra'
-import path from 'path'
 import tmp from 'tmp-promise'
-import type {
-	Wiki
-} from './Wiki'
+import type { Wiki } from './Wiki'
 
 export class Bot<WikiType extends Wiki = Wiki> {
 	readonly #password: string
@@ -21,9 +12,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 
 	#csrf?: string
 
-	public constructor( {
-		password, username, wiki
-	}: { password: string, username: string, wiki: WikiType } ) {
+	public constructor( { password, username, wiki }: { password: string, username: string, wiki: WikiType } ) {
 		this.#password = password.trim()
 		this.#username = username.trim()
 		this.#wiki = wiki
@@ -36,22 +25,19 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		this.#wiki = wiki
 	}
 
-	public async block( params: ReducedRequest<MediaWikiRequest.Block> ): Promise<MediaWikiResponse.Block> {
-		const token = await this.getCSRFToken()
-		return this.wiki.post<MediaWikiResponse.Block, MediaWikiRequest.Block>( {
+	public async block( params: NoActionToken<BlockRequest> ): Promise<BlockResponse> {
+		return this.wiki.post<BlockResponse, BlockRequest>( {
 			...params,
 			action: 'block',
-			token
+			token: await this.getCSRFToken()
 		} )
 	}
 
-	public async delete( params: ReducedRequest<MediaWikiRequest.Delete> ): Promise<MediaWikiResponse.Delete> {
-		const token = await this.getCSRFToken()
-
-		const req = await this.#wiki.post<MediaWikiResponse.Delete | MediaWikiResponse.ApiError>( {
+	public async delete( params: NoActionToken<DeleteRequest> ): Promise<DeleteResponse> {
+		const req = await this.#wiki.post<DeleteResponse | APIError>( {
 			...params,
 			action: 'delete',
-			token
+			token: await this.getCSRFToken()
 		} )
 
 		if ( 'error' in req ) {
@@ -62,14 +48,12 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		return req
 	}
 
-	public async edit( params: ReducedRequest<MediaWikiRequest.Edit> ): Promise<MediaWikiResponse.Edit> {
-		const token = await this.getCSRFToken()
-
-		const req = await this.#wiki.post<MediaWikiResponse.Edit | MediaWikiResponse.ApiError>( {
+	public async edit( params: NoActionToken<EditRequest> ): Promise<EditResponse> {
+		const req = await this.#wiki.post<EditResponse | APIError>( {
 			...params,
 			action: 'edit',
 			assert: params.bot ? 'bot' : 'user',
-			token
+			token: await this.getCSRFToken()
 		} )
 
 		if ( 'error' in req ) {
@@ -103,7 +87,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		const tokenreq = await this.#wiki.getToken( 'login' )
 		const lgtoken = tokenreq.query.tokens.logintoken
 
-		const res = await this.#wiki.post<MediaWikiResponse.Login, MediaWikiRequest.Login>( {
+		const res = await this.#wiki.post<LoginResponse, LoginRequest>( {
 			action: 'login',
 			lgname: this.#username,
 			lgpassword: this.#password,
@@ -124,12 +108,11 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		this.#wiki.request.clear( this.#wiki.api )
 	}
 
-	public async move( params: ReducedRequest<MediaWikiRequest.Move> ): Promise<MediaWikiResponse.Move> {
-		const token = await this.getCSRFToken()
-		const req = await this.#wiki.post<MediaWikiResponse.Move | MediaWikiResponse.ApiError>( {
+	public async move( params: NoActionToken<MoveRequest> ): Promise<MoveResponse> {
+		const req = await this.#wiki.post<MoveResponse | APIError>( {
 			...params,
 			action: 'move',
-			token
+			token: await this.getCSRFToken()
 		} )
 
 		if ( 'error' in req ) {
@@ -140,13 +123,11 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		return req
 	}
 
-	public async protect( params: ReducedRequest<MediaWikiRequest.Protect> ): Promise<MediaWikiResponse.Protect> {
-		const token = await this.getCSRFToken()
-
+	public async protect( params: NoActionToken<ProtectRequest> ): Promise<ProtectResponse> {
 		return this.wiki.post( {
 			...params,
 			action: 'protect',
-			token
+			token: await this.getCSRFToken()
 		} )
 	}
 
@@ -158,22 +139,19 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		return this.wiki.purge( titles )
 	}
 
-	public async unblock( params: ReducedRequest<MediaWikiRequest.Block> ): Promise<MediaWikiResponse.Block> {
-		const token = await this.getCSRFToken()
+	public async unblock( params: NoActionToken<BlockRequest> ): Promise<BlockResponse> {
 		return this.wiki.post( {
 			...params,
 			action: 'unblock',
-			token
+			token: await this.getCSRFToken()
 		} )
 	}
 
-	public async upload( params: ReducedRequest<MediaWikiRequest.Upload> ): Promise<MediaWikiResponse.Upload> {
-		const token = await this.getCSRFToken()
-
-		const req = await this.#wiki.post<MediaWikiResponse.Upload | MediaWikiResponse.ApiError>( {
+	public async upload( params: NoActionToken<UploadRequest> ): Promise<UploadResponse> {
+		const req = await this.#wiki.post<UploadResponse | APIError>( {
 			...params,
 			action: 'upload',
-			token
+			token: await this.getCSRFToken()
 		} )
 
 		if ( 'error' in req ) {
@@ -193,16 +171,17 @@ export class Bot<WikiType extends Wiki = Wiki> {
 	 */
 	public async uploadFromUrl( {
 		filename, url
-	}: { filename: string, url: string } ): Promise<MediaWikiResponse.Upload | undefined> {
+	}: { filename: string, url: string } ): Promise<UploadResponse | undefined> {
 		const image = await fetch( url )
 		if ( !image.ok ) return undefined
 
-		const tmpdir = await tmp.dir()
-		const filepath = path.resolve( tmpdir.path, filename )
-		const buffer = await image.arrayBuffer()
+		const tmpfile = await tmp.file()
+		console.log( tmpfile.path )
+		const filepath = tmpfile.path
+		const buffer = await image.buffer()
 		fs.writeFileSync(
 			filepath,
-			Buffer.from( buffer )
+			buffer
 		)
 
 		const file = fs.createReadStream( filepath )
@@ -210,7 +189,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 			file,
 			filename
 		} )
-		await tmpdir.cleanup()
+		await tmpfile.cleanup()
 
 		return res
 	}

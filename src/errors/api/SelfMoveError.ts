@@ -1,6 +1,4 @@
-import {
-	ApiError
-} from './ApiError'
+import { ApiError } from './ApiError'
 
 export class SelfMoveError extends ApiError {
 	public static override readonly code = 'selfmove'
