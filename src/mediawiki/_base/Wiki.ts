@@ -49,7 +49,7 @@ export class Wiki {
 		return qs
 	}
 
-	protected raw<Method extends 'GET' | 'POST', T, U extends Method extends 'GET' ? GETRequestJSON : POSTRequestJSON>( userparams: NoJSONRequest<U>, method: Method ): Promise<T> {
+	protected raw<T, U extends GETRequestJSON | POSTRequestJSON>( userparams: NoJSONRequest<U>, method: 'GET' | 'POST' ): Promise<T> {
 		const params = {
 			...userparams,
 			format: 'json',
