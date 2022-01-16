@@ -1,4 +1,4 @@
-import type { AllCategoriesRequest, AllCategoriesResponse, AllImagesRequest, AllImagesResponse, AllPagesRequest, AllPagesResponse, CategoryMembersRequest, CategoryMembersResponse, GETRequestJSON, LinksHereRequest, LinksHereResponse, ListQueryResponse, LogEventsRequest, LogEventsResponse, NoActionToken, NoJSONRequest, POSTRequestJSON, PurgeResponse, QueryRequest, RecentChangesRequest, RecentChangesResponse, Request, RevisionsResponse, SiteInfoRequest, SiteInfoResponse, TokensRequest, TokensResponse, TokenType, TranscludedInRequest, TranscludedInResponse, UserContribsRequest, UserContribsResponse, UsersRequest, UsersResponse } from '../../types'
+import type { AllCategoriesRequest, AllCategoriesResponse, AllImagesRequest, AllImagesResponse, AllPagesRequest, AllPagesResponse, CategoryMembersRequest, CategoryMembersResponse, ExtendedRequest, GETRequest, LinksHereRequest, LinksHereResponse, ListQueryResponse, LogEventsRequest, LogEventsResponse, NoActionToken, POSTRequest, PurgeRequest, PurgeResponse, QueryRequest, RecentChangesRequest, RecentChangesResponse, Request, RevisionsRequest, RevisionsResponse, SiteInfoRequest, SiteInfoResponse, TokensRequest, TokensResponse, TokenType, TranscludedInRequest, TranscludedInResponse, UserContribsRequest, UserContribsResponse, UsersRequest, UsersResponse } from '../../types'
 import fs from 'fs'
 import { RequestManager } from '../../utils'
 
@@ -26,9 +26,9 @@ export class Wiki {
 		this.request = request ?? new RequestManager()
 	}
 
-	private querystring<T extends NoJSONRequest<GETRequestJSON>>( params: T ): Record<keyof T, string>
-	private querystring<T extends NoJSONRequest<POSTRequestJSON>>( params: T ): Record<keyof T, string | fs.ReadStream>
-	private querystring<T extends NoJSONRequest<GETRequestJSON | POSTRequestJSON>>( params: T ): Record<keyof T, string | fs.ReadStream> {
+	private querystring<T extends GETRequest>( params: T ): Record<keyof T, string>
+	private querystring<T extends POSTRequest>( params: T ): Record<keyof T, string | fs.ReadStream>
+	private querystring<T extends Request>( params: T ): Record<keyof T, string | fs.ReadStream> {
 		const qs = {} as Record<keyof T, string | fs.ReadStream>
 
 		let prop: keyof T
@@ -49,12 +49,12 @@ export class Wiki {
 		return qs
 	}
 
-	protected raw<T, U extends Request>( userparams: NoJSONRequest<U>, method: 'GET' | 'POST' ): Promise<T> {
+	protected raw<T, U extends Request>( userparams: U, method: 'GET' | 'POST' ): Promise<T> {
 		const params = {
 			...userparams,
 			format: 'json',
 			formatversion: 2
-		}
+		} as const
 		const qs = this.querystring( params )
 
 		if ( method === 'GET' ) {
@@ -70,11 +70,11 @@ export class Wiki {
 		}
 	}
 
-	public get<T, U extends Request = GETRequestJSON>( userparams: NoJSONRequest<U> ): Promise<T> {
+	public get<T, U extends Request = GETRequest>( userparams: ExtendedRequest<U> ): Promise<T> {
 		return this.raw( userparams, 'GET' )
 	}
 
-	public post<T, U extends POSTRequestJSON = POSTRequestJSON>( userparams: NoJSONRequest<U> ): Promise<T> {
+	public post<T, U extends Request = POSTRequest>( userparams: ExtendedRequest<U> ): Promise<T> {
 		return this.raw( userparams, 'POST' )
 	}
 
@@ -84,10 +84,10 @@ export class Wiki {
 	}
 
 	public async getInterwikis(): Promise<Record<string, string>> {
-		const req = await this.get<SiteInfoResponse>( {
+		const req = await this.get<SiteInfoResponse, SiteInfoRequest>( {
 			action: 'query',
 			meta: 'siteinfo',
-			siprop: 'interwikimap'
+			siprop: [ 'interwikimap' ]
 		} )
 
 		const interwikis = req.query.interwikimap.filter( i => 'language' in i )
@@ -122,10 +122,10 @@ export class Wiki {
 		}
 
 		while ( titles.length !== 0 ) {
-			const res = await this.get<RevisionsResponse>( {
+			const res = await this.get<RevisionsResponse, RevisionsRequest>( {
 				action: 'query',
 				prop: 'revisions',
-				rvprop: 'content',
+				rvprop: [ 'content' ],
 				rvslots: 'main',
 				titles: titles.splice( 0, 50 ).join( '|' )
 			} )
@@ -185,10 +185,10 @@ export class Wiki {
 		}
 
 		while ( titles.length !== 0 ) {
-			const res = await this.get<RevisionsResponse>( {
+			const res = await this.get<RevisionsResponse, RevisionsRequest>( {
 				action: 'query',
 				prop: 'revisions',
-				rvprop: 'content',
+				rvprop: [ 'content' ],
 				rvslots: 'main',
 				titles: titles.splice( 0, 50 ).join( '|' )
 			} )
@@ -206,7 +206,7 @@ export class Wiki {
 		}
 
 		while ( titles.length !== 0 ) {
-			const req = await this.post<PurgeResponse>( {
+			const req = await this.post<PurgeResponse, PurgeRequest>( {
 				action: 'purge',
 				titles: titles.splice( 0, 50 ).join( '|' )
 			} )
@@ -323,10 +323,10 @@ export class Wiki {
 
 	public async *iterPages( titles: string[] ): AsyncGenerator<RevisionsResponse[ 'query' ][ 'pages' ][ 0 ], void, unknown> {
 		while ( titles.length !== 0 ) {
-			const res = await this.get<RevisionsResponse>( {
+			const res = await this.get<RevisionsResponse, RevisionsRequest>( {
 				action: 'query',
 				prop: 'revisions',
-				rvprop: 'content',
+				rvprop: [ 'content' ],
 				rvslots: 'main',
 				titles: titles.splice( 0, 50 ).join( '|' )
 			} )

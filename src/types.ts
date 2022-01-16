@@ -24,24 +24,26 @@ export interface Request {
 }
 
 export interface GETRequest extends Request {
-	[ key: string ]: RequestParameterType
+	//[ key: string ]: RequestParameterType
 }
 
 export interface POSTRequest extends Request {
-	[ key: string ]: RequestParameterType | ReadStream
+	//[ key: string ]: RequestParameterType | ReadStream
 }
 
-export interface GETRequestJSON extends GETRequest {
+
+export type JSONRequest<T extends Request> = T & {
 	format: 'json'
 	formatversion: 2
 }
 
-export interface POSTRequestJSON extends POSTRequest {
-	format: 'json'
-	formatversion: 2
+export type ExtendedRequest<T extends Request> = T & {
+	action?: string
+	assert?: 'bot' | 'user'
+	meta?: string
+	prop?: string
+	token?: string
 }
-
-export type NoJSONRequest<T extends Request> = Omit<T, 'format' | 'formatversion>'>
 
 export type NoActionToken<T> = Omit<T, 'action' | 'token'>
 
@@ -149,6 +151,72 @@ export interface FileRepoInfoRequest extends QueryRequest {
 	meta: 'filerepoinfo'
 }
 
+export interface RevisionsRequest extends QueryRequest {
+	prop: 'revisions'
+
+	/**
+	 * When more results are available, use this to continue.
+	 */
+	rvcontinue?: string
+
+	/**
+	 * In which direction to enumerate.
+	 */
+	rvdir?: 'newer' | 'older'
+
+	/**
+	 * Enumerate up to this timestamp.
+	 */
+	rvend?: string
+
+	/**
+	 * Stop enumeration at this revision's timestamp. The revision must exist, but need not belong to this page.
+	 */
+	rvendid?: number
+
+	/**
+	 * Exclude revisions made by user.
+	 */
+	rvexcludeuser?: string
+
+	/**
+	 * Limit how many revisions will be returned.
+	 */
+	rvlimit?: number | 'max'
+
+	/**
+	 * Which properties to get for each revision.
+	 */
+	rvprop?: Array<'ids' | 'flags' | 'timestamp' | 'user' | 'userid' | 'size' | 'slotsize' | 'sha1' | 'slotsha1' | 'contentmodel' | 'comment' | 'parsedcomment' | 'content' | 'tags' | 'roles'>
+
+	/**
+	 * Which revision slots to return data for, when slot-related properties are included in rvprops. If omitted, data from the main slot will be returned in a backwards-compatible format.
+	 */
+	rvslots?: 'main' | '*'
+
+	/**
+	 * From which revision timestamp to start enumeration.
+	 */
+	rvstart?: string
+
+	/**
+	 * Start enumeration from this revision's timestamp. The revision must exist, but need not belong to this page.
+	 */
+	rvstartid?: number
+
+	/**
+	 * Only list revisions tagged with this tag.
+	 */
+	rvtag?: string
+
+	/**
+	 * Only include revisions made by user.
+	 */
+	rvuser?: string
+
+	titles: string | string[]
+}
+
 /**
  * Options for `meta=siteinfo`.
  */
@@ -196,9 +264,7 @@ export interface TokensRequest extends QueryRequest {
 /**
  * Options to block an user.
  */
-export interface BlockRequest extends POSTRequestJSON {
-	action: 'block' | 'unblock'
-
+export interface BlockRequest extends POSTRequest {
 	/**
 	 * Allow the user to edit their own talk page.
 	 */
@@ -241,19 +307,12 @@ export interface BlockRequest extends POSTRequestJSON {
 	reason?: string
 
 	/**
-	 * A "csrf" token.
-	 */
-	token: string
-
-	/**
 	 * User to block.
 	 */
 	user: string
 }
 
-interface BaseDeleteRequest extends POSTRequestJSON {
-	action: 'delete'
-
+interface BaseDeleteRequest extends POSTRequest {
 	/**
 	 * Page ID of the page to delete.
 	 */
@@ -268,11 +327,6 @@ interface BaseDeleteRequest extends POSTRequestJSON {
 	 * Title of the page to delete.
 	 */
 	title: string
-
-	/**
-	 * A "csrf" token.
-	 */
-	token: string
 }
 
 /**
@@ -280,9 +334,7 @@ interface BaseDeleteRequest extends POSTRequestJSON {
  */
 export type DeleteRequest = RequireOnlyOne<BaseDeleteRequest, 'title' | 'pageid'>
 
-interface BaseEditRequest extends POSTRequestJSON {
-	action: 'edit'
-
+interface BaseEditRequest extends POSTRequest {
 	/**
 	 * Add this text to the end of the page.
 	 */
@@ -339,11 +391,6 @@ interface BaseEditRequest extends POSTRequestJSON {
 	title?: string
 
 	/**
-	 * A "csrf" token.
-	 */
-	token: string
-
-	/**
 	 * Undo this revision. The value must be no less than 0.
 	 */
 	undo?: number
@@ -364,9 +411,7 @@ interface BaseEditRequest extends POSTRequestJSON {
  */
 export type EditRequest = RequireOnlyOne<BaseEditRequest, 'title' | 'pageid'>
 
-export interface LoginRequest extends POSTRequestJSON {
-	action: 'login'
-
+export interface LoginRequest extends POSTRequest {
 	/**
 	 * User name.
 	 */
@@ -383,9 +428,7 @@ export interface LoginRequest extends POSTRequestJSON {
 	lgtoken: string
 }
 
-interface BaseMoveRequest extends POSTRequestJSON {
-	action: 'move'
-
+interface BaseMoveRequest extends POSTRequest {
 	/**
 	 * Title of the page to rename.
 	 */
@@ -426,11 +469,6 @@ interface BaseMoveRequest extends POSTRequestJSON {
 	 * Title to rename the page to.
 	 */
 	to: string
-
-	/**
-	 * A "csrf" token.
-	 */
-	token: string
 }
 
 /**
@@ -441,9 +479,7 @@ export type MoveRequest = RequireOnlyOne<BaseMoveRequest, 'from' | 'fromid'>
 export type ProtectionAction = 'edit' | 'move'
 export type ProtectionLevel = 'all' | 'autoconfirmed' | 'sysop'
 
-interface BaseProtectRequest<Action extends string = ProtectionAction, Level extends string = ProtectionLevel> extends POSTRequestJSON {
-	action: 'protect'
-
+interface BaseProtectRequest<Action extends string = ProtectionAction, Level extends string = ProtectionLevel> extends POSTRequest {
 	/**
 	 * Enable cascading protection (i.e. protect transcluded templates and images used in this page). Ignored if none of the given protection levels support cascading.
 	 */
@@ -474,11 +510,6 @@ interface BaseProtectRequest<Action extends string = ProtectionAction, Level ext
 	 * Title of the page to (un)protect. Cannot be used together with pageid.
 	 */
 	title: string
-
-	/**
-	 * A "csrf" token.
-	 */
-	token: string
 }
 
 /**
@@ -486,9 +517,7 @@ interface BaseProtectRequest<Action extends string = ProtectionAction, Level ext
  */
 export type ProtectRequest<Action extends string = ProtectionAction, Level extends string = ProtectionLevel> = RequireOnlyOne<BaseProtectRequest<Action, Level>, 'title' | 'pageid'>
 
-interface BasePurgeRequest extends POSTRequestJSON {
-	action: 'purge'
-
+interface BasePurgeRequest extends POSTRequest {
 	/**
 	 * When more results are available, use this to continue.
 	 */
@@ -535,9 +564,7 @@ interface BasePurgeRequest extends POSTRequestJSON {
  */
 export type PurgeRequest = RequireOnlyOne<BasePurgeRequest, 'pageids' | 'revids' | 'titles'>
 
-interface BaseUploadRequest extends POSTRequestJSON {
-	action: 'upload'
-
+interface BaseUploadRequest extends POSTRequest {
 	/**
 	 * File contents.
 	 */
@@ -552,11 +579,6 @@ interface BaseUploadRequest extends POSTRequestJSON {
 	 * Ignore any warnings.
 	 */
 	ignorewarnings?: boolean
-
-	/**
-	 * A "csrf" token.
-	 */
-	token: string
 
 	/**
 	 * URL to fetch the file from.

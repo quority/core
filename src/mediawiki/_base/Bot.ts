@@ -1,4 +1,4 @@
-import type { APIError, BlockRequest, BlockResponse, DeleteRequest, DeleteResponse, EditRequest, EditResponse, LoginRequest, LoginResponse, MoveRequest, MoveResponse, NoActionToken, ProtectRequest, ProtectResponse, UploadRequest, UploadResponse } from '../../types'
+import type { APIError, BlockRequest, BlockResponse, DeleteRequest, DeleteResponse, EditRequest, EditResponse, LoginRequest, LoginResponse, MoveRequest, MoveResponse, ProtectRequest, ProtectResponse, UploadRequest, UploadResponse } from '../../types'
 import { ErrorManager } from '../../errors'
 import fetch from 'node-fetch'
 import fs from 'fs-extra'
@@ -25,7 +25,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		this.#wiki = wiki
 	}
 
-	public async block( params: NoActionToken<BlockRequest> ): Promise<BlockResponse> {
+	public async block( params: BlockRequest ): Promise<BlockResponse> {
 		return this.wiki.post<BlockResponse, BlockRequest>( {
 			...params,
 			action: 'block',
@@ -33,7 +33,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		} )
 	}
 
-	public async delete( params: NoActionToken<DeleteRequest> ): Promise<DeleteResponse> {
+	public async delete( params: DeleteRequest ): Promise<DeleteResponse> {
 		const req = await this.#wiki.post<DeleteResponse | APIError>( {
 			...params,
 			action: 'delete',
@@ -48,7 +48,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		return req
 	}
 
-	public async edit( params: NoActionToken<EditRequest> ): Promise<EditResponse> {
+	public async edit( params: EditRequest ): Promise<EditResponse> {
 		const req = await this.#wiki.post<EditResponse | APIError>( {
 			...params,
 			action: 'edit',
@@ -108,7 +108,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		this.#wiki.request.clear( this.#wiki.api )
 	}
 
-	public async move( params: NoActionToken<MoveRequest> ): Promise<MoveResponse> {
+	public async move( params: MoveRequest ): Promise<MoveResponse> {
 		const req = await this.#wiki.post<MoveResponse | APIError>( {
 			...params,
 			action: 'move',
@@ -123,7 +123,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		return req
 	}
 
-	public async protect( params: NoActionToken<ProtectRequest> ): Promise<ProtectResponse> {
+	public async protect( params: ProtectRequest ): Promise<ProtectResponse> {
 		return this.wiki.post( {
 			...params,
 			action: 'protect',
@@ -139,7 +139,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		return this.wiki.purge( titles )
 	}
 
-	public async unblock( params: NoActionToken<BlockRequest> ): Promise<BlockResponse> {
+	public async unblock( params: BlockRequest ): Promise<BlockResponse> {
 		return this.wiki.post( {
 			...params,
 			action: 'unblock',
@@ -147,7 +147,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		} )
 	}
 
-	public async upload( params: NoActionToken<UploadRequest> ): Promise<UploadResponse> {
+	public async upload( params: UploadRequest ): Promise<UploadResponse> {
 		const req = await this.#wiki.post<UploadResponse | APIError>( {
 			...params,
 			action: 'upload',
@@ -195,7 +195,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 	}
 
 	public whoAmI(): Promise<{ query: { userinfo: { id: number, name: string } } }> {
-		return this.#wiki.get<{ query: { userinfo: { id: number, name: string } } }>( {
+		return this.#wiki.get<{ query: { userinfo: { id: number, name: string } } }, { uiprop: string }>( {
 			action: 'query',
 			meta: 'userinfo',
 			uiprop: 'groups'

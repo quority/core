@@ -14,7 +14,7 @@
     "re-build": "rimraf tsconfig.tsbuildinfo dist && yarn tsc --listEmittedFiles --incremental",
     "lint": "eslint src/ --ext .ts --cache",
     "lint:fix": "eslint src/ --fix --ext .ts --cache",
-    "prepare": "husky install .github/husky",
+    "hooks": "husky install .github/husky",
     "test": "mocha ./dist/tests"
   },
   "keywords": [
