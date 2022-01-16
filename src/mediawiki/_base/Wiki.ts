@@ -194,7 +194,7 @@ export class Wiki {
 			} )
 
 			for ( const page of res.query.pages ) {
-				pages[ page.title ] = page.missing ?? false
+				pages[ page.title ] = !page.missing
 			}
 		}
 
