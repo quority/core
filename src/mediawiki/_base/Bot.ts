@@ -176,7 +176,6 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		if ( !image.ok ) return undefined
 
 		const tmpfile = await tmp.file()
-		console.log( tmpfile.path )
 		const filepath = tmpfile.path
 		const buffer = await image.buffer()
 		fs.writeFileSync(
