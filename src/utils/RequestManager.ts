@@ -1,4 +1,4 @@
-import type { RequestInit, Response } from 'node-fetch'
+import type { HeadersInit, RequestInit, Response } from 'node-fetch'
 import { CookieJar } from './CookieJar'
 import fetch from 'node-fetch'
 import FormData from 'form-data'
@@ -6,10 +6,14 @@ import type fs from 'fs'
 import type { ICookieJarOptions } from './CookieJar'
 
 export class RequestManager {
+	public agent?: RequestInit[ 'agent' ]
 	#jar: CookieJar
+	public headers: HeadersInit
 
-	public constructor( { jarOptions }: { jarOptions?: ICookieJarOptions } = {} ) {
+	public constructor( { agent, headers, jarOptions }: { agent?: RequestInit[ 'agent' ], headers?: HeadersInit, jarOptions?: ICookieJarOptions } = {} ) {
+		this.agent = agent
 		this.#jar = new CookieJar( jarOptions )
+		this.headers = headers ?? {}
 	}
 
 	public get jar(): Readonly<CookieJar> {
@@ -52,7 +56,9 @@ export class RequestManager {
 
 		return fetch( url, {
 			...fetchOptions,
+			agent: this.agent,
 			headers: {
+				...this.headers,
 				cookie: this.#jar.get( url )
 			}
 		} )

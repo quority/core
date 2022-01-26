@@ -9,7 +9,7 @@ export class Fandom {
 
 	public readonly request: RequestManager
 
-	public constructor( { cookies, prettyCookies = false }: { cookies?: string, prettyCookies?: boolean } = {} ) {
+	public constructor( { cookies, prettyCookies = false, requestOptions = {} }: { cookies?: string, prettyCookies?: boolean, requestOptions?: ConstructorParameters<typeof RequestManager>[ 0 ] } = {} ) {
 		const jarOptions: ICookieJarOptions = {
 			prettify: prettyCookies
 		}
@@ -20,6 +20,7 @@ export class Fandom {
 			}
 		}
 		this.request = new RequestManager( {
+			...requestOptions,
 			jarOptions
 		} )
 	}
