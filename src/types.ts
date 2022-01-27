@@ -9,6 +9,8 @@ export type RequireOnlyOne<T, Keys extends keyof T = keyof T> =
 			& Partial<Record<Exclude<Keys, K>, undefined>>
 	}[Keys]
 
+export type MaybeArray<T> = T | T[]
+
 export interface APIError {
 	error: {
 		code: string
@@ -187,7 +189,7 @@ export interface RevisionsRequest extends QueryRequest {
 	/**
 	 * Which properties to get for each revision.
 	 */
-	rvprop?: Array<'ids' | 'flags' | 'timestamp' | 'user' | 'userid' | 'size' | 'slotsize' | 'sha1' | 'slotsha1' | 'contentmodel' | 'comment' | 'parsedcomment' | 'content' | 'tags' | 'roles'>
+	rvprop?: MaybeArray<'ids' | 'flags' | 'timestamp' | 'user' | 'userid' | 'size' | 'slotsize' | 'sha1' | 'slotsha1' | 'contentmodel' | 'comment' | 'parsedcomment' | 'content' | 'tags' | 'roles'>
 
 	/**
 	 * Which revision slots to return data for, when slot-related properties are included in rvprops. If omitted, data from the main slot will be returned in a backwards-compatible format.
@@ -226,7 +228,7 @@ export interface SiteInfoRequest extends QueryRequest {
 	/**
 	 * Return only local or only nonlocal entries of the interwiki map.
 	 */
-	sifilteriw?: Array<'local' | '!local'>
+	sifilteriw?: 'local' | '!local'
 
 	/**
 	 * Language code for localised language names (best effort) and skin names.
@@ -241,7 +243,7 @@ export interface SiteInfoRequest extends QueryRequest {
 	/**
 	 * Which information to get.
 	 */
-	siprop: Array<'general' | 'namespaces' | 'namespacealiases' | 'specialpagealiases' | 'magicwords' | 'interwikimap' | 'dbrepllag' | 'statistics' | 'usergroups' | 'libraries' | 'extensions' | 'fileextensions' | 'rightsinfo' | 'restrictions' | 'languages' | 'languagevariants' | 'skins' | 'extensiontags' | 'functionhooks' | 'showhooks' | 'variables' | 'protocols' | 'defaultoptions' | 'uploaddialog'>
+	siprop: MaybeArray<'general' | 'namespaces' | 'namespacealiases' | 'specialpagealiases' | 'magicwords' | 'interwikimap' | 'dbrepllag' | 'statistics' | 'usergroups' | 'libraries' | 'extensions' | 'fileextensions' | 'rightsinfo' | 'restrictions' | 'languages' | 'languagevariants' | 'skins' | 'extensiontags' | 'functionhooks' | 'showhooks' | 'variables' | 'protocols' | 'defaultoptions' | 'uploaddialog'>
 
 	/**
 	 * List all database servers, not just the one lagging the most.
@@ -258,7 +260,7 @@ export interface TokensRequest extends QueryRequest {
 	/**
 	 * Types of token to request.
 	 */
-	type: TokenType | TokenType[]
+	type: MaybeArray<TokenType>
 }
 
 /**
@@ -499,7 +501,7 @@ interface BaseProtectRequest<Action extends string = ProtectionAction, Level ext
 	 * List of protection levels, formatted `action=level` (e.g. `edit=sysop`). A level of all means everyone is allowed to take the action, i.e. no restriction.
 	 * Note: Any actions not listed will have restrictions removed.
 	 */
-	protections: Array<`${ Action }=${ Level }`> | ''
+	protections: MaybeArray<`${ Action }=${ Level }`> | ''
 
 	/**
 	 * Reason for (un)protecting.
@@ -635,7 +637,7 @@ export interface AllCategoriesRequest extends QueryRequest {
 	 * `size`: Adds number of pages in the category.
 	 * `hidden`: Tags categories that are hidden with `__HIDDENCAT__`.
 	 */
-	acprop?: Array<'size' | 'hidden'>
+	acprop?: MaybeArray<'size' | 'hidden'>
 
 	/**
 	 * The category to stop enumerating at.
@@ -697,7 +699,7 @@ export interface AllImagesRequest extends QueryRequest {
 	/**
 	 * Which file information to get.
 	 */
-	aiprop?: Array<'timestamp' | 'user' | 'userid' | 'comment' | 'parsedcomment' | 'canonicaltitle' | 'url' | 'size' | 'dimensions' | 'sha1' | 'mime' | 'mediatype' | 'metadata' | 'commonmetadata' | 'extmetadata' | 'bitdepth' | 'badfile'>
+	aiprop?: MaybeArray<'timestamp' | 'user' | 'userid' | 'comment' | 'parsedcomment' | 'canonicaltitle' | 'url' | 'size' | 'dimensions' | 'sha1' | 'mime' | 'mediatype' | 'metadata' | 'commonmetadata' | 'extmetadata' | 'bitdepth' | 'badfile'>
 
 	/**
 	 * Property to sort by.
@@ -812,7 +814,7 @@ interface BaseCategoryMembersRequest extends QueryRequest {
 	/**
 	 * Which pieces of information to include.
 	 */
-	cmprop?: Array<'ids' | 'title' | 'sortkey' | 'sortkeyprefix' | 'type' | 'timestamp'>
+	cmprop?: MaybeArray<'ids' | 'title' | 'sortkey' | 'sortkeyprefix' | 'type' | 'timestamp'>
 
 	/**
 	 * Property to sort by.
@@ -832,7 +834,7 @@ interface BaseCategoryMembersRequest extends QueryRequest {
 	/**
 	 * Which type of category members to include. Ignored when `cmsort=timestamp` is set.
 	 */
-	cmtype?: Array<'file' | 'page' | 'subcat'>
+	cmtype?: MaybeArray<'file' | 'page' | 'subcat'>
 
 	list: 'categorymembers'
 }
@@ -863,7 +865,7 @@ export interface LinksHereRequest extends QueryRequest {
 	/**
 	 * Which properties to get.
 	 */
-	lhprop?: Array<'pageid' | 'title' | 'redirect'>
+	lhprop?: MaybeArray<'pageid' | 'title' | 'redirect'>
 
 	/**
 	 * Show only items that meet these criteria.
@@ -903,7 +905,7 @@ export interface LogEventsRequest extends QueryRequest {
 	/**
 	 * Which properties to get.
 	 */
-	leprop?: Array<'ids' | 'title' | 'type' | 'user' | 'userid' | 'timestamp' | 'comment' | 'details' | 'tags'>
+	leprop?: MaybeArray<'ids' | 'title' | 'type' | 'user' | 'userid' | 'timestamp' | 'comment' | 'details' | 'tags'>
 
 	/**
 	 * The timestamp to start enumerating from.
@@ -962,12 +964,12 @@ export interface RecentChangesRequest extends QueryRequest {
 	/**
 	 * Include additional pieces of information.
 	 */
-	rcprop?: Array<'user' | 'userid' | 'comment' | 'flags' | 'timestamp' | 'title' | 'ids' | 'sizes' | 'redirect' | 'patrolled' | 'loginfo' | 'tags'>
+	rcprop?: MaybeArray<'user' | 'userid' | 'comment' | 'flags' | 'timestamp' | 'title' | 'ids' | 'sizes' | 'redirect' | 'patrolled' | 'loginfo' | 'tags'>
 
 	/**
 	 * Show only items that meet these criteria.
 	 */
-	rcshow?: Array<'!anon' | '!autropatrolled' | '!bot' | '!minor' | '!patrolled' | '!redirect' | 'anon' | 'autopatrolled' | 'bot' | 'minor' | 'patrolled' | 'redirect' | 'unpatrolled'>
+	rcshow?: MaybeArray<'!anon' | '!autropatrolled' | '!bot' | '!minor' | '!patrolled' | '!redirect' | 'anon' | 'autopatrolled' | 'bot' | 'minor' | 'patrolled' | 'redirect' | 'unpatrolled'>
 
 	/**
 	 * The timestamp to start enumerating from.
@@ -992,7 +994,7 @@ export interface RecentChangesRequest extends QueryRequest {
 	/**
 	 * Which types of changes to show.
 	 */
-	rctype?: Array<'edit' | 'new' | 'log' | 'categorize'>
+	rctype?: MaybeArray<'edit' | 'new' | 'log' | 'categorize'>
 }
 
 export interface TranscludedInRequest extends QueryRequest {
@@ -1016,7 +1018,7 @@ export interface TranscludedInRequest extends QueryRequest {
 	/**
 	 * Which properties to get.
 	 */
-	tiprop?: Array<'pageid' | 'title' | 'redirect'>
+	tiprop?: MaybeArray<'pageid' | 'title' | 'redirect'>
 
 	/**
 	 * Show only items that meet these criteria.
@@ -1055,12 +1057,12 @@ interface BaseUserContribsRequest extends QueryRequest {
 	/**
 	 * Include additional pieces of information.
 	 */
-	ucprop?: Array<'ids' | 'title' | 'timestamp' | 'comment' | 'parsedcomment' | 'size' | 'sizediff' | 'flags' | 'patrolled' | 'tags'>
+	ucprop?: MaybeArray<'ids' | 'title' | 'timestamp' | 'comment' | 'parsedcomment' | 'size' | 'sizediff' | 'flags' | 'patrolled' | 'tags'>
 
 	/**
 	 * Show only items that meet these criteria.
 	 */
-	ucshow?: Array< '!autopatrolled' | '!minor' | '!new' | '!patrolled' | '!top' | 'autopatrolled' | 'minor' | 'new' | 'patrolled' | 'top' >
+	ucshow?: MaybeArray< '!autopatrolled' | '!minor' | '!new' | '!patrolled' | '!top' | 'autopatrolled' | 'minor' | 'new' | 'patrolled' | 'top' >
 
 	/**
 	 * The start timestamp to return from, i.e. revisions before this timestamp.
@@ -1099,7 +1101,7 @@ interface BaseUsersRequest extends QueryRequest {
 	/**
 	 * Which pieces of information to include.
 	 */
-	usprop?: Array<'blockinfo' | 'groups' | 'groupmemberships' | 'implicitgroups' | 'rights' | 'editcount' | 'registration' | 'emailable' | 'gender' | 'centralids' | 'cancreate'>
+	usprop?: MaybeArray<'blockinfo' | 'groups' | 'groupmemberships' | 'implicitgroups' | 'rights' | 'editcount' | 'registration' | 'emailable' | 'gender' | 'centralids' | 'cancreate'>
 
 	/**
 	 * A list of users to obtain information for.
