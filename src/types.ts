@@ -964,7 +964,7 @@ export interface RecentChangesRequest extends QueryRequest {
 	/**
 	 * Include additional pieces of information.
 	 */
-	rcprop?: MaybeArray<'user' | 'userid' | 'comment' | 'flags' | 'timestamp' | 'title' | 'ids' | 'sizes' | 'redirect' | 'patrolled' | 'loginfo' | 'tags'>
+	rcprop?: MaybeArray<'user' | 'userid' | 'comment' | 'flags' | 'timestamp' | 'title' | 'ids' | 'sizes' | 'redirect' | 'patrolled' | 'loginfo' | 'tags' | 'parsedcomment'>
 
 	/**
 	 * Show only items that meet these criteria.
