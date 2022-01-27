@@ -1,4 +1,4 @@
-import type { AllCategoriesRequest, AllCategoriesResponse, AllImagesRequest, AllImagesResponse, AllPagesRequest, AllPagesResponse, CategoryMembersRequest, CategoryMembersResponse, ExtendedRequest, GETRequest, InfoRequest, InfoResponse, LinksHereRequest, LinksHereResponse, ListQueryResponse, LogEventsRequest, LogEventsResponse, NoActionToken, POSTRequest, PurgeRequest, PurgeResponse, QueryRequest, RecentChangesRequest, RecentChangesResponse, Request, RevisionsRequest, RevisionsResponse, SiteInfoRequest, SiteInfoResponse, TokensRequest, TokensResponse, TokenType, TranscludedInRequest, TranscludedInResponse, UserContribsRequest, UserContribsResponse, UsersRequest, UsersResponse } from '../../types'
+import type { AllCategoriesRequest, AllCategoriesResponse, AllImagesRequest, AllImagesResponse, AllPagesRequest, AllPagesResponse, CategoryMembersRequest, CategoryMembersResponse, ExtendedRequest, GETRequest, InfoRequest, InfoResponse, LinksHereRequest, LinksHereResponse, ListQueryResponse, LogEventsRequest, LogEventsResponse, NoActionToken, OpenSearchRequest, OpenSearchResponse, POSTRequest, PurgeRequest, PurgeResponse, QueryRequest, RecentChangesRequest, RecentChangesResponse, Request, RevisionsRequest, RevisionsResponse, SiteInfoRequest, SiteInfoResponse, TokensRequest, TokensResponse, TokenType, TranscludedInRequest, TranscludedInResponse, UserContribsRequest, UserContribsResponse, UsersRequest, UsersResponse } from '../../types'
 import fs from 'fs'
 import { RequestManager } from '../../utils'
 
@@ -221,6 +221,13 @@ export class Wiki {
 		}
 
 		return result
+	}
+
+	public search( params: NoActionToken<OpenSearchRequest> ): Promise<OpenSearchResponse> {
+		return this.get( {
+			...params,
+			action: 'opensearch'
+		} )
 	}
 
 	public async queryList( params: { list: 'allcategories' } & NoActionToken<AllCategoriesRequest>, limit?: number ): Promise<AllCategoriesResponse[ 'query' ][ 'allcategories' ]>
