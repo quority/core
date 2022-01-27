@@ -1,4 +1,4 @@
-import type { AllCategoriesRequest, AllCategoriesResponse, AllImagesRequest, AllImagesResponse, AllPagesRequest, AllPagesResponse, CategoryMembersRequest, CategoryMembersResponse, ExtendedRequest, GETRequest, LinksHereRequest, LinksHereResponse, ListQueryResponse, LogEventsRequest, LogEventsResponse, NoActionToken, POSTRequest, PurgeRequest, PurgeResponse, QueryRequest, RecentChangesRequest, RecentChangesResponse, Request, RevisionsRequest, RevisionsResponse, SiteInfoRequest, SiteInfoResponse, TokensRequest, TokensResponse, TokenType, TranscludedInRequest, TranscludedInResponse, UserContribsRequest, UserContribsResponse, UsersRequest, UsersResponse } from '../../types'
+import type { AllCategoriesRequest, AllCategoriesResponse, AllImagesRequest, AllImagesResponse, AllPagesRequest, AllPagesResponse, CategoryMembersRequest, CategoryMembersResponse, ExtendedRequest, GETRequest, InfoRequest, InfoResponse, LinksHereRequest, LinksHereResponse, ListQueryResponse, LogEventsRequest, LogEventsResponse, NoActionToken, POSTRequest, PurgeRequest, PurgeResponse, QueryRequest, RecentChangesRequest, RecentChangesResponse, Request, RevisionsRequest, RevisionsResponse, SiteInfoRequest, SiteInfoResponse, TokensRequest, TokensResponse, TokenType, TranscludedInRequest, TranscludedInResponse, UserContribsRequest, UserContribsResponse, UsersRequest, UsersResponse } from '../../types'
 import fs from 'fs'
 import { RequestManager } from '../../utils'
 
@@ -278,6 +278,7 @@ export class Wiki {
 		}
 	}
 
+	public async queryProp( params: { prop: 'info' } & NoActionToken<InfoRequest>, limit?: number ): Promise<InfoResponse[ 'query' ][ 'pages' ]>
 	public async queryProp( params: { prop: 'linkshere' } & NoActionToken<LinksHereRequest>, limit?: number ): Promise<LinksHereResponse[ 'query' ][ 'pages' ]>
 	public async queryProp( params: { prop: 'transcludedin' } & NoActionToken<TranscludedInRequest>, limit?: number ): Promise<TranscludedInResponse[ 'query' ][ 'pages' ]>
 	public async queryProp( params: { prop: string } & NoActionToken<QueryRequest>, limit?: number ): Promise<ListQueryResponse[ 'query' ][ string ]> {
@@ -289,6 +290,7 @@ export class Wiki {
 		return result
 	}
 
+	public iterQueryProp( params: { prop: 'info' } & NoActionToken<InfoRequest>, limit?: number ): AsyncGenerator<InfoResponse[ 'query' ][ 'pages' ][ 0 ], void, unknown>
 	public iterQueryProp( params: { prop: 'linkshere' } & NoActionToken<LinksHereRequest>, limit?: number ): AsyncGenerator<LinksHereResponse[ 'query' ][ 'pages' ][ 0 ], void, unknown>
 	public iterQueryProp( params: { prop: 'transcludedin' } & NoActionToken<TranscludedInRequest>, limit?: number ): AsyncGenerator<TranscludedInResponse[ 'query' ][ 'pages' ][ 0 ], void, unknown>
 	public iterQueryProp( params: { prop: string } & NoActionToken<QueryRequest>, limit?: number ): AsyncGenerator<ListQueryResponse[ 'query' ][ string ][ 0 ], void, unknown>
