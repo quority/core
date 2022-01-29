@@ -9,6 +9,8 @@ export type RequireOnlyOne<T, Keys extends keyof T = keyof T> =
 			& Partial<Record<Exclude<Keys, K>, undefined>>
 	}[Keys]
 
+export type MaybeArray<T> = T | T[]
+
 export interface APIError {
 	error: {
 		code: string
@@ -41,7 +43,7 @@ export type ExtendedRequest<T extends Request> = T & {
 	action?: string
 	assert?: 'bot' | 'user'
 	meta?: string
-	prop?: string
+	prop?: string | string[]
 	token?: string
 }
 
@@ -49,6 +51,66 @@ export type NoActionToken<T> = Omit<T, 'action' | 'token'>
 
 export interface QueryRequest extends Request {
 	action: 'query'
+
+	/**
+	 * When more results are available, use this to continue.
+	 */
+	continue?: string
+
+	/**
+	 * Convert titles to other variants if necessary. Only works if the wiki's content language supports variant conversion. Languages that support variant conversion include ban, en, crh, gan, iu, kk, ku, shi, sr, tg, uz and zh.
+	 */
+	converttitles?: boolean
+
+	/**
+	 * Export the current revisions of all given or generated pages.
+	 */
+	export?: boolean
+
+	/**
+	 * Return the export XML without wrapping it in an XML result (same format as Special:Export). Can only be used with query+export.
+	 */
+	exportnowrap?: boolean
+
+	/**
+	 * Target the given version of the XML dump format when exporting. Can only be used with query+export.
+	 */
+	exportschema?: '0.10' | '0.11'
+
+	/**
+	 * Include an additional pageids section listing all returned page IDs.
+	 */
+	indexpageids?: boolean
+
+	/**
+	 * Whether to get the full URL if the title is an interwiki link.
+	 */
+	iwurl?: boolean
+
+	/**
+	 * A list of page IDs to work on.
+	 */
+	pageids?: number | number[]
+
+	/**
+	 * Return raw query-continue data for continuation.
+	 */
+	rawcontinue?: boolean
+
+	/**
+	 * Automatically resolve redirects in query+titles, query+pageids, and query+revids, and in pages returned by query+generator.
+	 */
+	redirects?: boolean
+
+	/**
+	 * A list of revision IDs to work on.
+	 */
+	revids?: number | number[]
+
+	/**
+	 * A list of titles to work on.
+	 */
+	titles?: string | string[]
 }
 
 export interface Response {
@@ -187,7 +249,7 @@ export interface RevisionsRequest extends QueryRequest {
 	/**
 	 * Which properties to get for each revision.
 	 */
-	rvprop?: Array<'ids' | 'flags' | 'timestamp' | 'user' | 'userid' | 'size' | 'slotsize' | 'sha1' | 'slotsha1' | 'contentmodel' | 'comment' | 'parsedcomment' | 'content' | 'tags' | 'roles'>
+	rvprop?: MaybeArray<'ids' | 'flags' | 'timestamp' | 'user' | 'userid' | 'size' | 'slotsize' | 'sha1' | 'slotsha1' | 'contentmodel' | 'comment' | 'parsedcomment' | 'content' | 'tags' | 'roles'>
 
 	/**
 	 * Which revision slots to return data for, when slot-related properties are included in rvprops. If omitted, data from the main slot will be returned in a backwards-compatible format.
@@ -213,8 +275,6 @@ export interface RevisionsRequest extends QueryRequest {
 	 * Only include revisions made by user.
 	 */
 	rvuser?: string
-
-	titles: string | string[]
 }
 
 /**
@@ -226,7 +286,7 @@ export interface SiteInfoRequest extends QueryRequest {
 	/**
 	 * Return only local or only nonlocal entries of the interwiki map.
 	 */
-	sifilteriw?: Array<'local' | '!local'>
+	sifilteriw?: 'local' | '!local'
 
 	/**
 	 * Language code for localised language names (best effort) and skin names.
@@ -241,7 +301,7 @@ export interface SiteInfoRequest extends QueryRequest {
 	/**
 	 * Which information to get.
 	 */
-	siprop: Array<'general' | 'namespaces' | 'namespacealiases' | 'specialpagealiases' | 'magicwords' | 'interwikimap' | 'dbrepllag' | 'statistics' | 'usergroups' | 'libraries' | 'extensions' | 'fileextensions' | 'rightsinfo' | 'restrictions' | 'languages' | 'languagevariants' | 'skins' | 'extensiontags' | 'functionhooks' | 'showhooks' | 'variables' | 'protocols' | 'defaultoptions' | 'uploaddialog'>
+	siprop: MaybeArray<'general' | 'namespaces' | 'namespacealiases' | 'specialpagealiases' | 'magicwords' | 'interwikimap' | 'dbrepllag' | 'statistics' | 'usergroups' | 'libraries' | 'extensions' | 'fileextensions' | 'rightsinfo' | 'restrictions' | 'languages' | 'languagevariants' | 'skins' | 'extensiontags' | 'functionhooks' | 'showhooks' | 'variables' | 'protocols' | 'defaultoptions' | 'uploaddialog'>
 
 	/**
 	 * List all database servers, not just the one lagging the most.
@@ -258,7 +318,7 @@ export interface TokensRequest extends QueryRequest {
 	/**
 	 * Types of token to request.
 	 */
-	type: TokenType | TokenType[]
+	type: MaybeArray<TokenType>
 }
 
 /**
@@ -499,7 +559,7 @@ interface BaseProtectRequest<Action extends string = ProtectionAction, Level ext
 	 * List of protection levels, formatted `action=level` (e.g. `edit=sysop`). A level of all means everyone is allowed to take the action, i.e. no restriction.
 	 * Note: Any actions not listed will have restrictions removed.
 	 */
-	protections: Array<`${ Action }=${ Level }`> | ''
+	protections: MaybeArray<`${ Action }=${ Level }`> | ''
 
 	/**
 	 * Reason for (un)protecting.
@@ -635,7 +695,7 @@ export interface AllCategoriesRequest extends QueryRequest {
 	 * `size`: Adds number of pages in the category.
 	 * `hidden`: Tags categories that are hidden with `__HIDDENCAT__`.
 	 */
-	acprop?: Array<'size' | 'hidden'>
+	acprop?: MaybeArray<'size' | 'hidden'>
 
 	/**
 	 * The category to stop enumerating at.
@@ -697,7 +757,7 @@ export interface AllImagesRequest extends QueryRequest {
 	/**
 	 * Which file information to get.
 	 */
-	aiprop?: Array<'timestamp' | 'user' | 'userid' | 'comment' | 'parsedcomment' | 'canonicaltitle' | 'url' | 'size' | 'dimensions' | 'sha1' | 'mime' | 'mediatype' | 'metadata' | 'commonmetadata' | 'extmetadata' | 'bitdepth' | 'badfile'>
+	aiprop?: MaybeArray<'timestamp' | 'user' | 'userid' | 'comment' | 'parsedcomment' | 'canonicaltitle' | 'url' | 'size' | 'dimensions' | 'sha1' | 'mime' | 'mediatype' | 'metadata' | 'commonmetadata' | 'extmetadata' | 'bitdepth' | 'badfile'>
 
 	/**
 	 * Property to sort by.
@@ -812,7 +872,7 @@ interface BaseCategoryMembersRequest extends QueryRequest {
 	/**
 	 * Which pieces of information to include.
 	 */
-	cmprop?: Array<'ids' | 'title' | 'sortkey' | 'sortkeyprefix' | 'type' | 'timestamp'>
+	cmprop?: MaybeArray<'ids' | 'title' | 'sortkey' | 'sortkeyprefix' | 'type' | 'timestamp'>
 
 	/**
 	 * Property to sort by.
@@ -832,7 +892,7 @@ interface BaseCategoryMembersRequest extends QueryRequest {
 	/**
 	 * Which type of category members to include. Ignored when `cmsort=timestamp` is set.
 	 */
-	cmtype?: Array<'file' | 'page' | 'subcat'>
+	cmtype?: MaybeArray<'file' | 'page' | 'subcat'>
 
 	list: 'categorymembers'
 }
@@ -841,6 +901,37 @@ interface BaseCategoryMembersRequest extends QueryRequest {
  * Options for `list=categorymembers`
  */
 export type CategoryMembersRequest = RequireOnlyOne<BaseCategoryMembersRequest, 'cmpageid' | 'cmtitle'>
+
+/**
+ * Get basic page information.
+ */
+export interface InfoRequest extends QueryRequest {
+	/**
+	 * When more results are available, use this to continue.
+	 */
+	incontinue?: string
+
+	/**
+	 * The context title to use when determining extra CSS classes (e.g. link colors) when inprop contains linkclasses. Accepts non-existent pages.
+	 */
+	inlinkcontext?: string
+
+	/**
+	 * Which additional properties to get.
+	 */
+	inprop?: MaybeArray<'protection' | 'talkid' | 'watched' | 'watchers' | 'visitingwatchers' | 'notificationtimestamp' | 'subjectid' | 'associatedpage' | 'url' | 'preload' | 'displaytitle' | 'varianttitles' | 'linkclasses'>
+
+	/**
+	 * Test whether the current user can perform certain actions on the page.
+	 */
+	intestactions?: string | string[]
+
+	/**
+	 * Detail level for intestactions.
+	 * @default 'boolean'
+	 */
+	intestactionsdetail?: 'boolean' | 'full' | 'quick'
+}
 
 export interface LinksHereRequest extends QueryRequest {
 	titles: string | string[]
@@ -863,7 +954,7 @@ export interface LinksHereRequest extends QueryRequest {
 	/**
 	 * Which properties to get.
 	 */
-	lhprop?: Array<'pageid' | 'title' | 'redirect'>
+	lhprop?: MaybeArray<'pageid' | 'title' | 'redirect'>
 
 	/**
 	 * Show only items that meet these criteria.
@@ -903,7 +994,7 @@ export interface LogEventsRequest extends QueryRequest {
 	/**
 	 * Which properties to get.
 	 */
-	leprop?: Array<'ids' | 'title' | 'type' | 'user' | 'userid' | 'timestamp' | 'comment' | 'details' | 'tags'>
+	leprop?: MaybeArray<'ids' | 'title' | 'type' | 'user' | 'userid' | 'timestamp' | 'comment' | 'details' | 'tags'>
 
 	/**
 	 * The timestamp to start enumerating from.
@@ -926,6 +1017,213 @@ export interface LogEventsRequest extends QueryRequest {
 	leuser?: string
 
 	list: 'logevents'
+}
+
+/**
+ * Search the wiki using the OpenSearch protocol.
+ */
+export interface OpenSearchRequest extends Request {
+	/**
+	 * Maximum number of results to return.
+	 */
+	limit?: number | 'max'
+
+	/**
+	 * Namespaces to search. Ignored if search begins with a valid namespace prefix.
+	 * @default 0
+	 */
+	namespace?: number | number[] | '*'
+
+	/**
+	 * Search profile to use.
+
+	`strict`: Strict profile with few punctuation characters removed but diacritics and stress marks are kept.\n
+
+    `normal`: Few punctuation characters, some diacritics and stopwords removed.
+
+    `normal-subphrases`: Few punctuation characters, some diacritics and stopwords removed. It will match also subphrases (can be subphrases or subpages depending on internal wiki configuration).
+
+    `fuzzy`: Similar to normal with typo correction (two typos supported).
+
+    `fast-fuzzy`: Experimental fuzzy profile (may be removed at any time)
+
+    `fuzzy-subphrases`: Similar to normal with typo correction (two typos supported). It will match also subphrases (can be subphrases or subpages depending on internal wiki configuration).
+
+	`classic`: Classic prefix, few punctuation characters and some diacritics removed.
+
+	`engine_autoselect`: Let the search engine decide on the best profile to use.
+
+	 * @default 'engine_autoselect'
+	 */
+	profile?: 'strict' | 'normal' | 'normal-subphrases' | 'fuzzy' | 'fast-fuzzy' | 'fuzzy-subphrases' | 'classic' | 'engine_autoselect'
+
+	/**
+	 * How to handle redirects.
+	 */
+	redirects?: 'return' | 'resolve'
+
+	/**
+	 * Search string.
+	 */
+	search: string
+}
+
+/**
+ * Parses content and returns parser output.
+ */
+export interface ParseRequest extends Request {
+	action: 'parse'
+
+	/**
+	 * Content serialization format used for the input text. Only valid when used with `text`.
+	 */
+	contentformat?: 'application/json' | 'application/octet-stream' | 'application/unknown' | 'application/x-binary' | 'text/css' | 'text/javascript' | 'text/plain' | 'text/unknown' | 'text/x-wiki' | 'unknown/unknown'
+
+	/**
+	 * Content model of the input text. If omitted, title must be specified, and default will be the model of the specified title. Only valid when used with `text`.
+	 */
+	contentmodel?: 'GadgetDefinition' | 'Json.JsonConfig' | 'JsonSchema' | 'Map.JsonConfig' | 'MassMessageListContent' | 'NewsletterContent' | 'Scribunto' | 'SecurePoll' | 'Tabular.JsonConfig' | 'css' | 'flow-board' | 'javascript' | 'json' | 'sanitized-css' | 'text' | 'translate-messagebundle' | 'unknown' | 'wikitext'
+
+	/**
+	 * Omit edit section links from the parser output.
+	 */
+	disableeditsection?: boolean
+
+	/**
+	 * Omit the limit report ("NewPP limit report") from the parser output.
+	 */
+	disablelimitreport?: boolean
+
+	/**
+	 * Do not deduplicate inline stylesheets in the parser output.
+	 */
+	disablestylededuplication?: boolean
+
+	/**
+	 * Omit table of contents in output.
+	 */
+	disabletoc?: boolean
+
+	/**
+	 * Apply mobile main page transformations.
+	 */
+	mainpage?: boolean
+
+	/**
+	 * Return parse output in a format suitable for mobile devices.
+	 */
+	mobileformat?: boolean
+
+	/**
+	 * Parse the content of this revision. Overrides `page` and `pageid`.
+	 */
+	oldid?: number
+
+	/**
+	 * Do a pre-save transform (PST) on the input, but don't parse it. Returns the same wikitext, after a PST has been applied. Only valid when used with `text`.
+	 */
+	onlypst?: boolean
+
+	/**
+	 * Parse the content of this page. Cannot be used together with `text` and `title`.
+	 */
+	page?: string
+
+	/**
+	 * Parse the content of this page. Overrides `page`.
+	 */
+	pageid?: number
+
+	/**
+	 * Parse in preview mode.
+	 */
+	preview?: boolean
+
+	/**
+	 * Which pieces of information to get.
+	 */
+	prop?: MaybeArray<'text' | 'langlinks' | 'categories' | 'categorieshtml' | 'links' | 'templates' | 'images' | 'externallinks' | 'sections' | 'revid' | 'displaytitle' | 'subtitle' | 'headhtml' | 'modules' | 'jsconfigvars' | 'encodedjsconfigvars' | 'indicators' | 'iwlinks' | 'wikitext' | 'properties' | 'limitreportdata' | 'limitreporthtml' | 'parsetree' | 'parsewarnings' | 'parsewarningshtml'>
+
+	/**
+	 * Do a pre-save transform on the input before parsing it. Only valid when used with `text`.
+	 */
+	pst?: boolean
+
+	/**
+	 * If `page` or `pageid` is set to a redirect, resolve it.
+	 */
+	redirects?: boolean
+
+	/**
+	 * Revision ID, for `{{REVISIONID}}` and similar variables.
+	 */
+	revid?: number
+
+	/**
+	 * Only parse the content of this section number.
+	 */
+	section?: number | 'new'
+
+	/**
+	 * Parse in section preview mode (enables preview mode too).
+	 */
+	sectionpreview?: boolean
+
+	/**
+	 * New section title when `section` is `new`.
+	 */
+	sectiontitle?: string
+
+	/**
+	 * Summary to parse.
+	 */
+	summary?: string
+
+	/**
+	 * Content format of `templatesandboxtext`.
+	 */
+	templatesandboxcontentformat?: 'application/json' | 'application/octet-stream' | 'application/unknown' | 'application/x-binary' | 'text/css' | 'text/javascript' | 'text/plain' | 'text/unknown' | 'text/x-wiki' | 'unknown/unknown'
+
+	/**
+	 * Content model of `templatesandboxtext`.
+	 */
+	templatesandboxcontentmodel?: 'GadgetDefinition' | 'Json.JsonConfig' | 'JsonSchema' | 'Map.JsonConfig' | 'MassMessageListContent' | 'NewsletterContent' | 'Scribunto' | 'SecurePoll' | 'Tabular.JsonConfig' | 'css' | 'flow-board' | 'javascript' | 'json' | 'sanitized-css' | 'text' | 'translate-messagebundle' | 'unknown' | 'wikitext'
+
+	/**
+	 * Template sandbox prefix, as with Special:TemplateSandbox.
+	 */
+	templatesanboxprefix?: string | string[]
+
+	/**
+	 * Parse the page using this page content in place of the page named by `templatesandboxtitle`.
+	 */
+	templatesandboxtext?: string
+
+	/**
+	 * Parse the page using `templatesandboxtext` in place of the contents of the page named here.
+	 */
+	templatesandboxtitle?: string
+
+	/**
+	 * Text to parse. Use `title` or `contentmodel` to control the content model.
+	 */
+	text?: string
+
+	/**
+	 * Title of page the text belongs to. If omitted, `contentmodel` must be specified, and "API" will be used as the title.
+	 */
+	title?: string
+
+	/**
+	 * Apply the selected skin to the parser output. May affect the following properties: `langlinks`, `headitems`, `modules`, `jsconfigvars`, `indicators`.
+	 */
+	useskin?: string
+
+	/**
+	 * CSS class to use to wrap the parser output.
+	 * @default 'mw-parser-output'
+	 */
+	wrapoutputclass?: string
 }
 
 /**
@@ -962,12 +1260,12 @@ export interface RecentChangesRequest extends QueryRequest {
 	/**
 	 * Include additional pieces of information.
 	 */
-	rcprop?: Array<'user' | 'userid' | 'comment' | 'flags' | 'timestamp' | 'title' | 'ids' | 'sizes' | 'redirect' | 'patrolled' | 'loginfo' | 'tags'>
+	rcprop?: MaybeArray<'user' | 'userid' | 'comment' | 'flags' | 'timestamp' | 'title' | 'ids' | 'sizes' | 'redirect' | 'patrolled' | 'loginfo' | 'tags' | 'parsedcomment'>
 
 	/**
 	 * Show only items that meet these criteria.
 	 */
-	rcshow?: Array<'!anon' | '!autropatrolled' | '!bot' | '!minor' | '!patrolled' | '!redirect' | 'anon' | 'autopatrolled' | 'bot' | 'minor' | 'patrolled' | 'redirect' | 'unpatrolled'>
+	rcshow?: MaybeArray<'!anon' | '!autropatrolled' | '!bot' | '!minor' | '!patrolled' | '!redirect' | 'anon' | 'autopatrolled' | 'bot' | 'minor' | 'patrolled' | 'redirect' | 'unpatrolled'>
 
 	/**
 	 * The timestamp to start enumerating from.
@@ -992,7 +1290,7 @@ export interface RecentChangesRequest extends QueryRequest {
 	/**
 	 * Which types of changes to show.
 	 */
-	rctype?: Array<'edit' | 'new' | 'log' | 'categorize'>
+	rctype?: MaybeArray<'edit' | 'new' | 'log' | 'categorize'>
 }
 
 export interface TranscludedInRequest extends QueryRequest {
@@ -1016,7 +1314,7 @@ export interface TranscludedInRequest extends QueryRequest {
 	/**
 	 * Which properties to get.
 	 */
-	tiprop?: Array<'pageid' | 'title' | 'redirect'>
+	tiprop?: MaybeArray<'pageid' | 'title' | 'redirect'>
 
 	/**
 	 * Show only items that meet these criteria.
@@ -1055,12 +1353,12 @@ interface BaseUserContribsRequest extends QueryRequest {
 	/**
 	 * Include additional pieces of information.
 	 */
-	ucprop?: Array<'ids' | 'title' | 'timestamp' | 'comment' | 'parsedcomment' | 'size' | 'sizediff' | 'flags' | 'patrolled' | 'tags'>
+	ucprop?: MaybeArray<'ids' | 'title' | 'timestamp' | 'comment' | 'parsedcomment' | 'size' | 'sizediff' | 'flags' | 'patrolled' | 'tags'>
 
 	/**
 	 * Show only items that meet these criteria.
 	 */
-	ucshow?: Array< '!autopatrolled' | '!minor' | '!new' | '!patrolled' | '!top' | 'autopatrolled' | 'minor' | 'new' | 'patrolled' | 'top' >
+	ucshow?: MaybeArray< '!autopatrolled' | '!minor' | '!new' | '!patrolled' | '!top' | 'autopatrolled' | 'minor' | 'new' | 'patrolled' | 'top' >
 
 	/**
 	 * The start timestamp to return from, i.e. revisions before this timestamp.
@@ -1099,7 +1397,7 @@ interface BaseUsersRequest extends QueryRequest {
 	/**
 	 * Which pieces of information to include.
 	 */
-	usprop?: Array<'blockinfo' | 'groups' | 'groupmemberships' | 'implicitgroups' | 'rights' | 'editcount' | 'registration' | 'emailable' | 'gender' | 'centralids' | 'cancreate'>
+	usprop?: MaybeArray<'blockinfo' | 'groups' | 'groupmemberships' | 'implicitgroups' | 'rights' | 'editcount' | 'registration' | 'emailable' | 'gender' | 'centralids' | 'cancreate'>
 
 	/**
 	 * A list of users to obtain information for.
@@ -1377,6 +1675,62 @@ export interface MoveResponse extends Response {
 	}
 }
 
+type OpenSearchResponseArray = [ string, string[], string[], string[] ]
+
+export interface OpenSearchResponse extends Response, OpenSearchResponseArray {
+
+}
+
+export interface ParseResponse extends Response {
+	parse: {
+		title: string
+		pageid: number
+		revid: number
+		text: string
+		langlinks: Array<{
+			lang: string
+			url: string
+			langname: string
+			autonym: string
+			title: string
+		}>
+		categories: Array<{
+			sortkey: string
+			category: string
+			hidden?: boolean
+		}>
+		links: Array<{
+			ns: number
+			title: string
+			exists: boolean
+		}>
+		templates: Array<{
+			ns: number
+			title: string
+			exists: boolean
+		}>
+		images: string[]
+		externallinks: string[]
+		sections: Array<{
+			toclevel: number
+			level: string
+			line: string
+			number: string
+			index: string
+			fromtitle: string
+			byteoffset: number
+			anchor: string
+		}>
+		displaytitle: string
+		iwlinks: Array<{
+			prefix: string
+			url: string
+			title: string
+		}>
+		properties: Record<string, string>
+	}
+}
+
 export interface ProtectResponse extends Response {
 	protect: {
 		protections: string[]
@@ -1467,6 +1821,39 @@ export type CategoryMembersResponse = ListQueryResponse<
 		pageid: number
 		ns: number
 		title: string
+	}
+>
+
+export type InfoResponse = ListQueryResponse<
+	'in',
+	'pages',
+	{
+		pageid: number
+		ns: number
+		title: string
+		contentmodel: string
+		pagelanguage: string
+		pagelanguagehtmlcode: string
+		pagelanguagedir: string
+		touched: string
+		lastrevid: number
+		length: number
+		protection: Array<{
+			type: string
+			level: string
+			expiry: string
+		}>
+		restrictiontypes: string[]
+		watched: boolean
+		watchers: number
+		visitingwatchers: number
+		notificationtimestamp: string
+		fullurl: string
+		editurl: string
+		canonicalurl: string
+		preload: string
+		displaytitle: string
+		varianttitles: Record<string, string>
 	}
 >
 
