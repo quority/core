@@ -1,6 +1,6 @@
 {
   "name": "mw.js",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "Typed MediaWiki API client for node.js using TypeScript.",
   "main": "dist/main.js",
   "files": [
