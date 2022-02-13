@@ -1720,7 +1720,7 @@ export interface ParseResponse extends Response {
 		title: string
 		pageid: number
 		revid: number
-		text: string
+		text: Record<string, string>
 		langlinks: Array<{
 			lang: string
 			url: string
