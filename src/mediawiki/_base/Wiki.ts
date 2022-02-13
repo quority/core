@@ -304,6 +304,18 @@ export class Wiki {
 		return result
 	}
 
+	public async rawQueryProp( params: { prop: 'info' } & NoActionToken<InfoRequest>, ): Promise<InfoResponse[ 'query' ]>
+	public async rawQueryProp( params: { prop: 'linkshere' } & NoActionToken<LinksHereRequest>, ): Promise<LinksHereResponse[ 'query' ]>
+	public async rawQueryProp( params: { prop: 'transcludedin' } & NoActionToken<TranscludedInRequest>, ): Promise<TranscludedInResponse[ 'query' ]>
+	public async rawQueryProp( params: { prop: string } & NoActionToken<QueryRequest>): 
+	Promise<ListQueryResponse[ 'query' ]> {
+		const res = await this.get<ListQueryResponse>( {
+			action: 'query',
+			...params
+		} )
+		return res.query
+	}
+
 	public iterQueryProp( params: { prop: 'info' } & NoActionToken<InfoRequest>, limit?: number ): AsyncGenerator<InfoResponse[ 'query' ][ 'pages' ][ 0 ], void, unknown>
 	public iterQueryProp( params: { prop: 'linkshere' } & NoActionToken<LinksHereRequest>, limit?: number ): AsyncGenerator<LinksHereResponse[ 'query' ][ 'pages' ][ 0 ], void, unknown>
 	public iterQueryProp( params: { prop: 'transcludedin' } & NoActionToken<TranscludedInRequest>, limit?: number ): AsyncGenerator<TranscludedInResponse[ 'query' ][ 'pages' ][ 0 ], void, unknown>
