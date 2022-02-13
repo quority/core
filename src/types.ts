@@ -117,6 +117,7 @@ export interface Response {
 }
 
 export interface QueryResponse {
+	/** The API returns a batchcomplete element to indicate that all data for the current batch of items has been returned. MW 1.25+ */
 	batchcomplete?: boolean
 }
 
@@ -125,8 +126,41 @@ export interface ListQueryResponse<Shortname extends string = string, Name exten
 		[ key in `${ Shortname }continue` ]: string
 	}
 	query: {
+		/** Title normalization converts page titles to their canonical form. */
+		normalized?: NormalizedInfo[]
+		interwiki?: InterwikiInfo[]
+		redirects?: RedirectInfo[]
+
+		/** can show up if query.converttitles is set to true converttitles */
+		converted?: ConvertedInfo[]
+	} & {
 		[ key in Name ]: QueryItem[]
 	}
+}
+
+export type NormalizedInfo = {
+	fromencoded: boolean
+	from: string
+	to: string
+}
+
+export type InterwikiInfo<Site extends string = string> = {
+	title: `${Site}:${string}`
+	iw: Site
+	/** Available if iwurl is set to true */
+	url?: string	
+}
+
+export type RedirectInfo = {
+	from: string
+	to: string
+	/** may contain a this attribute for those redirects that point to specific sections. */
+	tofragment?: string
+}
+
+export type ConvertedInfo = {
+	from: string
+	to: string
 }
 
 /**
