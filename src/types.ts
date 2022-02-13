@@ -117,7 +117,9 @@ export interface Response {
 }
 
 export interface QueryResponse {
-	/** The API returns a batchcomplete element to indicate that all data for the current batch of items has been returned. MW 1.25+ */
+	/**
+	 * The API returns a batchcomplete element to indicate that all data for the current batch of items has been returned. MW 1.25+
+	 */
 	batchcomplete?: boolean
 }
 
@@ -126,39 +128,47 @@ export interface ListQueryResponse<Shortname extends string = string, Name exten
 		[ key in `${ Shortname }continue` ]: string
 	}
 	query: {
-		/** Title normalization converts page titles to their canonical form. */
+		/**
+		 * Title normalization converts page titles to their canonical form.
+		 */
 		normalized?: NormalizedInfo[]
 		interwiki?: InterwikiInfo[]
 		redirects?: RedirectInfo[]
 
-		/** can show up if query.converttitles is set to true converttitles */
+		/**
+		 * Can show up if `converttitles` is set to true.
+		 */
 		converted?: ConvertedInfo[]
 	} & {
 		[ key in Name ]: QueryItem[]
 	}
 }
 
-export type NormalizedInfo = {
+export interface NormalizedInfo extends Record<string, unknown> {
 	fromencoded: boolean
 	from: string
 	to: string
 }
 
-export type InterwikiInfo<Site extends string = string> = {
-	title: `${Site}:${string}`
+export interface InterwikiInfo<Site extends string = string> extends Record<string, unknown> {
+	title: `${ Site }:${ string }`
 	iw: Site
-	/** Available if iwurl is set to true */
-	url?: string	
+	/**
+	 * Available if `iwurl` is set to true.
+	 */
+	url?: string
 }
 
-export type RedirectInfo = {
+export interface RedirectInfo extends Record<string, unknown> {
 	from: string
 	to: string
-	/** may contain a this attribute for those redirects that point to specific sections. */
+	/**
+	 * May contain a this attribute for those redirects that point to specific sections.
+	 */
 	tofragment?: string
 }
 
-export type ConvertedInfo = {
+export interface ConvertedInfo extends Record<string, unknown> {
 	from: string
 	to: string
 }

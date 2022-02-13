@@ -307,8 +307,7 @@ export class Wiki {
 	public async rawQueryProp( params: { prop: 'info' } & NoActionToken<InfoRequest>, ): Promise<InfoResponse[ 'query' ]>
 	public async rawQueryProp( params: { prop: 'linkshere' } & NoActionToken<LinksHereRequest>, ): Promise<LinksHereResponse[ 'query' ]>
 	public async rawQueryProp( params: { prop: 'transcludedin' } & NoActionToken<TranscludedInRequest>, ): Promise<TranscludedInResponse[ 'query' ]>
-	public async rawQueryProp( params: { prop: string } & NoActionToken<QueryRequest>): 
-	Promise<ListQueryResponse[ 'query' ]> {
+	public async rawQueryProp( params: { prop: string } & NoActionToken<QueryRequest> ): Promise<ListQueryResponse[ 'query' ]> {
 		const res = await this.get<ListQueryResponse>( {
 			action: 'query',
 			...params
