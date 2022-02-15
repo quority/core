@@ -42,7 +42,7 @@
     "@types/fs-extra": "9.0.13",
     "@types/mocha": "9.1.0",
     "@types/node": "16.11.25",
-    "@types/node-fetch": "2.6.0",
+    "@types/node-fetch": "2.6.1",
     "@types/tough-cookie": "4.0.1",
     "@typescript-eslint/eslint-plugin": "5.12.0",
     "@typescript-eslint/parser": "5.12.0",
