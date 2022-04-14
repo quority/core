@@ -157,10 +157,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/tough-cookie@npm:4.0.1":
-  version: 4.0.1
-  resolution: "@types/tough-cookie@npm:4.0.1"
-  checksum: 7570c1c2d74201f4ead3512cf8e4c99e97d92ab8a02ae2fb987fd720ced0ca1a2baf250c98a861a170b86762606c9bf6d32207675f13dffc5ab75c08c96578d2
+"@types/tough-cookie@npm:4.0.2":
+  version: 4.0.2
+  resolution: "@types/tough-cookie@npm:4.0.2"
+  checksum: e055556ffdaa39ad85ede0af192c93f93f986f4bd9e9426efdc2948e3e2632db3a4a584d4937dbf6d7620527419bc99e6182d3daf2b08685e710f2eda5291905
   languageName: node
   linkType: hard
 
@@ -1866,7 +1866,7 @@ __metadata:
     "@types/mocha": 9.1.0
     "@types/node": 16.11.27
     "@types/node-fetch": 2.6.1
-    "@types/tough-cookie": 4.0.1
+    "@types/tough-cookie": 4.0.2
     "@typescript-eslint/eslint-plugin": 5.19.0
     "@typescript-eslint/parser": 5.19.0
     dotenv: 16.0.0
