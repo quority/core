@@ -1,5 +1,5 @@
 import type { APIError, BlockRequest, BlockResponse, DeleteRequest, DeleteResponse, EditRequest, EditResponse, LoginRequest, LoginResponse, MoveRequest, MoveResponse, ProtectRequest, ProtectResponse, UploadRequest, UploadResponse } from '../../types'
-import { ErrorManager } from '../../errors'
+import { MediaWikiError } from '../../errors'
 // import fs from 'fs-extra'
 // import tmp from 'tmp-promise'
 import type { Wiki } from './Wiki'
@@ -40,7 +40,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		} )
 
 		if ( 'error' in req ) {
-			const error = ErrorManager.getError( req.error.code, req.error.info )
+			const error = new MediaWikiError( req.error )
 			throw error
 		}
 
@@ -56,7 +56,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		} )
 
 		if ( 'error' in req ) {
-			const error = ErrorManager.getError( req.error.code, req.error.info )
+			const error = new MediaWikiError( req.error )
 			throw error
 		}
 
@@ -94,7 +94,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		} )
 
 		if ( res.login.result !== 'Success' ) {
-			const error = ErrorManager.getError( 'Failed', this.#username )
+			const error = new MediaWikiError( res.login )
 			throw error
 		}
 	}
@@ -115,7 +115,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		} )
 
 		if ( 'error' in req ) {
-			const error = ErrorManager.getError( req.error.code, req.error.info )
+			const error = new MediaWikiError( req.error )
 			throw error
 		}
 
@@ -154,7 +154,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		} )
 
 		if ( 'error' in req ) {
-			const error = ErrorManager.getError( req.error.code, req.error.info )
+			const error = new MediaWikiError( req.error )
 			throw error
 		}
 
