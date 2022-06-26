@@ -1,4 +1,4 @@
-import type { APIError, BlockRequest, BlockResponse, DeleteRequest, DeleteResponse, EditRequest, EditResponse, LoginRequest, LoginResponse, MoveRequest, MoveResponse, ProtectRequest, ProtectResponse, UploadRequest, UploadResponse } from '../../types'
+import type { APIError, BlockRequest, BlockResponse, DeleteRequest, DeleteResponse, EditRequest, EditResponse, LoginRequest, LoginResponse, MoveRequest, MoveResponse, NoActionToken, ProtectRequest, ProtectResponse, UploadRequest, UploadResponse } from '../../types'
 import { MediaWikiError } from '../../errors'
 // import fs from 'fs-extra'
 // import tmp from 'tmp-promise'
@@ -24,15 +24,15 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		this.#wiki = wiki
 	}
 
-	public async block( params: BlockRequest ): Promise<BlockResponse> {
-		return this.wiki.post<BlockResponse, BlockRequest>( {
+	public async block( params: NoActionToken<BlockRequest> ): Promise<BlockResponse> {
+		return this.wiki.post<BlockResponse>( {
 			...params,
 			action: 'block',
 			token: await this.getCSRFToken()
 		} )
 	}
 
-	public async delete( params: DeleteRequest ): Promise<DeleteResponse> {
+	public async delete( params: NoActionToken<DeleteRequest> ): Promise<DeleteResponse> {
 		const req = await this.#wiki.post<DeleteResponse | APIError>( {
 			...params,
 			action: 'delete',
@@ -47,7 +47,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		return req
 	}
 
-	public async edit( params: EditRequest ): Promise<EditResponse> {
+	public async edit( params: NoActionToken<EditRequest> ): Promise<EditResponse> {
 		const req = await this.#wiki.post<EditResponse | APIError>( {
 			...params,
 			action: 'edit',
@@ -195,7 +195,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 	*/
 
 	public whoAmI(): Promise<{ query: { userinfo: { id: number, name: string } } }> {
-		return this.#wiki.get<{ query: { userinfo: { id: number, name: string } } }, { uiprop: string }>( {
+		return this.#wiki.get<{ query: { userinfo: { id: number, name: string } } }>( {
 			action: 'query',
 			meta: 'userinfo',
 			uiprop: 'groups'
