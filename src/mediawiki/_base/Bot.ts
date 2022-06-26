@@ -1,8 +1,7 @@
 import type { APIError, BlockRequest, BlockResponse, DeleteRequest, DeleteResponse, EditRequest, EditResponse, LoginRequest, LoginResponse, MoveRequest, MoveResponse, ProtectRequest, ProtectResponse, UploadRequest, UploadResponse } from '../../types'
 import { ErrorManager } from '../../errors'
-import fetch from 'node-fetch'
-import fs from 'fs-extra'
-import tmp from 'tmp-promise'
+// import fs from 'fs-extra'
+// import tmp from 'tmp-promise'
 import type { Wiki } from './Wiki'
 
 export class Bot<WikiType extends Wiki = Wiki> {
@@ -169,6 +168,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 	 * Not to be confused with the `uploadByUrl` method, which uses MediaWiki's extension. \
 	 * It will store the image locally in order to upload it.
 	 */
+	/*
 	public async uploadFromUrl( {
 		filename, url
 	}: { filename: string, url: string } ): Promise<UploadResponse | undefined> {
@@ -192,6 +192,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 
 		return res
 	}
+	*/
 
 	public whoAmI(): Promise<{ query: { userinfo: { id: number, name: string } } }> {
 		return this.#wiki.get<{ query: { userinfo: { id: number, name: string } } }, { uiprop: string }>( {

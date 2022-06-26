@@ -79,8 +79,8 @@ export class Wiki {
 	}
 
 	public async exists(): Promise<boolean> {
-		const req = await this.request.raw( this.api )
-		return req.status === 200
+		const { statusCode } = await this.request.raw( this.api )
+		return statusCode === 200
 	}
 
 	public async getInterwikis(): Promise<Record<string, string>> {

@@ -33,7 +33,8 @@
   "dependencies": {
     "fs-extra": "^10.1.0",
     "tmp-promise": "^3.0.3",
-    "tough-cookie": "^4.0.0"
+    "tough-cookie": "^4.0.0",
+    "undici": "^5.5.1"
   },
   "devDependencies": {
     "@types/form-data": "2.5.0",
