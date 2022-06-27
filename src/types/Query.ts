@@ -19,9 +19,23 @@ export interface MetaQuery {
 }
 
 export interface PropQuery {
+	categories: [ Query.CategoriesRequest, Query.CategoriesResponse, Query.CategoriesItem ]
+	categoryinfo: [ Query.CategoryInfoRequest, Query.CategoryInfoResponse, Query.CategoriesItem ]
+	contributors: [ Query.ContributorsRequest, Query.ContributorsResponse, Query.ContributorsItem ]
+	deletedrevisions: [ Query.DeletedRevisionsRequest, Query.DeletedRevisionsResponse, Query.DeletedRevisionsItem ]
+	duplicatefiles: [ Query.DuplicateFilesRequest, Query.DuplicateFilesResponse, Query.DuplicateFilesItem ]
+	extlinks: [ Query.ExtLinksRequest, Query.ExtLinksResponse, Query.ExtLinksItem ]
+	fileusage: [ Query.FileUsageRequest, Query.FileUsageResponse, Query.FileUsageItem ]
+	imageinfo: [ Query.ImageInfoRequest, Query.ImageInfoResponse, Query.ImageInfoItem ]
+	images: [ Query.ImagesRequest, Query.ImagesResponse, Query.ImagesItem ]
 	info: [ Query.InfoRequest, Query.InfoResponse, Query.InfoItem ]
+	iwlinks: [ Query.IwLinksRequest, Query.IwLinksResponse, Query.IwLinksItem ]
+	langlinks: [ Query.LangLinksRequest, Query.LangLinksResponse, Query.LangLinksItem ]
+	links: [ Query.LinksRequest, Query.LinksResponse, Query.LinksItem ]
 	linkshere: [ Query.LinksHereRequest, Query.LinksHereResponse, Query.LinksHereItem ]
+	redirects: [ Query.RedirectsRequest, Query.RedirectsResponse, Query.RedirectsItem ]
 	revisions: [ Query.RevisionsRequest, Query.RevisionsResponse, Query.RevisionsItem ]
+	templates: [ Query.TemplatesRequest, Query.TemplatesResponse, Query.TemplatesItem ]
 	transcludedin: [ Query.TranscludedInRequest, Query.TranscludedInResponse, Query.TranscludedInItem ]
 }
 
