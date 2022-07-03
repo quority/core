@@ -1,7 +1,5 @@
 import type { APIError, BlockRequest, BlockResponse, DeleteRequest, DeleteResponse, EditRequest, EditResponse, LoginRequest, LoginResponse, MoveRequest, MoveResponse, NoActionToken, ProtectRequest, ProtectResponse, UploadRequest, UploadResponse } from '../../types'
 import { MediaWikiError } from '../../errors'
-// import fs from 'fs-extra'
-// import tmp from 'tmp-promise'
 import type { Wiki } from './Wiki'
 
 export class Bot<WikiType extends Wiki = Wiki> {
@@ -40,8 +38,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		} )
 
 		if ( 'error' in req ) {
-			const error = new MediaWikiError( req.error )
-			throw error
+			throw new MediaWikiError( req.error )
 		}
 
 		return req
@@ -56,8 +53,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		} )
 
 		if ( 'error' in req ) {
-			const error = new MediaWikiError( req.error )
-			throw error
+			throw new MediaWikiError( req.error )
 		}
 
 		return req
@@ -94,8 +90,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		} )
 
 		if ( res.login.result !== 'Success' ) {
-			const error = new MediaWikiError( res.login )
-			throw error
+			throw new MediaWikiError( res.login )
 		}
 	}
 
@@ -115,8 +110,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		} )
 
 		if ( 'error' in req ) {
-			const error = new MediaWikiError( req.error )
-			throw error
+			throw new MediaWikiError( req.error )
 		}
 
 		return req
@@ -154,8 +148,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		} )
 
 		if ( 'error' in req ) {
-			const error = new MediaWikiError( req.error )
-			throw error
+			throw new MediaWikiError( req.error )
 		}
 
 		return req

@@ -72,7 +72,7 @@ export type RevisionsItem = {
 } & ( {
 	missing: true
 	} | {
-	missing?: undefined
+	missing: undefined
 	pageid: number
 	revisions: [ {
 		slots: {
