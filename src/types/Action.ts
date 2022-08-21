@@ -10,5 +10,6 @@ export interface AllActions {
 	parse: [ Action.ParseRequest, Action.ParseResponse ]
 	protect: [ Action.ProtectRequest, Action.ProtectResponse ]
 	purge: [ Action.PurgeRequest, Action.PurgeResponse ]
+	rollback: [ Action.RollbackRequest, Action.RollbackResponse ]
 	upload: [ Action.UploadRequest, Action.UploadResponse ]
 }

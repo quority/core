@@ -1,4 +1,4 @@
-import type { APIError, BlockRequest, BlockResponse, DeleteRequest, DeleteResponse, EditRequest, EditResponse, LoginRequest, LoginResponse, MoveRequest, MoveResponse, NoActionToken, ProtectRequest, ProtectResponse, UploadRequest, UploadResponse } from '../../types'
+import type { APIError, BlockRequest, BlockResponse, DeleteRequest, DeleteResponse, EditRequest, EditResponse, LoginRequest, LoginResponse, MoveRequest, MoveResponse, NoActionToken, ProtectRequest, ProtectResponse, RollbackRequest, RollbackResponse, UploadRequest, UploadResponse } from '../../types'
 import { MediaWikiError } from '../../errors'
 import type { Wiki } from './Wiki'
 
@@ -126,6 +126,20 @@ export class Bot<WikiType extends Wiki = Wiki> {
 
 	public purge( titles: string[] ): Promise<Record<string, boolean>> {
 		return this.wiki.purge( titles )
+	}
+
+	public async rollback( params: NoActionToken<RollbackRequest> ): Promise<RollbackResponse> {
+		const req = await this.wiki.post<APIError | RollbackResponse>( {
+			...params,
+			action: 'rollback',
+			token: ( await this.wiki.getToken( 'rollback' ) ).query.tokens.rollbacktoken
+		} )
+
+		if ( 'error' in req ) {
+			throw new MediaWikiError( req.error )
+		}
+
+		return req
 	}
 
 	public touch( titles: string[] ): Promise<Record<string, boolean>> {
