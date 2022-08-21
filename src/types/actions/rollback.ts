@@ -38,16 +38,6 @@ interface BaseRollbackRequest extends ActionRequest {
 	 * Name of the user whose edits are to be rolled back.
 	 */
 	user: string
-
-	/**
-	 * Unconditionally add or remove the page from the current user's watchlist, use preferences (ignored for bot users) or do not change watch.
-	 */
-	watchlist?: 'nochange' | 'preferences' | 'unwatch' | 'watch'
-
-	/**
-	 * Watchlist expiry timestamp. Omit this parameter entirely to leave the current expiry unchanged.
-	 */
-	watchlistexpiry?: Date
 }
 
 /**

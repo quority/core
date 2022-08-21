@@ -27,7 +27,7 @@ interface BaseUndeleteRequest extends ActionRequest {
 	/**
 	 * Timestamps of the revisions to undelete. If both timestamps and fileids are empty, all will be undeleted.
 	 */
-	timestamps?: MaybeArray<Date>
+	timestamps?: MaybeArray<string>
 
 	/**
 	 * Title of the page to undelete.
