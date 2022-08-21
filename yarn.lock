@@ -154,10 +154,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:16.11.47":
-  version: 16.11.47
-  resolution: "@types/node@npm:16.11.47"
-  checksum: 26811000753fd1bb9a90a563fc72942ac3ad5d5b6c97609a090c1e24210e040597ba060e55a7a46cb22cc84dafee112d741f45652139c6166e8ce0c970b4f05a
+"@types/node@npm:16.11.51":
+  version: 16.11.51
+  resolution: "@types/node@npm:16.11.51"
+  checksum: b4193d3f9d4240d866db0ca50de4a8c3b68fd81754d0a572712b559497d0f34931e4246ce0b2692afc8f8def9fcc69fd176bd7176af896d07eefa6d78d886425
   languageName: node
   linkType: hard
 
@@ -2251,7 +2251,7 @@ __metadata:
     "@types/form-data": 2.5.0
     "@types/fs-extra": 9.0.13
     "@types/mocha": 9.1.1
-    "@types/node": 16.11.47
+    "@types/node": 16.11.51
     "@types/tough-cookie": 4.0.2
     "@typescript-eslint/eslint-plugin": 5.32.0
     "@typescript-eslint/parser": 5.32.0
