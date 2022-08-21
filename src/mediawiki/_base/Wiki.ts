@@ -281,7 +281,7 @@ export class Wiki {
 		for await ( const item of generator ) {
 			result.push( item )
 		}
-		return result
+		return result.flat()
 	}
 
 	public async rawQueryProp<PropName extends keyof PropQuery = keyof PropQuery>( params: { prop: PropName } & PropQuery[ PropName ][ 0 ] ): Promise<PropQuery[ PropName ][ 1 ][ 'query' ]> {
@@ -301,13 +301,11 @@ export class Wiki {
 				...params
 			} )
 
-			const results = req.query[ params.prop ] as Array<PropQuery[ PropName ][ 2 ]> | undefined
-			if ( results ) {
-				for ( const item of results ) {
-					yield item
-					counter++
-					if ( limit && counter === limit ) return
-				}
+			const results = req.query.pages
+			for ( const item of results ) {
+				yield item as PropQuery[ PropName ][ 2 ]
+				counter++
+				if ( limit && counter === limit ) return
 			}
 
 			if ( !req.continue ) break
