@@ -1,5 +1,6 @@
-import type { AllCategoriesRequest, AllCategoriesResponse, AllImagesRequest, AllImagesResponse, AllPagesRequest, AllPagesResponse, CategoryMembersRequest, CategoryMembersResponse, ExtendedRequest, GETRequest, InfoRequest, InfoResponse, LinksHereRequest, LinksHereResponse, ListQueryResponse, LogEventsRequest, LogEventsResponse, NoActionToken, OpenSearchRequest, OpenSearchResponse, ParseRequest, ParseResponse, POSTRequest, PurgeRequest, PurgeResponse, QueryRequest, RecentChangesRequest, RecentChangesResponse, Request, RevisionsRequest, RevisionsResponse, SiteInfoRequest, SiteInfoResponse, TokensRequest, TokensResponse, TokenType, TranscludedInRequest, TranscludedInResponse, UserContribsRequest, UserContribsResponse, UsersRequest, UsersResponse } from '../../types'
+import type { AddActionQueryToken, APIError, ListQuery, NoActionToken, OpenSearchRequest, OpenSearchResponse, ParseRequest, ParseResponse, PropQuery, PurgeRequest, PurgeResponse, Request, RevisionsRequest, RevisionsResponse, SiteInfoRequest, SiteInfoResponse, TokensRequest, TokensResponse, TokenType } from '../../types'
 import fs from 'fs'
+import { MediaWikiError } from '../../errors'
 import { RequestManager } from '../../utils'
 
 export type Loaded<T extends Wiki = Wiki> = Required<T>
@@ -26,8 +27,6 @@ export class Wiki {
 		this.request = request ?? new RequestManager()
 	}
 
-	private querystring<T extends GETRequest>( params: T ): Record<keyof T, string>
-	private querystring<T extends POSTRequest>( params: T ): Record<keyof T, string | fs.ReadStream>
 	private querystring<T extends Request>( params: T ): Record<keyof T, string | fs.ReadStream> {
 		const qs = {} as Record<keyof T, string | fs.ReadStream>
 
@@ -49,7 +48,7 @@ export class Wiki {
 		return qs
 	}
 
-	protected raw<T, U extends Request>( userparams: U, method: 'GET' | 'POST' ): Promise<T> {
+	protected async raw<T, U extends Request>( userparams: U, method: 'GET' | 'POST' ): Promise<T> {
 		const params = {
 			...userparams,
 			format: 'json',
@@ -57,30 +56,34 @@ export class Wiki {
 		} as const
 		const qs = this.querystring( params )
 
-		if ( method === 'GET' ) {
-			return this.request.get( {
+		const response: T | APIError = method === 'GET'
+			? await this.request.get( {
 				qs: qs as Record<string, string>,
 				url: this.api
 			} )
-		} else {
-			return this.request.post( {
+			: await this.request.post( {
 				form: qs,
 				url: this.api
 			} )
+
+		if ( 'error' in response ) {
+			throw new MediaWikiError( response.error )
 		}
+
+		return response
 	}
 
-	public get<T, U extends Request = GETRequest>( userparams: ExtendedRequest<U> ): Promise<T> {
+	public get<T, U extends Request = Request>( userparams: U | U & AddActionQueryToken ): Promise<T> {
 		return this.raw( userparams, 'GET' )
 	}
 
-	public post<T, U extends Request = POSTRequest>( userparams: ExtendedRequest<U> ): Promise<T> {
+	public post<T, U extends Request = Request>( userparams: U | U & AddActionQueryToken ): Promise<T> {
 		return this.raw( userparams, 'POST' )
 	}
 
 	public async exists(): Promise<boolean> {
-		const req = await this.request.raw( this.api )
-		return req.status === 200
+		const { statusCode } = await this.request.raw( this.api )
+		return statusCode === 200
 	}
 
 	public async getInterwikis(): Promise<Record<string, string>> {
@@ -237,54 +240,34 @@ export class Wiki {
 		} )
 	}
 
-	public async queryList( params: { list: 'allcategories' } & NoActionToken<AllCategoriesRequest>, limit?: number ): Promise<AllCategoriesResponse[ 'query' ][ 'allcategories' ]>
-	public async queryList( params: { list: 'allimages' } & NoActionToken<AllImagesRequest>, limit?: number ): Promise<AllImagesResponse[ 'query' ][ 'allimages' ]>
-	public async queryList( params: { list: 'allpages' } & NoActionToken<AllPagesRequest>, limit?: number ): Promise<AllPagesResponse[ 'query' ][ 'allpages' ]>
-	public async queryList( params: { list: 'categorymembers' } & NoActionToken<CategoryMembersRequest>, limit?: number ): Promise<CategoryMembersResponse[ 'query' ][ 'categorymembers' ]>
-	public async queryList( params: { list: 'logevents' } & NoActionToken<LogEventsRequest>, limit?: number ): Promise<LogEventsResponse[ 'query' ][ 'logevents' ]>
-	public async queryList( params: { list: 'recentchanges' } & NoActionToken<RecentChangesRequest>, limit?: number ): Promise<RecentChangesResponse[ 'query' ][ 'recentchanges' ]>
-	public async queryList( params: { list: 'usercontribs' } & NoActionToken<UserContribsRequest>, limit?: number ): Promise<UserContribsResponse[ 'query' ][ 'usercontribs' ]>
-	public async queryList( params: { list: 'users' } & NoActionToken<UsersRequest>, limit?: number ): Promise<UsersResponse[ 'query' ][ 'users' ]>
-	public async queryList( params: { list: string } & NoActionToken<QueryRequest>, limit?: number ): Promise<ListQueryResponse[ 'query' ][ string ]> {
-		const generator = this.iterQueryList( params, limit )
-		const result: ListQueryResponse[ 'query' ][ string ] = []
+	public async queryList<ListName extends keyof ListQuery = keyof ListQuery>( params: { list: ListName } & ListQuery[ ListName ][ 0 ], limit?: number ): Promise<Array<ListQuery[ ListName ][ 2 ]>> {
+		const generator = this.iterQueryList<ListName>( params, limit )
+		const result: Array<ListQuery[ ListName ][ 2 ]> = []
 		for await ( const item of generator ) {
 			result.push( item )
 		}
 		return result
 	}
 
-	public iterQueryList( params: { list: 'allcategories' } & NoActionToken<AllCategoriesRequest>, limit?: number ): AsyncGenerator<AllCategoriesResponse[ 'query' ][ 'allcategories' ][ 0 ], void, unknown>
-	public iterQueryList( params: { list: 'allimages' } & NoActionToken<AllImagesRequest>, limit?: number ): AsyncGenerator<AllImagesResponse[ 'query' ][ 'allimages' ][ 0 ], void, unknown>
-	public iterQueryList( params: { list: 'allpages' } & NoActionToken<AllPagesRequest>, limit?: number ): AsyncGenerator<AllPagesResponse[ 'query' ][ 'allpages' ][ 0 ], void, unknown>
-	public iterQueryList( params: { list: 'categorymembers' } & NoActionToken<CategoryMembersRequest>, limit?: number ): AsyncGenerator<CategoryMembersResponse[ 'query' ][ 'categorymembers' ][ 0 ], void, unknown>
-	public iterQueryList( params: { list: 'logevents' } & NoActionToken<LogEventsRequest>, limit?: number ): AsyncGenerator<LogEventsResponse[ 'query' ][ 'logevents' ][ 0 ], void, unknown>
-	public iterQueryList( params: { list: 'recentchanges' } & NoActionToken<RecentChangesRequest>, limit?: number ): AsyncGenerator<RecentChangesResponse[ 'query' ][ 'recentchanges' ][ 0 ], void, unknown>
-	public iterQueryList( params: { list: 'usercontribs' } & NoActionToken<UserContribsRequest>, limit?: number ): AsyncGenerator<UserContribsResponse[ 'query' ][ 'usercontribs' ][ 0 ], void, unknown>
-	public iterQueryList( params: { list: 'users' } & NoActionToken<UsersRequest>, limit?: number ): AsyncGenerator<UsersResponse[ 'query' ][ 'users' ][ 0 ], void, unknown>
-	public iterQueryList( params: { list: string } & NoActionToken<QueryRequest>, limit?: number ): AsyncGenerator<ListQueryResponse[ 'query' ][ string ][ 0 ], void, unknown>
-	public async *iterQueryList( params: { list: string } & NoActionToken<QueryRequest>, limit?: number ): AsyncGenerator<ListQueryResponse[ 'query' ][ string ][ 0 ], void, unknown> {
+	public async *iterQueryList<ListName extends keyof ListQuery = keyof ListQuery>( params: { list: ListName } & ListQuery[ ListName ][ 0 ], limit?: number ): AsyncGenerator<ListQuery[ ListName ][ 2 ]> {
 		let counter = 0
-		// eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		while ( true ) {
-			const req = await this.get<ListQueryResponse>( {
+			const req = await this.get<ListQuery[ ListName ][ 1 ] & { query: { [ key in ListName ]: Array<ListQuery[ ListName ][ 2 ]> } }>( {
 				action: 'query',
 				...params
 			} )
 
-			const [ results ] = Object.values( req.query )
+			const results = req.query[ params.list ] as Array<ListQuery[ ListName ][ 2 ]> | undefined
 			if ( results ) {
 				for ( const item of results ) {
 					yield item
 					counter++
-					if ( limit && counter === limit ) {
-						return
-					}
+					if ( limit && counter === limit ) return
 				}
 			}
 
 			if ( !req.continue ) break
-
 			const continuekey = Object.keys( req.continue ).find( i => i !== 'continue' )
 			if ( !continuekey ) break
 			// @ts-expect-error - faulty typing i don't know how to fix
@@ -292,55 +275,40 @@ export class Wiki {
 		}
 	}
 
-	public async queryProp( params: { prop: 'info' } & NoActionToken<InfoRequest>, limit?: number ): Promise<InfoResponse[ 'query' ][ 'pages' ]>
-	public async queryProp( params: { prop: 'linkshere' } & NoActionToken<LinksHereRequest>, limit?: number ): Promise<LinksHereResponse[ 'query' ][ 'pages' ]>
-	public async queryProp( params: { prop: 'transcludedin' } & NoActionToken<TranscludedInRequest>, limit?: number ): Promise<TranscludedInResponse[ 'query' ][ 'pages' ]>
-	public async queryProp( params: { prop: string } & NoActionToken<QueryRequest>, limit?: number ): Promise<ListQueryResponse[ 'query' ][ string ]> {
-		const generator = this.iterQueryProp( params, limit )
-		const result: ListQueryResponse[ 'query' ][ string ] = []
+	public async queryProp<PropName extends keyof PropQuery = keyof PropQuery>( params: { prop: PropName } & PropQuery[ PropName ][ 0 ], limit?: number ): Promise<Array<PropQuery[ PropName ][ 2 ]>> {
+		const generator = this.iterQueryProp<PropName>( params, limit )
+		const result: Array<PropQuery[ PropName ][ 2 ]> = []
 		for await ( const item of generator ) {
 			result.push( item )
 		}
-		return result
+		return result.flat()
 	}
 
-	public async rawQueryProp( params: { prop: 'info' } & NoActionToken<InfoRequest>, ): Promise<InfoResponse[ 'query' ]>
-	public async rawQueryProp( params: { prop: 'linkshere' } & NoActionToken<LinksHereRequest>, ): Promise<LinksHereResponse[ 'query' ]>
-	public async rawQueryProp( params: { prop: 'transcludedin' } & NoActionToken<TranscludedInRequest>, ): Promise<TranscludedInResponse[ 'query' ]>
-	public async rawQueryProp( params: { prop: string } & NoActionToken<QueryRequest> ): Promise<ListQueryResponse[ 'query' ]> {
-		const res = await this.get<ListQueryResponse>( {
+	public async rawQueryProp<PropName extends keyof PropQuery = keyof PropQuery>( params: { prop: PropName } & PropQuery[ PropName ][ 0 ] ): Promise<PropQuery[ PropName ][ 1 ][ 'query' ]> {
+		const res = await this.get<PropQuery[ PropName ][ 1 ]>( {
 			action: 'query',
 			...params
 		} )
 		return res.query
 	}
 
-	public iterQueryProp( params: { prop: 'info' } & NoActionToken<InfoRequest>, limit?: number ): AsyncGenerator<InfoResponse[ 'query' ][ 'pages' ][ 0 ], void, unknown>
-	public iterQueryProp( params: { prop: 'linkshere' } & NoActionToken<LinksHereRequest>, limit?: number ): AsyncGenerator<LinksHereResponse[ 'query' ][ 'pages' ][ 0 ], void, unknown>
-	public iterQueryProp( params: { prop: 'transcludedin' } & NoActionToken<TranscludedInRequest>, limit?: number ): AsyncGenerator<TranscludedInResponse[ 'query' ][ 'pages' ][ 0 ], void, unknown>
-	public iterQueryProp( params: { prop: string } & NoActionToken<QueryRequest>, limit?: number ): AsyncGenerator<ListQueryResponse[ 'query' ][ string ][ 0 ], void, unknown>
-	public async *iterQueryProp( params: { prop: string } & NoActionToken<QueryRequest>, limit?: number ): AsyncGenerator<ListQueryResponse[ 'query' ][ string ][ 0 ], void, unknown> {
+	public async *iterQueryProp<PropName extends keyof PropQuery = keyof PropQuery>( params: { prop: PropName } & PropQuery[ PropName ][ 0 ], limit?: number ): AsyncGenerator<PropQuery[ PropName ][ 2 ]> {
 		let counter = 0
-		// eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		while ( true ) {
-			const req = await this.get<ListQueryResponse>( {
+			const req = await this.get<PropQuery[ PropName ][ 1 ] & { query: { [ key in PropName ]: Array<PropQuery[ PropName ][ 2 ]> } }>( {
 				action: 'query',
 				...params
 			} )
 
-			const [ results ] = Object.values( req.query )
-			if ( results ) {
-				for ( const item of results ) {
-					yield item
-					counter++
-					if ( limit && counter === limit ) {
-						return
-					}
-				}
+			const results = req.query.pages
+			for ( const item of results ) {
+				yield item as PropQuery[ PropName ][ 2 ]
+				counter++
+				if ( limit && counter === limit ) return
 			}
 
 			if ( !req.continue ) break
-
 			const continuekey = Object.keys( req.continue ).find( i => i !== 'continue' )
 			if ( !continuekey ) break
 			// @ts-expect-error - faulty typing i don't know how to fix

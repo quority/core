@@ -78,8 +78,8 @@ export class Fandom {
 		const userId = await this.getUserId( username )
 		if ( !userId ) return null
 
-		const req = await this.request.raw( `https://services.fandom.com/user-attribute/user/${ userId }/attr/avatar` )
-		const res = await req.json() as unknown as { value?: string }
+		const { body } = await this.request.raw( `https://services.fandom.com/user-attribute/user/${ userId }/attr/avatar` )
+		const res = await body.json() as unknown as { value?: string }
 
 		return res.value ?? null
 	}
@@ -88,8 +88,8 @@ export class Fandom {
 		const userId = await this.getUserId( username )
 		if ( !userId ) return null
 
-		const req = await this.request.raw( `https://services.fandom.com/user-attribute/user/${ userId }/attr/discordHandle` )
-		const res = await req.json() as unknown as { value?: string }
+		const { body } = await this.request.raw( `https://services.fandom.com/user-attribute/user/${ userId }/attr/discordHandle` )
+		const res = await body.json() as unknown as { value?: string }
 
 		return res.value ?? null
 	}

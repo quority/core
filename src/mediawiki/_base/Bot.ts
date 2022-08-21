@@ -1,8 +1,5 @@
-import type { APIError, BlockRequest, BlockResponse, DeleteRequest, DeleteResponse, EditRequest, EditResponse, LoginRequest, LoginResponse, MoveRequest, MoveResponse, ProtectRequest, ProtectResponse, UploadRequest, UploadResponse } from '../../types'
-import { ErrorManager } from '../../errors'
-import fetch from 'node-fetch'
-import fs from 'fs-extra'
-import tmp from 'tmp-promise'
+import type { BlockRequest, BlockResponse, DeleteRequest, DeleteResponse, EditRequest, EditResponse, LoginRequest, LoginResponse, MoveRequest, MoveResponse, NoActionToken, ProtectRequest, ProtectResponse, RollbackRequest, RollbackResponse, UndeleteRequest, UndeleteResponse, UploadRequest, UploadResponse } from '../../types'
+import { MediaWikiError } from '../../errors'
 import type { Wiki } from './Wiki'
 
 export class Bot<WikiType extends Wiki = Wiki> {
@@ -25,43 +22,29 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		this.#wiki = wiki
 	}
 
-	public async block( params: BlockRequest ): Promise<BlockResponse> {
-		return this.wiki.post<BlockResponse, BlockRequest>( {
+	public async block( params: NoActionToken<BlockRequest> ): Promise<BlockResponse> {
+		return this.wiki.post<BlockResponse>( {
 			...params,
 			action: 'block',
 			token: await this.getCSRFToken()
 		} )
 	}
 
-	public async delete( params: DeleteRequest ): Promise<DeleteResponse> {
-		const req = await this.#wiki.post<DeleteResponse | APIError>( {
+	public async delete( params: NoActionToken<DeleteRequest> ): Promise<DeleteResponse> {
+		return this.#wiki.post<DeleteResponse>( {
 			...params,
 			action: 'delete',
 			token: await this.getCSRFToken()
 		} )
-
-		if ( 'error' in req ) {
-			const error = ErrorManager.getError( req.error.code, req.error.info )
-			throw error
-		}
-
-		return req
 	}
 
-	public async edit( params: EditRequest ): Promise<EditResponse> {
-		const req = await this.#wiki.post<EditResponse | APIError>( {
+	public async edit( params: NoActionToken<EditRequest> ): Promise<EditResponse> {
+		return this.#wiki.post<EditResponse>( {
 			...params,
 			action: 'edit',
 			assert: params.bot ? 'bot' : 'user',
 			token: await this.getCSRFToken()
 		} )
-
-		if ( 'error' in req ) {
-			const error = ErrorManager.getError( req.error.code, req.error.info )
-			throw error
-		}
-
-		return req
 	}
 
 	public async getCSRFToken( force = false ): Promise<string> {
@@ -95,8 +78,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		} )
 
 		if ( res.login.result !== 'Success' ) {
-			const error = ErrorManager.getError( 'Failed', this.#username )
-			throw error
+			throw new MediaWikiError( res.login )
 		}
 	}
 
@@ -109,18 +91,11 @@ export class Bot<WikiType extends Wiki = Wiki> {
 	}
 
 	public async move( params: MoveRequest ): Promise<MoveResponse> {
-		const req = await this.#wiki.post<MoveResponse | APIError>( {
+		return this.#wiki.post<MoveResponse>( {
 			...params,
 			action: 'move',
 			token: await this.getCSRFToken()
 		} )
-
-		if ( 'error' in req ) {
-			const error = ErrorManager.getError( req.error.code, req.error.info )
-			throw error
-		}
-
-		return req
 	}
 
 	public async protect( params: ProtectRequest ): Promise<ProtectResponse> {
@@ -135,6 +110,14 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		return this.wiki.purge( titles )
 	}
 
+	public async rollback( params: NoActionToken<RollbackRequest> ): Promise<RollbackResponse> {
+		return this.wiki.post<RollbackResponse>( {
+			...params,
+			action: 'rollback',
+			token: ( await this.wiki.getToken( 'rollback' ) ).query.tokens.rollbacktoken
+		} )
+	}
+
 	public touch( titles: string[] ): Promise<Record<string, boolean>> {
 		return this.wiki.purge( titles )
 	}
@@ -147,19 +130,20 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		} )
 	}
 
+	public async undelete( params: NoActionToken<UndeleteRequest> ): Promise<UndeleteResponse> {
+		return this.wiki.post( {
+			...params,
+			action: 'undelete',
+			token: await this.getCSRFToken()
+		} )
+	}
+
 	public async upload( params: UploadRequest ): Promise<UploadResponse> {
-		const req = await this.#wiki.post<UploadResponse | APIError>( {
+		return this.#wiki.post<UploadResponse>( {
 			...params,
 			action: 'upload',
 			token: await this.getCSRFToken()
 		} )
-
-		if ( 'error' in req ) {
-			const error = ErrorManager.getError( req.error.code, req.error.info )
-			throw error
-		}
-
-		return req
 	}
 
 	/**
@@ -169,6 +153,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 	 * Not to be confused with the `uploadByUrl` method, which uses MediaWiki's extension. \
 	 * It will store the image locally in order to upload it.
 	 */
+	/*
 	public async uploadFromUrl( {
 		filename, url
 	}: { filename: string, url: string } ): Promise<UploadResponse | undefined> {
@@ -192,9 +177,10 @@ export class Bot<WikiType extends Wiki = Wiki> {
 
 		return res
 	}
+	*/
 
 	public whoAmI(): Promise<{ query: { userinfo: { id: number, name: string } } }> {
-		return this.#wiki.get<{ query: { userinfo: { id: number, name: string } } }, { uiprop: string }>( {
+		return this.#wiki.get<{ query: { userinfo: { id: number, name: string } } }>( {
 			action: 'query',
 			meta: 'userinfo',
 			uiprop: 'groups'

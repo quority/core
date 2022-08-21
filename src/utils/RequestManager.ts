@@ -1,16 +1,18 @@
-import type { HeadersInit, RequestInit, Response } from 'node-fetch'
-import { CookieJar } from './CookieJar'
-import fetch from 'node-fetch'
-import FormData from 'form-data'
+import { CookieJar, type ICookieJarOptions } from './CookieJar'
+import { type Dispatcher, FormData, request } from 'undici'
+import type { Agent } from 'undici'
 import type fs from 'fs'
-import type { ICookieJarOptions } from './CookieJar'
+import { type IncomingHttpHeaders } from 'http'
+
+type RequestOptions = Omit<Dispatcher.RequestOptions, 'path'>
+type Response = Dispatcher.ResponseData
 
 export class RequestManager {
-	public agent?: RequestInit[ 'agent' ]
+	public agent: Agent | undefined
 	#jar: CookieJar
-	public headers: HeadersInit
+	public headers: IncomingHttpHeaders
 
-	public constructor( { agent, headers, jarOptions }: { agent?: RequestInit[ 'agent' ], headers?: HeadersInit, jarOptions?: ICookieJarOptions } = {} ) {
+	public constructor( { agent, headers, jarOptions }: { agent?: Agent, headers?: IncomingHttpHeaders, jarOptions?: ICookieJarOptions } = {} ) {
 		this.agent = agent
 		this.#jar = new CookieJar( jarOptions )
 		this.headers = headers ?? {}
@@ -26,37 +28,34 @@ export class RequestManager {
 
 	public async get<T>( { url, qs }: { url: string, qs: Record<string, string> } ): Promise<T> {
 		const params = new URLSearchParams( qs )
-		const req = await this.raw( `${ url }?${ params }` )
+		const { body, headers } = await this.raw( `${ url }?${ params }` )
 
-		const cookies = req.headers.raw()[ 'set-cookie' ] ?? []
+		const cookies: string[] = headers[ 'set-cookie' ] || []
 		this.addCookies( url, cookies )
 
-		return req.json() as unknown as T
+		return body.json() as unknown as T
 	}
 
 	public async post<T>( { url, form }: { url: string, form: Record<string, string | fs.ReadStream> } ): Promise<T> {
 		const formData = new FormData()
 		for ( const prop in form ) {
-			formData.append( prop, form[ prop ] )
+			formData.set( prop, form[ prop ] )
 		}
 
-		const req = await this.raw( url, {
+		const { body, headers } = await this.raw( url, {
 			body: formData,
 			method: 'POST'
 		} )
 
-		const cookies = req.headers.raw()[ 'set-cookie' ] || []
-		this.addCookies( url, cookies )
+		this.addCookies( url, headers[ 'set-cookie' ] )
 
-		return req.json() as unknown as T
+		return body.json() as unknown as T
 	}
 
-	public raw( url: string, fetchOptions: RequestInit = {} ): Promise<Response> {
-		fetchOptions.method ??= 'GET'
-
-		return fetch( url, {
+	public raw( url: string, fetchOptions: RequestOptions = { method: 'GET' } ): Promise<Response> {
+		return request( url, {
 			...fetchOptions,
-			agent: this.agent,
+			dispatcher: this.agent,
 			headers: {
 				...this.headers,
 				cookie: this.#jar.get( url )
@@ -64,8 +63,10 @@ export class RequestManager {
 		} )
 	}
 
-	private addCookies( url: string, cookies: string[] ): void {
-		for ( const cookie of cookies ) {
+	private addCookies( url: string, cookies: string | string[] | undefined ): void {
+		if ( !cookies ) return
+		const cookiesList = Array.isArray( cookies ) ? cookies : [ cookies ]
+		for ( const cookie of cookiesList ) {
 			this.#jar.set( {
 				cookie,
 				url
