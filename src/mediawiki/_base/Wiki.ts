@@ -1,5 +1,6 @@
-import type { AddActionQueryToken, ListQuery, NoActionToken, OpenSearchRequest, OpenSearchResponse, ParseRequest, ParseResponse, PropQuery, PurgeRequest, PurgeResponse, Request, RevisionsRequest, RevisionsResponse, SiteInfoRequest, SiteInfoResponse, TokensRequest, TokensResponse, TokenType } from '../../types'
+import type { AddActionQueryToken, APIError, ListQuery, NoActionToken, OpenSearchRequest, OpenSearchResponse, ParseRequest, ParseResponse, PropQuery, PurgeRequest, PurgeResponse, Request, RevisionsRequest, RevisionsResponse, SiteInfoRequest, SiteInfoResponse, TokensRequest, TokensResponse, TokenType } from '../../types'
 import fs from 'fs'
+import { MediaWikiError } from '../../errors'
 import { RequestManager } from '../../utils'
 
 export type Loaded<T extends Wiki = Wiki> = Required<T>
@@ -47,7 +48,7 @@ export class Wiki {
 		return qs
 	}
 
-	protected raw<T, U extends Request>( userparams: U, method: 'GET' | 'POST' ): Promise<T> {
+	protected async raw<T, U extends Request>( userparams: U, method: 'GET' | 'POST' ): Promise<T> {
 		const params = {
 			...userparams,
 			format: 'json',
@@ -55,17 +56,21 @@ export class Wiki {
 		} as const
 		const qs = this.querystring( params )
 
-		if ( method === 'GET' ) {
-			return this.request.get( {
+		const response: T | APIError = method === 'GET'
+			? await this.request.get( {
 				qs: qs as Record<string, string>,
 				url: this.api
 			} )
-		} else {
-			return this.request.post( {
+			: await this.request.post( {
 				form: qs,
 				url: this.api
 			} )
+
+		if ( 'error' in response ) {
+			throw new MediaWikiError( response.error )
 		}
+
+		return response
 	}
 
 	public get<T, U extends Request = Request>( userparams: U | U & AddActionQueryToken ): Promise<T> {

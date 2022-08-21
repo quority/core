@@ -1,4 +1,4 @@
-import type { APIError, BlockRequest, BlockResponse, DeleteRequest, DeleteResponse, EditRequest, EditResponse, LoginRequest, LoginResponse, MoveRequest, MoveResponse, NoActionToken, ProtectRequest, ProtectResponse, RollbackRequest, RollbackResponse, UploadRequest, UploadResponse } from '../../types'
+import type { BlockRequest, BlockResponse, DeleteRequest, DeleteResponse, EditRequest, EditResponse, LoginRequest, LoginResponse, MoveRequest, MoveResponse, NoActionToken, ProtectRequest, ProtectResponse, RollbackRequest, RollbackResponse, UploadRequest, UploadResponse } from '../../types'
 import { MediaWikiError } from '../../errors'
 import type { Wiki } from './Wiki'
 
@@ -31,32 +31,20 @@ export class Bot<WikiType extends Wiki = Wiki> {
 	}
 
 	public async delete( params: NoActionToken<DeleteRequest> ): Promise<DeleteResponse> {
-		const req = await this.#wiki.post<DeleteResponse | APIError>( {
+		return this.#wiki.post<DeleteResponse>( {
 			...params,
 			action: 'delete',
 			token: await this.getCSRFToken()
 		} )
-
-		if ( 'error' in req ) {
-			throw new MediaWikiError( req.error )
-		}
-
-		return req
 	}
 
 	public async edit( params: NoActionToken<EditRequest> ): Promise<EditResponse> {
-		const req = await this.#wiki.post<EditResponse | APIError>( {
+		return this.#wiki.post<EditResponse>( {
 			...params,
 			action: 'edit',
 			assert: params.bot ? 'bot' : 'user',
 			token: await this.getCSRFToken()
 		} )
-
-		if ( 'error' in req ) {
-			throw new MediaWikiError( req.error )
-		}
-
-		return req
 	}
 
 	public async getCSRFToken( force = false ): Promise<string> {
@@ -103,17 +91,11 @@ export class Bot<WikiType extends Wiki = Wiki> {
 	}
 
 	public async move( params: MoveRequest ): Promise<MoveResponse> {
-		const req = await this.#wiki.post<MoveResponse | APIError>( {
+		return this.#wiki.post<MoveResponse>( {
 			...params,
 			action: 'move',
 			token: await this.getCSRFToken()
 		} )
-
-		if ( 'error' in req ) {
-			throw new MediaWikiError( req.error )
-		}
-
-		return req
 	}
 
 	public async protect( params: ProtectRequest ): Promise<ProtectResponse> {
@@ -129,17 +111,11 @@ export class Bot<WikiType extends Wiki = Wiki> {
 	}
 
 	public async rollback( params: NoActionToken<RollbackRequest> ): Promise<RollbackResponse> {
-		const req = await this.wiki.post<APIError | RollbackResponse>( {
+		return this.wiki.post<RollbackResponse>( {
 			...params,
 			action: 'rollback',
 			token: ( await this.wiki.getToken( 'rollback' ) ).query.tokens.rollbacktoken
 		} )
-
-		if ( 'error' in req ) {
-			throw new MediaWikiError( req.error )
-		}
-
-		return req
 	}
 
 	public touch( titles: string[] ): Promise<Record<string, boolean>> {
@@ -155,17 +131,11 @@ export class Bot<WikiType extends Wiki = Wiki> {
 	}
 
 	public async upload( params: UploadRequest ): Promise<UploadResponse> {
-		const req = await this.#wiki.post<UploadResponse | APIError>( {
+		return this.#wiki.post<UploadResponse>( {
 			...params,
 			action: 'upload',
 			token: await this.getCSRFToken()
 		} )
-
-		if ( 'error' in req ) {
-			throw new MediaWikiError( req.error )
-		}
-
-		return req
 	}
 
 	/**
