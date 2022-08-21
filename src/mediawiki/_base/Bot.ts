@@ -1,4 +1,4 @@
-import type { BlockRequest, BlockResponse, DeleteRequest, DeleteResponse, EditRequest, EditResponse, LoginRequest, LoginResponse, MoveRequest, MoveResponse, NoActionToken, ProtectRequest, ProtectResponse, RollbackRequest, RollbackResponse, UploadRequest, UploadResponse } from '../../types'
+import type { BlockRequest, BlockResponse, DeleteRequest, DeleteResponse, EditRequest, EditResponse, LoginRequest, LoginResponse, MoveRequest, MoveResponse, NoActionToken, ProtectRequest, ProtectResponse, RollbackRequest, RollbackResponse, UndeleteRequest, UndeleteResponse, UploadRequest, UploadResponse } from '../../types'
 import { MediaWikiError } from '../../errors'
 import type { Wiki } from './Wiki'
 
@@ -126,6 +126,14 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		return this.wiki.post( {
 			...params,
 			action: 'unblock',
+			token: await this.getCSRFToken()
+		} )
+	}
+
+	public async undelete( params: NoActionToken<UndeleteRequest> ): Promise<UndeleteResponse> {
+		return this.wiki.post( {
+			...params,
+			action: 'undelete',
 			token: await this.getCSRFToken()
 		} )
 	}

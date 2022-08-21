@@ -11,5 +11,6 @@ export interface AllActions {
 	protect: [ Action.ProtectRequest, Action.ProtectResponse ]
 	purge: [ Action.PurgeRequest, Action.PurgeResponse ]
 	rollback: [ Action.RollbackRequest, Action.RollbackResponse ]
+	undelete: [ Action.UndeleteRequest, Action.UndeleteResponse ]
 	upload: [ Action.UploadRequest, Action.UploadResponse ]
 }
