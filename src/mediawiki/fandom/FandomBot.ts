@@ -22,5 +22,7 @@ export class FandomBot extends Bot<FandomWiki> {
 			await this.login()
 			this.#_wikis.add( wiki.interwiki )
 		}
+
+		this.csrf = null
 	}
 }

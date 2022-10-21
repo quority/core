@@ -21,7 +21,7 @@
     "lint": "eslint src/ --ext .ts --cache",
     "lint:fix": "eslint src/ --fix --ext .ts --cache",
     "hooks": "husky install .github/husky",
-    "test": "mocha ./dist/tests"
+    "test": "mocha ./dist/tests/**/*.js"
   },
   "keywords": [
     "Fandom",

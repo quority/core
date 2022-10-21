@@ -1,4 +1,4 @@
-import type { BlockRequest, BlockResponse, DeleteRequest, DeleteResponse, EditRequest, EditResponse, LoginRequest, LoginResponse, MoveRequest, MoveResponse, NoActionToken, ProtectRequest, ProtectResponse, RollbackRequest, RollbackResponse, UndeleteRequest, UndeleteResponse, UploadRequest, UploadResponse } from '../../types'
+import type { BlockRequest, BlockResponse, DeleteRequest, DeleteResponse, EditRequest, EditResponse, LoginRequest, LoginResponse, MoveRequest, MoveResponse, NoActionToken, ProtectRequest, ProtectResponse, RollbackRequest, RollbackResponse, UnblockRequest, UnblockResponse, UndeleteRequest, UndeleteResponse, UploadRequest, UploadResponse } from '../../types'
 import { MediaWikiError } from '../../errors'
 import type { Wiki } from './Wiki'
 
@@ -7,7 +7,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 	readonly #username: string
 	#wiki: WikiType
 
-	#csrf?: string
+	protected csrf: string | null = null
 
 	public constructor( { password, username, wiki }: { password: string, username: string, wiki: WikiType } ) {
 		this.#password = password.trim()
@@ -48,11 +48,11 @@ export class Bot<WikiType extends Wiki = Wiki> {
 	}
 
 	public async getCSRFToken( force = false ): Promise<string> {
-		if ( force || !this.#csrf ) {
+		if ( force || !this.csrf ) {
 			const token = await this.#wiki.getToken( 'csrf' )
-			this.#csrf = token.query.tokens.csrftoken
+			this.csrf = token.query.tokens.csrftoken
 		}
-		return this.#csrf
+		return this.csrf
 	}
 
 	public async isLoggedIn(): Promise<boolean> {
@@ -90,7 +90,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		this.#wiki.request.clear( this.#wiki.api )
 	}
 
-	public async move( params: MoveRequest ): Promise<MoveResponse> {
+	public async move( params: NoActionToken<MoveRequest> ): Promise<MoveResponse> {
 		return this.#wiki.post<MoveResponse>( {
 			...params,
 			action: 'move',
@@ -98,7 +98,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		} )
 	}
 
-	public async protect( params: ProtectRequest ): Promise<ProtectResponse> {
+	public async protect( params: NoActionToken<ProtectRequest> ): Promise<ProtectResponse> {
 		return this.wiki.post( {
 			...params,
 			action: 'protect',
@@ -122,7 +122,7 @@ export class Bot<WikiType extends Wiki = Wiki> {
 		return this.wiki.purge( titles )
 	}
 
-	public async unblock( params: BlockRequest ): Promise<BlockResponse> {
+	public async unblock( params: NoActionToken<UnblockRequest> ): Promise<UnblockResponse> {
 		return this.wiki.post( {
 			...params,
 			action: 'unblock',

@@ -1,5 +1,5 @@
 import type { ActionRequest } from '../Request'
-import type { RequireOnlyOne } from '../utils'
+import type { RequireOnlyOneFromThree } from '../utils'
 
 interface BaseEditRequest extends ActionRequest {
 	action: 'edit'
@@ -78,7 +78,7 @@ interface BaseEditRequest extends ActionRequest {
 /**
  * Options to edit a page.
  */
-export type EditRequest = RequireOnlyOne<BaseEditRequest, 'title', 'pageid'>
+export type EditRequest = RequireOnlyOneFromThree<BaseEditRequest, 'appendtext', 'prependtext', 'text'>
 
 export interface EditResponse extends Response {
 	edit: {
