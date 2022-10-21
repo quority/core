@@ -215,7 +215,7 @@ export class Wiki {
 		} )
 	}
 
-	public async purge( titles: string[] ): Promise<Record<string, boolean>> {
+	public async purge<T extends string>( titles: T[] ): Promise<Record<T, boolean>> {
 		const result: Record<string, boolean> = {
 		}
 
