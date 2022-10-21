@@ -155,6 +155,7 @@ export class Wiki {
 	}
 
 	public getURL( title: string ): string {
+		title = title.replace( / /g, '_' )
 		const base = new URL( this.api ).origin
 		const articlepath = new URL( this.articlepath ?? '/wiki/$1', base ).href
 		return articlepath.replace( '$1', encodeURI( title ) )

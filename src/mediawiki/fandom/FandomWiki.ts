@@ -19,6 +19,7 @@ export class FandomWiki extends Wiki {
 	}
 
 	public override getURL( title: string ): string {
+		title = title.replace( / /g, '_' )
 		const base = this.api.replace( '/api.php', '/wiki/' )
 		return new URL( title, base ).href
 	}
