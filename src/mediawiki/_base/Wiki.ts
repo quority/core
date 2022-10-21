@@ -116,12 +116,12 @@ export class Wiki {
 		} )
 	}
 
-	public async getPages( _titles: string ): Promise<string>
-	public async getPages( _titles: string[] ): Promise<Record<string, string>>
-	public async getPages( _titles: string | string[] ): Promise<string | Record<string, string>> {
+	public async getPages<T extends string>( _titles: T ): Promise<string>
+	public async getPages<T extends string>( _titles: T[] ): Promise<{ [ key in T ]?: string }>
+	public async getPages<T extends string>( _titles: T | T[] ): Promise<T | { [ key in T ]?: string }> {
 		const titles = Array.isArray( _titles ) ? _titles : [ _titles ]
 
-		const pages: Record<string, string> = {
+		const pages: { [ key in T ]?: string } = {
 		}
 
 		while ( titles.length !== 0 ) {
@@ -136,7 +136,7 @@ export class Wiki {
 			for ( const page of res.query.pages ) {
 				if ( !page.missing ) {
 					const { content } = page.revisions[ 0 ].slots.main
-					if ( content ) pages[ page.title ] = content
+					if ( content ) pages[ page.title as T ] = content
 				}
 			}
 		}
