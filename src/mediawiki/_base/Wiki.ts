@@ -180,9 +180,9 @@ export class Wiki {
 		return this as Loaded<this>
 	}
 
-	public async pagesExist( _titles: string ): Promise<Record<string, boolean>>
-	public async pagesExist( _titles: string[] ): Promise<Record<string, boolean>>
-	public async pagesExist( _titles: string | string[] ): Promise<Record<string, boolean>> {
+	public async pagesExist( _titles: string ): Promise<boolean>
+	public async pagesExist<T extends string>( _titles: T[] ): Promise<Record<T, boolean>>
+	public async pagesExist<T extends string>( _titles: T ): Promise<boolean | Record<string, boolean>> {
 		const titles = Array.isArray( _titles ) ? _titles : [ _titles ]
 
 		const pages: Record<string, boolean> = {
@@ -198,6 +198,9 @@ export class Wiki {
 			} )
 
 			for ( const page of res.query.pages ) {
+				if ( titles.length === 1 ) {
+					return !page.missing
+				}
 				pages[ page.title ] = !page.missing
 			}
 		}
