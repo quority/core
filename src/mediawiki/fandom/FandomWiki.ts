@@ -24,6 +24,8 @@ export class FandomWiki extends Wiki {
 	}
 
 	public override async load(): Promise<Loaded<this>> {
+		if ( this.id ) return this as Loaded<this>
+
 		const siteinfo = await this.getSiteInfo( 'general', 'variables' )
 
 		this.mainpage = siteinfo.query.general.mainpage
