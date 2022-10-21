@@ -198,7 +198,7 @@ export class Wiki {
 			} )
 
 			for ( const page of res.query.pages ) {
-				if ( titles.length === 1 ) {
+				if ( typeof _titles === 'string' ) {
 					return !page.missing
 				}
 				pages[ page.title ] = !page.missing
