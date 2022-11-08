@@ -2262,7 +2262,7 @@ __metadata:
     rimraf: 3.0.2
     tmp-promise: ^3.0.3
     tough-cookie: ^4.1.2
-    ts-dotenv: ^0.8.3
+    ts-dotenv: ^0.9.0
     tsup: ^6.4.0
     typescript: 4.8.4
     undici: ^5.12.0
@@ -3124,10 +3124,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-dotenv@npm:^0.8.3":
-  version: 0.8.3
-  resolution: "ts-dotenv@npm:0.8.3"
-  checksum: 286fa123b66a6dc0a9b7249a74b83c06a2bc8be77b7c9cbbeeb73219090d3af267f2baa590a0e5f1fcfca99c3a170f3386ca02dd1b48b84a72d0087377e50443
+"ts-dotenv@npm:^0.9.0":
+  version: 0.9.0
+  resolution: "ts-dotenv@npm:0.9.0"
+  checksum: 4c1089d8416c7c6c74e526c7227387b68603436ca1ca01f175efdcef6dbbc66c71f251981c6a50fe2f4754a57e06b094e7b9c5814ad0c1a55328517db624dde6
   languageName: node
   linkType: hard
 
