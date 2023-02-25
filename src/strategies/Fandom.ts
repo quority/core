@@ -2,19 +2,19 @@ import { BaseStrategy } from './BaseStrategy'
 import { s } from '@sapphire/shapeshift'
 import { InvalidInterwikiError } from '../errors'
 
-export class FandomStrategy extends BaseStrategy {
+export class Fandom extends BaseStrategy {
 	public static readonly InterwikiRegex = /^([a-z-]{2,5}\.)?[a-z0-9-]+$/
-	public readonly InterwikiRegex = FandomStrategy.InterwikiRegex
+	public readonly InterwikiRegex = Fandom.InterwikiRegex
 
-	public static readonly InterwikiValidator = s.string.regex( FandomStrategy.InterwikiRegex )
-	public readonly InterwikiValidator = FandomStrategy.InterwikiValidator
+	public static readonly InterwikiValidator = s.string.regex( Fandom.InterwikiRegex )
+	public readonly InterwikiValidator = Fandom.InterwikiValidator
 
 	public static readonly services = new URL( 'https://services.fandom.com/' )
-	public readonly services = FandomStrategy.services
+	public readonly services = Fandom.services
 
 	public override getApi( api: string ): URL {
 		if ( this.InterwikiValidator.run( api ).isOk() ) {
-			const url = FandomStrategy.interwiki2base( api )
+			const url = Fandom.interwiki2base( api )
 			url.pathname = `${ url.pathname }api.php`
 			return url
 		} else {
