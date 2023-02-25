@@ -18,7 +18,8 @@ export class Wiki<S extends BaseStrategy> {
 	public readonly request: RequestManager = new RequestManager()
 	public readonly strategy: S
 
-	public constructor( options: WikiOptions<new ( ...args: unknown[] ) => S> ) {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	public constructor( options: WikiOptions<new ( ...args: any ) => S> ) {
 		if ( options.request ) this.request = options.request
 		this.strategy = options.strategy
 			? new options.strategy( this )
