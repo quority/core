@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Request {
 
 }
@@ -10,6 +11,8 @@ export interface AddActionQueryToken {
 }
 
 export interface QueryRequest extends Request {
+	action: 'query'
+
 	/**
 	 * When more results are available, use this to continue.
 	 */

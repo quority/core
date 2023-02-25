@@ -37,18 +37,20 @@
   },
   "homepage": "https://github.com/bitomic/mwjs#readme",
   "dependencies": {
+    "@sapphire/shapeshift": "^3.8.1",
     "fs-extra": "^10.1.0",
     "tough-cookie": "^4.1.2",
     "undici": "^5.12.0"
   },
   "devDependencies": {
+    "@bitomic/eslint-config": "^1.2.0",
     "@types/form-data": "2.5.0",
     "@types/fs-extra": "9.0.13",
     "@types/mocha": "10.0.0",
     "@types/node": "18.11.9",
     "@types/tough-cookie": "4.0.2",
-    "@typescript-eslint/eslint-plugin": "5.43.0",
-    "@typescript-eslint/parser": "5.43.0",
+    "@typescript-eslint/eslint-plugin": "5.53.0",
+    "@typescript-eslint/parser": "5.53.0",
     "dotenv": "16.0.3",
     "eslint": "8.27.0",
     "husky": "8.0.2",
@@ -57,7 +59,7 @@
     "rimraf": "3.0.2",
     "ts-dotenv": "^0.9.0",
     "tsup": "^6.5.0",
-    "typescript": "4.8.4"
+    "typescript": "^4.9.5"
   },
   "packageManager": "yarn@3.2.4"
 }

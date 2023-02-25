@@ -1,46 +1,33 @@
 import 'mocha'
 import assert from 'assert'
-import { Fandom } from '../../main'
+import { FandomStrategy, Wiki } from '../../main'
 
 describe( 'Fandom wiki', () => {
-	const wiki = Fandom.getWiki( 'es.genshin-impact' )
-
-	it( '#load', async () => {
-		const loaded = await wiki.load()
-		assert.notStrictEqual(loaded.id, 0)
+	const wiki = new Wiki( {
+		api: 'es.genshin-impact',
+		strategy: FandomStrategy
 	} )
 
-	it( '#getURL', () => {
+	it( '#getUrl', () => {
 		const random = `${ Math.random() }`
 		assert.strictEqual(
-			wiki.getURL( random ),
+			wiki.getUrl( random ).href,
 			`https://genshin-impact.fandom.com/es/wiki/${ random }`
 		)
 
 		assert.strictEqual(
-			wiki.getURL( `${ random } ${ random }` ),
-			`https://genshin-impact.fandom.com/es/wiki/${ random }_${ random }`
+			wiki.getUrl( `${ random } ${ random }` ).href,
+			`https://genshin-impact.fandom.com/es/wiki/${ random }%20${ random }`
 		)
 	} )
 
 	it( '#getPages', async () => {
-		const single = await wiki.getPages( 'Tartaglia' )
+		const single = await wiki.getPage( 'Tartaglia' )
 		assert.notStrictEqual( single.length, 0 )
 
 		const multiple = await wiki.getPages( [ 'Tartaglia', 'Xiao' ] )
 		assert.strictEqual( typeof multiple.Tartaglia, 'string' )
 		assert.strictEqual( typeof multiple.Xiao, 'string' )
-	} )
-
-	it( '#pagesExist', async () => {
-		const singleExists = await wiki.pagesExist( 'Tartaglia' )
-		assert.strictEqual( singleExists, true )
-
-		const multipleExists = await wiki.pagesExist( [ 'Tartaglia', 'Venti', 'Xiao', 'Inexistent' ] )
-		assert.strictEqual( multipleExists.Tartaglia, true )
-		assert.strictEqual( multipleExists.Venti, true )
-		assert.strictEqual( multipleExists.Xiao, true )
-		assert.strictEqual( multipleExists.Inexistent, false )
 	} )
 
 	it( '#parse', async () => {
@@ -51,8 +38,7 @@ describe( 'Fandom wiki', () => {
 	} )
 
 	it( '#purge', async () => {
-		const purge = await wiki.purge( [ 'Usuario:Bitomic' ] )
-		assert.strictEqual( purge['Usuario:Bitomic'], true )
+		await wiki.purge( [ 'Usuario:Bitomic' ] )
 	} )
 
 	it( '#search', async () => {

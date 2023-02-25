@@ -1,22 +1,19 @@
 import 'mocha'
 import assert from 'assert'
 import { env } from '../lib'
-import { Fandom, FandomBot } from '../../main'
+import { Bot, FandomStrategy, Wiki } from '../../main'
 
 const now = Date.now()
 
 describe( 'Fandom bot', () => {
-	const fandom = new Fandom()
-	let bot: FandomBot
-	const wiki = fandom.getWiki( env.FANDOM_WIKI )
+	const wiki = new Wiki( {
+		api: env.FANDOM_WIKI,
+		strategy: FandomStrategy
+	} )
+	let bot: Bot<FandomStrategy>
 	
 	before( async () => {
-		const fandom = new Fandom()
-		bot = await fandom.login( {
-			password: env.FANDOM_PASSWORD,
-			username: env.FANDOM_USERNAME,
-			wiki
-		} )
+		bot = await wiki.login( env.FANDOM_USERNAME, env.FANDOM_PASSWORD )
 	} )
 
 	it( '#login', async () => {
@@ -60,34 +57,6 @@ describe( 'Fandom bot', () => {
 			title: `Moved @ ${ now }`
 		} )
 	} )
-
-	it( '#setWiki', async () => {
-		const wikis = {
-			comunidad: fandom.getWiki( 'comunidad' ),
-			'genshin-impact': fandom.getWiki( 'es.genshin-impact' ),
-			twice: fandom.getWiki( 'twice' )
-		}
-
-		let id: number
-
-		for ( let i = 0; i < 2; i++ ) {
-			await bot.setWiki( wikis.comunidad )
-			id = await bot.whoAmI().then( res => res.query.userinfo.id )
-			assert.notStrictEqual( id, 0 )
-
-			await bot.setWiki( wikis[ 'genshin-impact' ] )
-			id = await bot.whoAmI().then( res => res.query.userinfo.id )
-			assert.notStrictEqual( id, 0 )
-
-			await bot.setWiki( wikis.twice )
-			id = await bot.whoAmI().then( res => res.query.userinfo.id )
-			assert.notStrictEqual( id, 0 )
-		}
-
-		await bot.setWiki( wiki )
-		id = await bot.whoAmI().then( res => res.query.userinfo.id )
-		assert.notStrictEqual( id, 0 )
-	} ).timeout( 8000 )
 
 	it( '#block', async () => {
 		const result = await bot.block( {

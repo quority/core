@@ -52,7 +52,7 @@ export class CookieJar {
 		this.expire()
 	}
 
-	public clear( url: string ): void {
+	public clear( url: URL ): void {
 		const host = CookieJar.getHost( url )
 		if ( !this.#storage[ host ] ) return
 		this.#storage[ host ]?.clear()
@@ -62,8 +62,10 @@ export class CookieJar {
 		this.#storage = {}
 	}
 
-	public expire( url?: string ): void {
-		const hosts = url ?? Object.keys( this.#storage )
+	public expire( url?: URL ): void {
+		const hosts = url
+			? [ CookieJar.getHost( url ) ]
+			: Object.keys( this.#storage )
 		for ( const host of hosts ) {
 			const collection = this.#storage[ host ]
 			if ( !collection ) continue
@@ -86,15 +88,15 @@ export class CookieJar {
 		}
 	}
 
-	public get( url: string ): string {
+	public get( url: URL ): string {
 		const host = CookieJar.getHost( url )
-		this.expire( host )
+		this.expire( url )
 		const storage = this.#storage[ host ]
 		if ( !storage ) return ''
 		return [ ...storage.values() ].join( ';' )
 	}
 
-	public set( { cookie, url }: { cookie: string, url: string } ): void {
+	public set( { cookie, url }: { cookie: string, url: URL } ): void {
 		const toughcookie = tough.parse( cookie )
 
 		if ( !toughcookie || !this.allowCookie( toughcookie ) ) return
@@ -113,8 +115,8 @@ export class CookieJar {
 		return match !== undefined
 	}
 
-	private static getHost( url: string ): string {
-		const { host, pathname } = new URL( url )
+	private static getHost( url: URL ): string {
+		const { host, pathname } = url
 		const lang = pathname.match( /\/([a-z-]+)\// )?.[ 1 ]
 
 		if ( lang ) {
