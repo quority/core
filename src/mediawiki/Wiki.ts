@@ -57,16 +57,10 @@ export class Wiki<S extends BaseStrategy> {
 		} )
 
 		const response = method === 'GET'
-			? await this.request.get( {
-				qs: qs as Record<string, string>,
-				url: this.api
-			} )
-			: await this.request.post( {
-				form: qs,
-				url: this.api
-			} )
+			? await this.request.get( this.api, qs as Record<string, string> )
+			: await this.request.post( this.api, qs )
 
-		if ( 'error' in response ) {
+		if ( typeof response === 'object' && response && 'error' in response ) {
 			throw new MediaWikiError( response.error )
 		}
 

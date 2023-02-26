@@ -1,4 +1,4 @@
-import { CookieJar, type ICookieJarOptions } from './CookieJar'
+import { Cookie, CookieJar, type Store } from 'tough-cookie'
 import { type Agent, type Dispatcher, FormData, request } from 'undici'
 import type fs from 'fs'
 import { type IncomingHttpHeaders } from 'http'
@@ -8,36 +8,38 @@ type Response = Dispatcher.ResponseData
 
 export interface RequestManagerOptions {
 	agent?: Agent
+	allowedCookies?: RegExp[]
 	headers?: IncomingHttpHeaders
-	jarOptions?: ICookieJarOptions
+	jar?: {
+		store?: Store
+		options?: CookieJar.Options
+	}
 }
 
 export class RequestManager {
-	public agent: Agent | undefined
-	public headers: IncomingHttpHeaders
 	protected jar: CookieJar
+	public readonly options: RequestManagerOptions
 
-	public constructor( { agent, headers, jarOptions }: RequestManagerOptions = {} ) {
-		this.agent = agent
-		this.jar = new CookieJar( jarOptions )
-		this.headers = headers ?? {}
+	public constructor( options: RequestManagerOptions = {} ) {
+		this.jar = new CookieJar( options.jar?.store, options.jar?.options )
+		this.options = options
 	}
 
-	public clear( url: URL ): void {
-		this.jar.clear( url )
+	public clear(): void {
+		this.jar.removeAllCookiesSync()
 	}
 
-	public async get<T extends Record<string, unknown>>( { url, qs }: { url: URL, qs: Record<string, string> } ): Promise<T> {
+	public async get( url: string | URL, qs: Record<string, string> = {} ): Promise<unknown> {
 		const params = new URLSearchParams( qs )
 		const { body, headers } = await this.raw( new URL( `?${ params }`, url ) )
 
 		const cookies: string[] = headers[ 'set-cookie' ] || []
 		this.addCookies( url, cookies )
 
-		return body.json() as unknown as T
+		return body.json()
 	}
 
-	public async post<T extends Record<string, unknown>>( { url, form }: { url: URL, form: Record<string, string | fs.ReadStream> } ): Promise<T> {
+	public async post( url: string | URL, form: Record<string, string | fs.ReadStream> = {} ): Promise<unknown> {
 		const formData = new FormData()
 		for ( const prop in form ) {
 			formData.set( prop, form[ prop ] )
@@ -50,28 +52,36 @@ export class RequestManager {
 
 		this.addCookies( url, headers[ 'set-cookie' ] )
 
-		return body.json() as unknown as T
+		return body.json()
 	}
 
-	public raw( url: URL, fetchOptions: RequestOptions = { method: 'GET' } ): Promise<Response> {
+	public raw( url: string | URL, fetchOptions: RequestOptions = { method: 'GET' } ): Promise<Response> {
 		return request( url, {
 			...fetchOptions,
-			dispatcher: this.agent,
+			dispatcher: this.options.agent,
 			headers: {
-				...this.headers,
-				cookie: this.jar.get( url )
+				...this.options.headers,
+				cookie: this.jar.getCookieStringSync( typeof url === 'string' ? url : url.href )
 			}
 		} )
 	}
 
-	private addCookies( url: URL, cookies: string | string[] | undefined ): void {
-		if ( !cookies ) return
-		const cookiesList = Array.isArray( cookies ) ? cookies : [ cookies ]
-		for ( const cookie of cookiesList ) {
-			this.jar.set( {
-				cookie,
-				url
-			} )
+	public addCookies( url: string | URL, headers: string | string[] | undefined ): void {
+		if ( typeof headers === 'string' ) headers = [ headers ]
+		if ( !headers?.length ) return
+
+		const stringUrl = typeof url === 'string' ? url : url.href
+		let cookies = headers.map( cookie => Cookie.parse( cookie ) )
+
+		if ( this.options.allowedCookies ) {
+			const isAllowed = ( cookie: Cookie | undefined ) => cookie && this.options.allowedCookies?.some( regex => cookie.key.match( regex ) )
+			cookies = cookies.filter( isAllowed )
 		}
+
+		cookies.forEach( cookie => {
+			if ( cookie ) {
+				this.jar.setCookieSync( cookie, stringUrl )
+			}
+		} )
 	}
 }
