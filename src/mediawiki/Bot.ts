@@ -72,7 +72,7 @@ export class Bot<S extends BaseStrategy> {
 			const isLoggedIn = await this.isLoggedIn()
 			if ( isLoggedIn ) return
 		}
-		this.wiki.request.clear( this.wiki.api )
+		this.wiki.request.clear()
 
 		const tokenreq = await this.wiki.getToken( 'login' )
 		const lgtoken = tokenreq.query.tokens.logintoken
@@ -94,7 +94,7 @@ export class Bot<S extends BaseStrategy> {
 			action: 'logout',
 			token: await this.getCSRFToken()
 		} )
-		this.wiki.request.clear( this.wiki.api )
+		this.wiki.request.clear()
 	}
 
 	public async move( params: NoActionToken<MoveRequest> ): Promise<MoveResponse> {

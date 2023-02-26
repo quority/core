@@ -9,23 +9,23 @@ export type StrategyName = 'base' | 'fandom'
 
 export interface WikiOptions<S extends typeof BaseStrategy> {
 	api: string
+	platform?: S
 	request?: RequestManager
-	strategy?: S
 }
 
 export class Wiki<S extends BaseStrategy> {
 	public readonly api: URL
 	public readonly request: RequestManager = new RequestManager()
-	public readonly strategy: S
+	public readonly platform: S
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	public constructor( options: WikiOptions<new ( ...args: any ) => S> ) {
 		if ( options.request ) this.request = options.request
-		this.strategy = options.strategy
-			? new options.strategy( this )
+		this.platform = options.platform
+			? new options.platform( this )
 			: new BaseStrategy( this ) as S
 
-		this.api = this.strategy.getApi( options.api )
+		this.api = this.platform.getApi( options.api )
 	}
 
 	protected querystring<T extends Record<string, unknown>>( params: T ): Record<keyof T, string | fs.ReadStream> {
@@ -57,16 +57,10 @@ export class Wiki<S extends BaseStrategy> {
 		} )
 
 		const response = method === 'GET'
-			? await this.request.get( {
-				qs: qs as Record<string, string>,
-				url: this.api
-			} )
-			: await this.request.post( {
-				form: qs,
-				url: this.api
-			} )
+			? await this.request.get( this.api, qs as Record<string, string> )
+			: await this.request.post( this.api, qs )
 
-		if ( 'error' in response ) {
+		if ( typeof response === 'object' && response && 'error' in response ) {
 			throw new MediaWikiError( response.error )
 		}
 
