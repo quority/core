@@ -16,6 +16,10 @@ export interface RequestManagerOptions {
 	}
 }
 
+export interface CustomRequestOptions {
+	cookieUrl?: string | URL
+}
+
 export class RequestManager {
 	protected jar: CookieJar
 	public readonly options: RequestManagerOptions
@@ -55,13 +59,16 @@ export class RequestManager {
 		return body.json()
 	}
 
-	public raw( url: string | URL, fetchOptions: RequestOptions = { method: 'GET' } ): Promise<Response> {
+	public raw( url: string | URL, fetchOptions: RequestOptions = { method: 'GET' }, customOptions: CustomRequestOptions = {} ): Promise<Response> {
+		customOptions.cookieUrl ??= url
+		const cookieUrl = typeof customOptions.cookieUrl === 'string' ? customOptions.cookieUrl : customOptions.cookieUrl.href
+
 		return request( url, {
 			...fetchOptions,
 			dispatcher: this.options.agent,
 			headers: {
 				...this.options.headers,
-				cookie: this.jar.getCookieStringSync( typeof url === 'string' ? url : url.href )
+				cookie: this.jar.getCookieStringSync( cookieUrl )
 			}
 		} )
 	}
