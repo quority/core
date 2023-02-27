@@ -1,7 +1,7 @@
 import type { Wiki } from '../../../mediawiki'
 import type { Fandom } from '../../FandomStrategy'
 import { BaseEndpoint } from '../BaseEndpoint'
-import { ArticleCommentsController } from './controllers'
+import { ArticleCommentsController, DiscussionContributionController } from './controllers'
 
 export enum WikiaControllers {
 	ArticleComments = 'ArticleComments',
@@ -21,10 +21,12 @@ export enum WikiaControllers {
 
 export class WikiaEndpoint extends BaseEndpoint<Fandom> {
 	public readonly ArticleComments: ArticleCommentsController
+	public readonly DiscussionContribution: DiscussionContributionController
 
 	public constructor( wiki: Wiki<Fandom> ) {
 		super( wiki, new URL( 'wikia.php', wiki.api ) )
 		this.ArticleComments = new ArticleCommentsController( this )
+		this.DiscussionContribution = new DiscussionContributionController( this )
 	}
 
 }

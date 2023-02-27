@@ -1,5 +1,4 @@
 import type { Dispatcher } from 'undici'
-import type { RequestOptions } from 'undici/types/dispatcher'
 import type { WikiaEndpoint } from '../wikia'
 import { BaseController } from './BaseController'
 
@@ -31,39 +30,7 @@ const attachmentsDefault = {
 }
 
 export class ArticleCommentsController extends BaseController<WikiaEndpoint> {
-	protected get( searchParams: Record<string, string> ): Promise<Dispatcher.ResponseData> {
-		const usp = new URLSearchParams( {
-			controller: 'ArticleComments',
-			...searchParams
-		} ).toString()
-		const url = new URL( `?${ usp }`, this.endpoint.url )
-		return this.raw( url, {
-			method: 'GET'
-		} )
-	}
-
-	protected post( body: Record<string, string> ): Promise<Dispatcher.ResponseData> {
-		return this.raw( this.endpoint.url, {
-			body: new URLSearchParams( {
-				controller: 'ArticleComments',
-				...body
-			} ).toString(),
-			method: 'POST'
-		} )
-	}
-
-	protected raw( url: string | URL, fetchOptions: Omit<RequestOptions, 'path'> ): Promise<Dispatcher.ResponseData> {
-		return this.request.raw(
-			url,
-			{
-				headers: {
-					'content-type': 'application/x-www-form-urlencoded'
-				},
-				...fetchOptions
-			},
-			{ cookieUrl: this.endpoint.wiki.platform.services }
-		)
-	}
+	public readonly controller = 'ArticleComments'
 
 	public async deletePost( postId: string ): Promise<void> {
 		await this.post( {
