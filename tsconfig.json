@@ -3,7 +3,7 @@
 	"include": [ "src", "types.d.ts" ],
 	"compilerOptions": {
 		"module": "CommonJS",
-		"target": "ES6",
+		"target": "ES2018",
 		"skipLibCheck": true,
 		"strict": true,
 		"declaration": true,
