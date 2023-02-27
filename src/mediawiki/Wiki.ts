@@ -15,17 +15,19 @@ export interface WikiOptions<S extends typeof BaseStrategy> {
 
 export class Wiki<S extends BaseStrategy> {
 	public readonly api: URL
+	public readonly custom: S[ 'custom' ]
 	public readonly request: RequestManager = new RequestManager()
 	public readonly platform: S
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	public constructor( options: WikiOptions<new ( ...args: any ) => S> ) {
+	public constructor( options: WikiOptions<( new ( ...args: any ) => S ) & { getApi: ( api: string ) => URL }> ) {
 		if ( options.request ) this.request = options.request
-		this.platform = options.platform
-			? new options.platform( this )
-			: new BaseStrategy( this ) as S
 
-		this.api = this.platform.getApi( options.api )
+		const platform = options.platform ?? BaseStrategy
+		this.api = platform.getApi( options.api )
+
+		this.platform = new platform( this ) as S
+		this.custom = this.platform.custom
 	}
 
 	protected querystring<T extends Record<string, unknown>>( params: T ): Record<keyof T, string | fs.ReadStream> {

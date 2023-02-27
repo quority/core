@@ -1,2 +1,2 @@
 export * from './BaseStrategy'
-export * from './Fandom'
+export * from './FandomStrategy'

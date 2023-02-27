@@ -35,10 +35,7 @@ export class RequestManager {
 
 	public async get( url: string | URL, qs: Record<string, string> = {} ): Promise<unknown> {
 		const params = new URLSearchParams( qs )
-		const { body, headers } = await this.raw( new URL( `?${ params }`, url ) )
-
-		const cookies: string[] = headers[ 'set-cookie' ] || []
-		this.addCookies( url, cookies )
+		const { body } = await this.raw( new URL( `?${ params }`, url ) )
 
 		return body.json()
 	}
@@ -49,28 +46,30 @@ export class RequestManager {
 			formData.set( prop, form[ prop ] )
 		}
 
-		const { body, headers } = await this.raw( url, {
+		const { body } = await this.raw( url, {
 			body: formData,
 			method: 'POST'
 		} )
 
-		this.addCookies( url, headers[ 'set-cookie' ] )
-
 		return body.json()
 	}
 
-	public raw( url: string | URL, fetchOptions: RequestOptions = { method: 'GET' }, customOptions: CustomRequestOptions = {} ): Promise<Response> {
+	public async raw( url: string | URL, fetchOptions: RequestOptions = { method: 'GET' }, customOptions: CustomRequestOptions = {} ): Promise<Response> {
 		customOptions.cookieUrl ??= url
 		const cookieUrl = typeof customOptions.cookieUrl === 'string' ? customOptions.cookieUrl : customOptions.cookieUrl.href
 
-		return request( url, {
+		const headers = Object.assign( {}, {
+			...this.options.headers,
+			cookie: this.jar.getCookieStringSync( cookieUrl )
+		}, fetchOptions.headers ?? {} )
+		const req = await request( url, {
 			...fetchOptions,
 			dispatcher: this.options.agent,
-			headers: {
-				...this.options.headers,
-				cookie: this.jar.getCookieStringSync( cookieUrl )
-			}
+			headers
 		} )
+		this.addCookies( cookieUrl, req.headers[ 'set-cookie' ] )
+
+		return req
 	}
 
 	public addCookies( url: string | URL, headers: string | string[] | undefined ): void {
