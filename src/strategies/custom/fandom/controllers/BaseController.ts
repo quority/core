@@ -24,12 +24,17 @@ export abstract class BaseController<Endpoint extends BaseEndpoint<Fandom>> {
 		} )
 	}
 
-	protected post( body: Record<string, string> ): Promise<Dispatcher.ResponseData> {
+	protected post( body: Record<string, unknown>, json?: true ): Promise<Dispatcher.ResponseData>
+	protected post( body: Record<string, string>, json?: false ): Promise<Dispatcher.ResponseData>
+	protected post( body: Record<string, string> | Record<string, unknown>, json?: boolean ): Promise<Dispatcher.ResponseData> {
 		return this.raw( this.endpoint.url, {
 			body: new URLSearchParams( {
 				controller: 'ArticleComments',
 				...body
 			} ).toString(),
+			headers: {
+				'content-type': json ? 'application/json' : 'application/x-www-form-urlencoded'
+			},
 			method: 'POST'
 		} )
 	}

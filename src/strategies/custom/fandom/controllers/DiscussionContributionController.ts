@@ -6,7 +6,6 @@ export class DiscussionContributionController extends BaseController<WikiaEndpoi
 
 	public async deleteAll( userId: number ): Promise<unknown> {
 		const req = await this.post( {
-			controller: 'DiscussionContribution',
 			method: 'deleteAll',
 			userId: `${ userId }`
 		} )
