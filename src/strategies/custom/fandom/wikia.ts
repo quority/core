@@ -1,9 +1,7 @@
 import type { Wiki } from '../../../mediawiki'
 import type { Fandom } from '../../FandomStrategy'
 import { BaseEndpoint } from '../BaseEndpoint'
-import { ArticleCommentsController, DiscussionContributionController } from './controllers'
-import { DiscussionForumController } from './controllers/DiscussionForumController'
-import { DiscussionImagesController } from './controllers/DiscussionImagesController'
+import { ArticleCommentsController, DiscussionContributionController, DiscussionForumController, DiscussionImagesController } from './controllers'
 
 export enum WikiaControllers {
 	ArticleComments = 'ArticleComments',

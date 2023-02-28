@@ -1,3 +1,5 @@
 export * from './ArticleCommentsController'
 export * from './BaseController'
 export * from './DiscussionContributionController'
+export * from './DiscussionForumController'
+export * from './DiscussionImagesController'
