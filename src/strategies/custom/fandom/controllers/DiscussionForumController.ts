@@ -65,7 +65,7 @@ export class DiscussionForumController extends BaseController<WikiaEndpoint> {
 		const req = await this.post( {
 			method: 'moveThreadsIntoForum',
 			...options
-		}, true )
+		}, 'application/json' )
 		return req.body.text()
 	}
 

@@ -1,4 +1,4 @@
-import type { Dispatcher } from 'undici'
+import { type Dispatcher, FormData } from 'undici'
 import type { RequestManager } from '../../../../utils'
 import type { Fandom } from '../../../FandomStrategy'
 import type { BaseEndpoint } from '../../BaseEndpoint'
@@ -24,17 +24,27 @@ export abstract class BaseController<Endpoint extends BaseEndpoint<Fandom>> {
 		} )
 	}
 
-	protected post( body: Record<string, unknown>, json?: true ): Promise<Dispatcher.ResponseData>
-	protected post( body: Record<string, string>, json?: false ): Promise<Dispatcher.ResponseData>
-	protected post( body: Record<string, string> | Record<string, unknown>, json?: boolean ): Promise<Dispatcher.ResponseData> {
+	protected post( body: FormData, contentType?: 'multipart/form-data' ): Promise<Dispatcher.ResponseData>
+	protected post( body: Record<string, unknown>, contentType?: 'application/json' ): Promise<Dispatcher.ResponseData>
+	protected post( body: Record<string, string>, contentType?: string ): Promise<Dispatcher.ResponseData>
+	protected post( body: Record<string, string> | Record<string, unknown> | FormData, contentType?: string ): Promise<Dispatcher.ResponseData> {
+		let requestBody: string | FormData
+		const headers: Record<string, string | undefined> = {
+			'content-type': contentType ?? 'application/x-www-form-urlencoded'
+		}
+
+		if ( contentType === 'application/json' ) {
+			requestBody = JSON.stringify( body )
+		} else if ( contentType === 'multipart/form-data' && body instanceof FormData ) {
+			headers[ 'content-type' ] = undefined
+			requestBody = body
+		} else {
+			requestBody = new URLSearchParams( body as Record<string, string> ).toString()
+		}
+
 		return this.raw( this.endpoint.url, {
-			body: new URLSearchParams( {
-				controller: 'ArticleComments',
-				...body
-			} ).toString(),
-			headers: {
-				'content-type': json ? 'application/json' : 'application/x-www-form-urlencoded'
-			},
+			body: requestBody,
+			headers,
 			method: 'POST'
 		} )
 	}
