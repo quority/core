@@ -15,7 +15,7 @@ export abstract class BaseController<Endpoint extends BaseEndpoint<Fandom>> {
 
 	protected get( searchParams: Record<string, string> ): Promise<Dispatcher.ResponseData> {
 		const usp = new URLSearchParams( {
-			controller: 'ArticleComments',
+			controller: this.controller,
 			...searchParams
 		} ).toString()
 		const url = new URL( `?${ usp }`, this.endpoint.url )
