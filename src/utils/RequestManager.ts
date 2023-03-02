@@ -60,7 +60,8 @@ export class RequestManager {
 
 		const headers = Object.assign( {}, {
 			...this.options.headers,
-			cookie: this.jar.getCookieStringSync( cookieUrl )
+			cookie: this.jar.getCookiesSync( cookieUrl ).map( c => `${ c.key }=${ c.value }` )
+				.join( ';' )
 		}, fetchOptions.headers ?? {} )
 		const req = await request( url, {
 			...fetchOptions,

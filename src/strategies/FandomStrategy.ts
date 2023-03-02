@@ -7,7 +7,7 @@ import type { RequestManager } from '../utils'
 import type { TokensResponse } from '../types'
 
 export class Fandom extends BaseStrategy {
-	public override cookieRegexes = [ /session/i, /csrf_token/ ]
+	public static override cookieRegexes = [ /session/i, /csrf_token/ ]
 
 	public static readonly InterwikiRegex = /^([a-z-]{2,5}\.)?[a-z0-9-]+$/
 	public readonly InterwikiRegex = Fandom.InterwikiRegex

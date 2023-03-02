@@ -8,6 +8,12 @@ export abstract class BaseController<Endpoint extends BaseEndpoint<Fandom>> {
 	public readonly endpoint: Endpoint
 	public readonly request: RequestManager
 
+	public static readonly attachmentsDefault = Object.freeze( {
+		atMentions: [],
+		contentImages: [],
+		openGraphs: []
+	} )
+
 	public constructor( endpoint: Endpoint ) {
 		this.endpoint = endpoint
 		this.request = endpoint.wiki.request
@@ -33,8 +39,11 @@ export abstract class BaseController<Endpoint extends BaseEndpoint<Fandom>> {
 			'content-type': contentType ?? 'application/x-www-form-urlencoded'
 		}
 
-		if ( contentType === 'application/json' ) {
-			requestBody = JSON.stringify( body )
+		let { url } = this.endpoint
+		if ( contentType === 'application/json' && !( body instanceof FormData ) ) {
+			const { method, ...json } = body
+			requestBody = JSON.stringify( json )
+			url = new URL( `?controller=${ this.controller }&method=${ method }`, url )
 		} else if ( contentType === 'multipart/form-data' && body instanceof FormData ) {
 			headers[ 'content-type' ] = undefined
 			requestBody = body
@@ -42,7 +51,7 @@ export abstract class BaseController<Endpoint extends BaseEndpoint<Fandom>> {
 			requestBody = new URLSearchParams( body as Record<string, string> ).toString()
 		}
 
-		return this.raw( this.endpoint.url, {
+		return this.raw( url, {
 			body: requestBody,
 			headers,
 			method: 'POST'

@@ -1,7 +1,7 @@
 import type { Wiki } from '../../../mediawiki'
 import type { Fandom } from '../../FandomStrategy'
 import { BaseEndpoint } from '../BaseEndpoint'
-import { ArticleCommentsController, DiscussionContributionController, DiscussionForumController, DiscussionLeaderboardController, DiscussionModerationController, DiscussionPermalinkController, DiscussionPollController } from './controllers'
+import { ArticleCommentsController, DiscussionContributionController, DiscussionForumController, DiscussionLeaderboardController, DiscussionModerationController, DiscussionPermalinkController, DiscussionPollController, DiscussionPostController } from './controllers'
 
 export enum WikiaControllers {
 	ArticleComments = 'ArticleComments',
@@ -27,6 +27,7 @@ export class WikiaEndpoint extends BaseEndpoint<Fandom> {
 	public readonly DiscussionModerationController: DiscussionModerationController
 	public readonly DiscussionPermalinkController: DiscussionPermalinkController
 	public readonly DiscussionPollController: DiscussionPollController
+	public readonly DiscussionPostController: DiscussionPostController
 
 	public constructor( wiki: Wiki<Fandom> ) {
 		super( wiki, new URL( 'wikia.php', wiki.api ) )
@@ -37,6 +38,7 @@ export class WikiaEndpoint extends BaseEndpoint<Fandom> {
 		this.DiscussionModerationController = new DiscussionModerationController( this )
 		this.DiscussionPermalinkController = new DiscussionPermalinkController( this )
 		this.DiscussionPollController = new DiscussionPollController( this )
+		this.DiscussionPostController = new DiscussionPostController( this )
 	}
 
 }

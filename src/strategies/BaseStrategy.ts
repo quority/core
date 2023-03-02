@@ -2,7 +2,7 @@ import type { Wiki } from '../mediawiki'
 import type { BaseEndpoint } from './custom/BaseEndpoint'
 
 export class BaseStrategy {
-	public readonly cookieRegexes: RegExp[] = []
+	public static readonly cookieRegexes: RegExp[] = []
 	public csrf: string | null = null
 	public readonly custom: Record<string, BaseEndpoint> | null = null
 	public readonly wiki: Wiki<BaseStrategy>

@@ -23,12 +23,6 @@ export interface ReportCommentOptions {
 	title: string
 }
 
-const attachmentsDefault = {
-	atMentions: [],
-	contentImages: [],
-	openGraphs: []
-}
-
 export class ArticleCommentsController extends BaseController<WikiaEndpoint> {
 	public readonly controller = 'ArticleComments'
 
@@ -41,7 +35,7 @@ export class ArticleCommentsController extends BaseController<WikiaEndpoint> {
 	}
 
 	public async editComment( options: EditCommentOptions ): Promise<Dispatcher.ResponseData> {
-		options.attachments ??= attachmentsDefault
+		options.attachments ??= ArticleCommentsController.attachmentsDefault
 
 		return this.post( {
 			attachments: JSON.stringify( options.attachments ),
@@ -97,7 +91,7 @@ export class ArticleCommentsController extends BaseController<WikiaEndpoint> {
 	}
 
 	public async postNewCommentReply( options: CommentReplyOptions ): Promise<unknown> {
-		options.attachments ??= attachmentsDefault
+		options.attachments ??= ArticleCommentsController.attachmentsDefault
 		const req = await this.post( {
 			attachments: JSON.stringify( options.attachments ),
 			jsonModel: JSON.stringify( options.jsonModel ),
@@ -111,7 +105,7 @@ export class ArticleCommentsController extends BaseController<WikiaEndpoint> {
 	}
 
 	public async postNewCommentThread( options: CommentOptions ): Promise<unknown> {
-		options.attachments ??= attachmentsDefault
+		options.attachments ??= ArticleCommentsController.attachmentsDefault
 		const req = await this.post( {
 			attachments: JSON.stringify( options.attachments ),
 			jsonModel: JSON.stringify( options.jsonModel ),

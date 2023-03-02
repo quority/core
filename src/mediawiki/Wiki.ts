@@ -2,7 +2,7 @@ import fs from 'fs'
 import { MediaWikiError } from '../errors'
 import { BaseStrategy } from '../strategies'
 import type { ListQuery, NoActionToken, OpenSearchRequest, OpenSearchResponse, ParseRequest, ParseResponse, PropQuery, PurgeRequest, RevisionsRequest, RevisionsResponse, SiteInfoRequest, SiteInfoResponse, TokensRequest, TokensResponse, TokenType } from '../types'
-import { RequestManager } from '../utils'
+import { RequestManager, type RequestManagerOptions } from '../utils'
 import { Bot } from './Bot'
 
 export type StrategyName = 'base' | 'fandom'
@@ -11,17 +11,27 @@ export interface WikiOptions<S extends typeof BaseStrategy> {
 	api: string
 	platform?: S
 	request?: RequestManager
+	requestOptions?: RequestManagerOptions
 }
 
 export class Wiki<S extends BaseStrategy> {
 	public readonly api: URL
 	public readonly custom: S[ 'custom' ]
-	public readonly request: RequestManager = new RequestManager()
+	public readonly request: RequestManager
 	public readonly platform: S
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	public constructor( options: WikiOptions<( new ( ...args: any ) => S ) & { getApi: ( api: string ) => URL }> ) {
-		if ( options.request ) this.request = options.request
+	public constructor( options: WikiOptions<( new ( ...args: any ) => S ) & { cookieRegexes: RegExp[], getApi: ( api: string ) => URL }> ) {
+		if ( options.request ) {
+			this.request = options.request
+		} else {
+			const requestOptions = options.requestOptions ?? {}
+			if ( options.platform ) {
+				requestOptions.allowedCookies ??= []
+				requestOptions.allowedCookies.push( ...options.platform.cookieRegexes )
+			}
+			this.request = new RequestManager( requestOptions )
+		}
 
 		const platform = options.platform ?? BaseStrategy
 		this.api = platform.getApi( options.api )
