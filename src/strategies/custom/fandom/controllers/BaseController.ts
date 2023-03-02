@@ -30,6 +30,11 @@ export abstract class BaseController<Endpoint extends BaseEndpoint<Fandom>> {
 		} )
 	}
 
+	protected getUrl( params: Record<string, string> ): URL {
+		const searchParams = new URLSearchParams( params ).toString()
+		return new URL( `?${ searchParams }`, this.endpoint.url )
+	}
+
 	protected post( body: FormData, contentType?: 'multipart/form-data' ): Promise<Dispatcher.ResponseData>
 	protected post( body: Record<string, unknown>, contentType?: 'application/json' ): Promise<Dispatcher.ResponseData>
 	protected post( body: Record<string, string>, contentType?: string ): Promise<Dispatcher.ResponseData>
