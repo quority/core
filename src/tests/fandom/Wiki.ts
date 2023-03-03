@@ -45,9 +45,9 @@ describe( 'Fandom wiki', () => {
 		const search = await wiki.search( {
 			search: 'Espada'
 		} )
-		assert.strictEqual(Array.isArray(search), true)
-		assert.strictEqual(typeof search[0], 'string')
-		assert.strictEqual(Array.isArray(search[1]), true)
+		assert.strictEqual( Array.isArray( search ), true )
+		assert.strictEqual( typeof search[ 0 ], 'string' )
+		assert.strictEqual( Array.isArray( search[ 1 ] ), true )
 	} )
 
 	describe( '#queryList', () => {
@@ -96,32 +96,32 @@ describe( 'Fandom wiki', () => {
 		} )
 
 		it( 'logevents', async () => {
-			const query = ( await wiki.queryList( {
+			const query =  await wiki.queryList( {
 				leaction: 'block/block',
 				lelimit: 5,
 				list: 'logevents'
-			}, 10 ) )
+			}, 10 )
 
 			assert.strictEqual( Array.isArray( query ), true )
 			assert.strictEqual( query.length, 10 )
 		} )
 
 		it( 'recentchanges', async () => {
-			const query = ( await wiki.queryList( {
+			const query =  await wiki.queryList( {
 				list: 'recentchanges',
 				rclimit: 5
-			}, 10 ) )
+			}, 10 )
 
 			assert.strictEqual( Array.isArray( query ), true )
 			assert.strictEqual( query.length, 10 )
 		} )
 
 		it( 'usercontribs', async () => {
-			const query = ( await wiki.queryList( {
+			const query =  await wiki.queryList( {
 				list: 'usercontribs',
 				uclimit: 5,
 				ucuser: 'User:Botomic'
-			}, 10 ) )
+			}, 10 )
 
 			assert.strictEqual( Array.isArray( query ), true )
 			assert.strictEqual( query.length, 10 )
@@ -130,19 +130,19 @@ describe( 'Fandom wiki', () => {
 
 	describe( '#queryProp', () => {
 		it( 'categories', async () => {
-			const single = ( await wiki.queryProp( {
+			const single =  await wiki.queryProp( {
 				cllimit: 'max',
 				prop: 'categories',
 				titles: 'Tartaglia'
-			} ) )
+			} )
 			assert.strictEqual( single[ 0 ]?.title, 'Tartaglia' )
 			assert.strictEqual( Array.isArray( single[ 0 ]?.categories ), true )
-			
-			const multiple = ( await wiki.queryProp( {
+
+			const multiple =  await wiki.queryProp( {
 				cllimit: 'max',
 				prop: 'categories',
 				titles: [ 'Tartaglia', 'Xiao' ]
-			} ) )
+			} )
 			assert.strictEqual( Array.isArray( multiple[ 0 ]?.categories ), true )
 			assert.strictEqual( Array.isArray( multiple[ 1 ]?.categories ), true )
 		} )

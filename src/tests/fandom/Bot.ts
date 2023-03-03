@@ -1,7 +1,7 @@
 import 'mocha'
 import assert from 'assert'
 import { env } from '../lib'
-import { Bot, Fandom, Wiki } from '../../main'
+import { type Bot, Fandom, Wiki } from '../../main'
 
 const now = Date.now()
 
@@ -11,9 +11,9 @@ describe( 'Fandom bot', () => {
 		platform: Fandom
 	} )
 	let bot: Bot<Fandom>
-	
+
 	before( async () => {
-		bot = await wiki.login( env.FANDOM_USERNAME, env.FANDOM_PASSWORD )
+		bot = await wiki.login( env.BP_USERNAME, env.BP_PASSWORD )
 	} )
 
 	it( '#login', async () => {
@@ -62,14 +62,14 @@ describe( 'Fandom bot', () => {
 		const result = await bot.block( {
 			user: 'User:Botomic'
 		} )
-		assert.strictEqual(typeof result.block.id, 'number');
+		assert.strictEqual( typeof result.block.id, 'number' )
 	} )
 
 	it( '#unblock', async () => {
 		const result = await bot.unblock( {
 			user: 'User:Botomic'
 		} )
-		assert.strictEqual(typeof result.unblock.id, 'number');
+		assert.strictEqual( typeof result.unblock.id, 'number' )
 	} )
 
 	it( '#rollback', async () => {
@@ -83,6 +83,6 @@ describe( 'Fandom bot', () => {
 			title: 'User:Bitomic',
 			user: 'User:Botomic'
 		} )
-		assert.strictEqual(action.rollback.title, 'User:Bitomic')
+		assert.strictEqual( action.rollback.title, 'User:Bitomic' )
 	} )
 } )
