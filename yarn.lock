@@ -460,6 +460,34 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@wikiscript/core@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@wikiscript/core@workspace:."
+  dependencies:
+    "@bitomic/eslint-config": ^1.2.0
+    "@sapphire/shapeshift": ^3.8.1
+    "@types/form-data": 2.5.0
+    "@types/fs-extra": 9.0.13
+    "@types/mocha": 10.0.0
+    "@types/node": 18.11.9
+    "@types/tough-cookie": 4.0.2
+    "@typescript-eslint/eslint-plugin": 5.53.0
+    "@typescript-eslint/parser": 5.53.0
+    dotenv: 16.0.3
+    eslint: 8.27.0
+    fs-extra: ^10.1.0
+    husky: 8.0.2
+    lint-staged: ^13.0.3
+    mocha: 10.1.0
+    rimraf: 3.0.2
+    tough-cookie: ^4.1.2
+    ts-dotenv: ^0.9.0
+    tsup: ^6.6.3
+    typescript: ^4.9.5
+    undici: ^5.12.0
+  languageName: unknown
+  linkType: soft
+
 "abbrev@npm:1":
   version: 1.1.1
   resolution: "abbrev@npm:1.1.1"
@@ -2276,34 +2304,6 @@ __metadata:
   checksum: aa92de608021b242401676e35cfa5aa42dd70cbdc082b916da7fb925c542173e36bce97ea3e804923fe92c0ad991434e4a38327e15a1b5b5f945d66df615ae6d
   languageName: node
   linkType: hard
-
-"mw.js@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "mw.js@workspace:."
-  dependencies:
-    "@bitomic/eslint-config": ^1.2.0
-    "@sapphire/shapeshift": ^3.8.1
-    "@types/form-data": 2.5.0
-    "@types/fs-extra": 9.0.13
-    "@types/mocha": 10.0.0
-    "@types/node": 18.11.9
-    "@types/tough-cookie": 4.0.2
-    "@typescript-eslint/eslint-plugin": 5.53.0
-    "@typescript-eslint/parser": 5.53.0
-    dotenv: 16.0.3
-    eslint: 8.27.0
-    fs-extra: ^10.1.0
-    husky: 8.0.2
-    lint-staged: ^13.0.3
-    mocha: 10.1.0
-    rimraf: 3.0.2
-    tough-cookie: ^4.1.2
-    ts-dotenv: ^0.9.0
-    tsup: ^6.6.3
-    typescript: ^4.9.5
-    undici: ^5.12.0
-  languageName: unknown
-  linkType: soft
 
 "mz@npm:^2.7.0":
   version: 2.7.0
