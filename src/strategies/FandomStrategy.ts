@@ -97,6 +97,19 @@ export class Fandom extends BaseStrategy {
 		return res.value
 	}
 
+	public async getWikiId(): Promise<number> {
+		const siteinfo = await this.wiki.get( {
+			action: 'query',
+			meta: 'siteinfo',
+			siprop: 'variables'
+		} ) as { query: { variables: Array<{
+			id: string
+			'*': number
+		}> } }
+		const cityId = siteinfo.query.variables.find( i => i.id === 'wgCityId' )?.[ '*' ]
+		return cityId ?? 0
+	}
+
 	public async login( username: string, password: string ): Promise<void> {
 		const flow = await this.request.get( 'https://services.fandom.com/kratos-public/self-service/login/api' ) as {
 			id: string

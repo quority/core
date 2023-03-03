@@ -69,7 +69,6 @@ export class RequestManager {
 			headers
 		} )
 		this.addCookies( cookieUrl, req.headers[ 'set-cookie' ] )
-
 		return req
 	}
 
