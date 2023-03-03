@@ -217,3 +217,110 @@ export interface DiscussionForums extends Omit<DiscussionForumBody, '_embedded'>
 		'doc:forum': Array<Omit<DiscussionForumBody, '_embedded'>>
 	}
 }
+
+export interface DiscussionLeaderboard {
+	days: number
+	users: Array<{
+		rank: number
+		totalCount: number
+		userInfo: {
+			avatarUrl: string
+			badgePermission: string
+			id: `${ number }`
+			name: string
+		}
+	}>
+}
+
+export interface DiscussionReportLeaderboard extends DiscussionLeaderboard {
+	users: Array<DiscussionLeaderboard[ 'users' ][ number ] & {
+		actionBreakdown: {
+			deleted: number
+			queued: number
+			validated: number
+		}
+	}>
+}
+
+export interface DiscussionReportedPosts {
+	_embedded: {
+		count: [ {
+			ARTICLE_COMMENT: number
+			FORUM: number
+			WALL: number
+			total: number
+		} ]
+		contributors: [ {
+			count: number
+			userInfo: Array<{
+				avatarUrl: string
+				badgePermission: string
+				id: `${ number }`
+				name: string
+			}>
+		} ]
+		'doc:posts': Array<{
+			_embedded: {
+				attachments: [ {
+					atMentions: unknown[]
+					contentImages: unknown[]
+					openGraphs: unknown[]
+					polls: unknown[]
+					quizzes: unknown[]
+				} ]
+				contentImages: unknown[]
+				userData: [ {
+					hasReported: boolean
+					hasUpvoted: boolean
+					permissions: string[]
+				} ]
+				thread: [ {
+					containerId: `${ number }`
+					containerType: string
+					creatorId: `${ number }`
+					firstPost: unknown
+				} ]
+			}
+			createdBy: {
+				avatarUrl: string
+				badgePermission: string
+				id: `${ number }`
+				name: string
+			}
+			creationDate: ArticleCommentsBody[ 'firstPost' ][ 'creationDate' ]
+			creatorId: `${ number }`
+			creatorIp: string
+			forumId: `${ number }`
+			forumName: string
+			id: `${ number }`
+			isDeleted: boolean
+			isEditable: boolean
+			isLocked: boolean
+			isReply: boolean
+			isReported: boolean
+			jsonModel: unknown | null
+			latestRevisionId: `${ number }`
+			modificationDate: ArticleCommentsBody[ 'firstPost' ][ 'creationDate' ] | null
+			position: number
+			rawContent: string
+			renderedContent: unknown | null
+			requesterId: `${ number }`
+			siteId: `${ number }`
+			threadCreatedBy: {
+				avatarUrl: string
+				badgePermission: string
+				id: `${ number }`
+				name: string
+			}
+			threadId: `${ number }`
+			title: string | null
+			upvoteCount: number
+		}>
+		wallOwners: Array<{
+			userId: `${ number }`
+			wallContainerId: `${ number }`
+		}>
+	}
+	postCount: `${ number }`
+	readOnlyMode: boolean
+}

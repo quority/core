@@ -24,12 +24,13 @@ export class DiscussionModerationController extends BaseController<WikiaEndpoint
 		return req.body.json()
 	}
 
-	public async reportPost( postId: string ): Promise<unknown> {
+	public async reportPost( postId: string ): Promise<boolean> {
 		const req = await this.post( {
+			controller: this.controller,
 			method: 'reportPost',
 			postId
 		} )
-		return req.body.json()
+		return req.statusCode === 201
 	}
 
 	public async validatePostReport( options: ValidatePostReportOptions ): Promise<unknown> {

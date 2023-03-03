@@ -254,4 +254,65 @@ describe( 'Controllers', () => {
 			}
 		} )
 	} )
+
+	describe( 'DiscussionLeaderboardController', () => {
+		const controller = wiki.custom.wikia.DiscussionLeaderboard
+
+		it( '#getModeratorActions', async () => {
+			const actions = await controller.getModeratorActions()
+			assert.strictEqual( actions.days, 30 )
+		} )
+
+		it( '#getPosts', async () => {
+			const posts = await controller.getPosts()
+			assert.strictEqual( posts.days, 30 )
+		} )
+
+		it( '#getReports', async () => {
+			const reports = await controller.getReports()
+			assert.strictEqual( reports.days, 30 )
+		} )
+	} )
+
+	describe.only( 'DiscussionModerationController', () => {
+		const controller = wiki.custom.wikia.DiscussionModerationController
+		const discussionPost = wiki.custom.wikia.DiscussionThreadController
+		const discussionReply = wiki.custom.wikia.DiscussionPostController
+
+		let threadId: `${ number }`
+		let replyId: `${ number }`
+
+		it( '#create', async () => {
+			const thread = await discussionPost.create( {
+				body: 'Post used to test reports.',
+				forumId: `${ wikiId }`,
+				siteId: `${ wikiId }`,
+				title: 'Report test'
+			} )
+			// @ts-expect-error - missing types
+			threadId = thread.id // eslint-disable-line
+
+			const reply = await discussionReply.create( {
+				body: 'Test reply.',
+				siteId: `${ wikiId }`,
+				threadId
+			} )
+			// @ts-expect-error - missing types
+			replyId = reply.id // eslint-disable-line
+		} )
+
+		it( '#reportPost', async () => {
+			const reported = await controller.reportPost( replyId )
+			assert.strictEqual( reported, true )
+		} )
+
+		it( '#getReportedPosts', async () => {
+			await controller.getReportedPosts()
+			// console.log( JSON.stringify( reportedPosts ) )
+		} )
+
+		it( '#cleanup', async () => {
+			await discussionPost.delete( threadId )
+		} )
+	} )
 } )
