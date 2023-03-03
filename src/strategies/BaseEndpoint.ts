@@ -1,5 +1,5 @@
-import type { Wiki } from '../../mediawiki'
-import type { BaseStrategy } from '../BaseStrategy'
+import type { Wiki } from '../mediawiki'
+import type { BaseStrategy } from './BaseStrategy'
 
 export abstract class BaseEndpoint<Strategy extends BaseStrategy = BaseStrategy> {
 	public readonly url: URL

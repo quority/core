@@ -9,7 +9,7 @@ export interface BotOptions<S extends BaseStrategy> {
 	wiki: Wiki<S>
 }
 
-export class Bot<S extends BaseStrategy> {
+export class Bot<S extends BaseStrategy = BaseStrategy> {
 	#csrf: string | null = null
 	readonly #password: string
 	public readonly username: string

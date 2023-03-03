@@ -1,11 +1,10 @@
 import 'mocha'
 import assert from 'assert'
-import { Fandom, Wiki } from '../../main'
+import { Wiki } from '../../main'
 
 describe( 'Fandom wiki', () => {
 	const wiki = new Wiki( {
-		api: 'es.genshin-impact',
-		platform: Fandom
+		api: 'https://genshin-impact.fandom.com/es/api.php'
 	} )
 
 	it( '#getUrl', () => {

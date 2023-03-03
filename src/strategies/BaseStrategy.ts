@@ -1,5 +1,5 @@
 import type { Wiki } from '../mediawiki'
-import type { BaseEndpoint } from './custom/BaseEndpoint'
+import type { BaseEndpoint } from './BaseEndpoint'
 
 export class BaseStrategy {
 	public static readonly cookieRegexes: RegExp[] = []

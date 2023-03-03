@@ -1,16 +1,15 @@
 import 'mocha'
 import assert from 'assert'
 import { env } from '../lib'
-import { type Bot, Fandom, Wiki } from '../../main'
+import { type Bot, Wiki } from '../../main'
 
 const now = Date.now()
 
 describe( 'Fandom bot', () => {
 	const wiki = new Wiki( {
-		api: env.FANDOM_WIKI,
-		platform: Fandom
+		api: env.FANDOM_WIKI
 	} )
-	let bot: Bot<Fandom>
+	let bot: Bot
 
 	before( async () => {
 		bot = await wiki.login( env.BP_USERNAME, env.BP_PASSWORD )
