@@ -14,7 +14,9 @@ export interface WikiOptions<S extends typeof BaseStrategy> {
 	requestOptions?: RequestManagerOptions
 }
 
-export class Wiki<S extends BaseStrategy> {
+export class Wiki<S extends BaseStrategy = BaseStrategy> {
+	public static readonly defaultStrategy = BaseStrategy
+
 	public readonly api: URL
 	public readonly custom: S[ 'custom' ]
 	public readonly request: RequestManager
@@ -33,7 +35,8 @@ export class Wiki<S extends BaseStrategy> {
 			this.request = new RequestManager( requestOptions )
 		}
 
-		const platform = options.platform ?? BaseStrategy
+		const constructor = this.constructor as typeof Wiki
+		const platform = options.platform ?? constructor.defaultStrategy
 		this.api = platform.getApi( options.api )
 
 		this.platform = new platform( this ) as S
