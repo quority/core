@@ -11,7 +11,8 @@ describe( 'Fandom bot', () => {
 	} )
 	let bot: Bot
 
-	before( async () => {
+	before( async function() {
+		this.timeout( 5000 )
 		bot = await wiki.login( env.BP_USERNAME, env.BP_PASSWORD )
 	} )
 

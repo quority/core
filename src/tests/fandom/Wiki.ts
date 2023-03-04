@@ -20,7 +20,8 @@ describe( 'Fandom wiki', () => {
 		)
 	} )
 
-	it( '#getPages', async () => {
+	it( '#getPages', async function() {
+		this.timeout( 5000 )
 		const single = await wiki.getPage( 'Tartaglia' )
 		assert.notStrictEqual( single.length, 0 )
 
@@ -50,7 +51,8 @@ describe( 'Fandom wiki', () => {
 	} )
 
 	describe( '#queryList', () => {
-		it( 'allcategories', async () => {
+		it( 'allcategories', async function() {
+			this.timeout( 5000 )
 			const query = ( await wiki.queryList( {
 				aclimit: 50,
 				list: 'allcategories'
@@ -61,7 +63,8 @@ describe( 'Fandom wiki', () => {
 			assert.strictEqual( query.length, 100 )
 		} )
 
-		it( 'allimages', async () => {
+		it( 'allimages', async function() {
+			this.timeout( 5000 )
 			const query = ( await wiki.queryList( {
 				ailimit: 50,
 				list: 'allimages'
