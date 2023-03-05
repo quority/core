@@ -1,76 +1,93 @@
-import { CookieJar, type ICookieJarOptions } from './CookieJar'
-import { type Dispatcher, FormData, request } from 'undici'
-import type { Agent } from 'undici'
+import { Cookie, CookieJar, type Store } from 'tough-cookie'
+import { type Agent, type Dispatcher, FormData, request } from 'undici'
 import type fs from 'fs'
 import { type IncomingHttpHeaders } from 'http'
 
 type RequestOptions = Omit<Dispatcher.RequestOptions, 'path'>
 type Response = Dispatcher.ResponseData
 
+export interface RequestManagerOptions {
+	agent?: Agent
+	allowedCookies?: RegExp[]
+	headers?: IncomingHttpHeaders
+	jar?: {
+		store?: Store
+		options?: CookieJar.Options
+	}
+}
+
+export interface CustomRequestOptions {
+	cookieUrl?: string | URL
+}
+
 export class RequestManager {
-	public agent: Agent | undefined
-	#jar: CookieJar
-	public headers: IncomingHttpHeaders
+	protected jar: CookieJar
+	public readonly options: RequestManagerOptions
 
-	public constructor( { agent, headers, jarOptions }: { agent?: Agent, headers?: IncomingHttpHeaders, jarOptions?: ICookieJarOptions } = {} ) {
-		this.agent = agent
-		this.#jar = new CookieJar( jarOptions )
-		this.headers = headers ?? {}
+	public constructor( options: RequestManagerOptions = {} ) {
+		this.jar = new CookieJar( options.jar?.store, options.jar?.options )
+		this.options = options
 	}
 
-	public get jar(): Readonly<CookieJar> {
-		return this.#jar
+	public clear(): void {
+		this.jar.removeAllCookiesSync()
 	}
 
-	public clear( url: string ): void {
-		this.#jar.clear( url )
-	}
-
-	public async get<T>( { url, qs }: { url: string, qs: Record<string, string> } ): Promise<T> {
+	public async get( url: string | URL, qs: Record<string, string> = {} ): Promise<unknown> {
 		const params = new URLSearchParams( qs )
-		const { body, headers } = await this.raw( `${ url }?${ params }` )
+		const { body } = await this.raw( new URL( `?${ params }`, url ) )
 
-		const cookies: string[] = headers[ 'set-cookie' ] || []
-		this.addCookies( url, cookies )
-
-		return body.json() as unknown as T
+		return body.json()
 	}
 
-	public async post<T>( { url, form }: { url: string, form: Record<string, string | fs.ReadStream> } ): Promise<T> {
+	public async post( url: string | URL, form: Record<string, string | fs.ReadStream> = {} ): Promise<unknown> {
 		const formData = new FormData()
 		for ( const prop in form ) {
 			formData.set( prop, form[ prop ] )
 		}
 
-		const { body, headers } = await this.raw( url, {
+		const { body } = await this.raw( url, {
 			body: formData,
 			method: 'POST'
 		} )
 
-		this.addCookies( url, headers[ 'set-cookie' ] )
-
-		return body.json() as unknown as T
+		return body.json()
 	}
 
-	public raw( url: string, fetchOptions: RequestOptions = { method: 'GET' } ): Promise<Response> {
-		return request( url, {
+	public async raw( url: string | URL, fetchOptions: RequestOptions = { method: 'GET' }, customOptions: CustomRequestOptions = {} ): Promise<Response> {
+		customOptions.cookieUrl ??= url
+		const cookieUrl = typeof customOptions.cookieUrl === 'string' ? customOptions.cookieUrl : customOptions.cookieUrl.href
+
+		const headers = Object.assign( {}, {
+			...this.options.headers,
+			cookie: this.jar.getCookiesSync( cookieUrl ).map( c => `${ c.key }=${ c.value }` )
+				.join( ';' )
+		}, fetchOptions.headers ?? {} )
+		const req = await request( url, {
 			...fetchOptions,
-			dispatcher: this.agent,
-			headers: {
-				...this.headers,
-				cookie: this.#jar.get( url )
+			dispatcher: this.options.agent,
+			headers
+		} )
+		this.addCookies( cookieUrl, req.headers[ 'set-cookie' ] )
+		return req
+	}
+
+	public addCookies( url: string | URL, headers: string | string[] | undefined ): void {
+		if ( typeof headers === 'string' ) headers = [ headers ]
+		if ( !headers?.length ) return
+
+		const stringUrl = typeof url === 'string' ? url : url.href
+		let cookies = headers.map( cookie => Cookie.parse( cookie ) )
+
+		if ( this.options.allowedCookies ) {
+			const isAllowed = ( cookie: Cookie | undefined ) => cookie && this.options.allowedCookies?.some( regex => cookie.key.match( regex ) )
+			cookies = cookies.filter( isAllowed )
+		}
+
+		cookies.forEach( cookie => {
+			if ( cookie ) {
+				this.jar.setCookieSync( cookie, stringUrl )
 			}
 		} )
-	}
-
-	private addCookies( url: string, cookies: string | string[] | undefined ): void {
-		if ( !cookies ) return
-		const cookiesList = Array.isArray( cookies ) ? cookies : [ cookies ]
-		for ( const cookie of cookiesList ) {
-			this.#jar.set( {
-				cookie,
-				url
-			} )
-		}
 	}
 }

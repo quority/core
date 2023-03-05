@@ -4,6 +4,8 @@ import type { ActionRequest } from '../Request'
  * Search the wiki using the OpenSearch protocol.
  */
 export interface OpenSearchRequest extends ActionRequest {
+	action: 'opensearch'
+
 	/**
 	 * Maximum number of results to return.
 	 */

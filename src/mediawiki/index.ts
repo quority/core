@@ -1,2 +1,2 @@
-export * from './_base'
-export * from './fandom'
+export * from './Bot'
+export * from './Wiki'

@@ -1,22 +1,19 @@
 import 'mocha'
 import assert from 'assert'
 import { env } from '../lib'
-import { Fandom, FandomBot } from '../../main'
+import { type Bot, Wiki } from '../../main'
 
 const now = Date.now()
 
 describe( 'Fandom bot', () => {
-	const fandom = new Fandom()
-	let bot: FandomBot
-	const wiki = fandom.getWiki( env.FANDOM_WIKI )
-	
-	before( async () => {
-		const fandom = new Fandom()
-		bot = await fandom.login( {
-			password: env.FANDOM_PASSWORD,
-			username: env.FANDOM_USERNAME,
-			wiki
-		} )
+	const wiki = new Wiki( {
+		api: env.FANDOM_WIKI
+	} )
+	let bot: Bot
+
+	before( async function() {
+		this.timeout( 5000 )
+		bot = await wiki.login( env.BP_USERNAME, env.BP_PASSWORD )
 	} )
 
 	it( '#login', async () => {
@@ -61,46 +58,18 @@ describe( 'Fandom bot', () => {
 		} )
 	} )
 
-	it( '#setWiki', async () => {
-		const wikis = {
-			comunidad: fandom.getWiki( 'comunidad' ),
-			'genshin-impact': fandom.getWiki( 'es.genshin-impact' ),
-			twice: fandom.getWiki( 'twice' )
-		}
-
-		let id: number
-
-		for ( let i = 0; i < 2; i++ ) {
-			await bot.setWiki( wikis.comunidad )
-			id = await bot.whoAmI().then( res => res.query.userinfo.id )
-			assert.notStrictEqual( id, 0 )
-
-			await bot.setWiki( wikis[ 'genshin-impact' ] )
-			id = await bot.whoAmI().then( res => res.query.userinfo.id )
-			assert.notStrictEqual( id, 0 )
-
-			await bot.setWiki( wikis.twice )
-			id = await bot.whoAmI().then( res => res.query.userinfo.id )
-			assert.notStrictEqual( id, 0 )
-		}
-
-		await bot.setWiki( wiki )
-		id = await bot.whoAmI().then( res => res.query.userinfo.id )
-		assert.notStrictEqual( id, 0 )
-	} ).timeout( 8000 )
-
 	it( '#block', async () => {
 		const result = await bot.block( {
 			user: 'User:Botomic'
 		} )
-		assert.strictEqual(typeof result.block.id, 'number');
+		assert.strictEqual( typeof result.block.id, 'number' )
 	} )
 
 	it( '#unblock', async () => {
 		const result = await bot.unblock( {
 			user: 'User:Botomic'
 		} )
-		assert.strictEqual(typeof result.unblock.id, 'number');
+		assert.strictEqual( typeof result.unblock.id, 'number' )
 	} )
 
 	it( '#rollback', async () => {
@@ -114,6 +83,6 @@ describe( 'Fandom bot', () => {
 			title: 'User:Bitomic',
 			user: 'User:Botomic'
 		} )
-		assert.strictEqual(action.rollback.title, 'User:Bitomic')
+		assert.strictEqual( action.rollback.title, 'User:Bitomic' )
 	} )
 } )

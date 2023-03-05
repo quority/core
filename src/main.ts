@@ -1,4 +1,5 @@
 export * from './errors'
 export * from './mediawiki'
+export * from './strategies'
 export * from './types'
 export * from './utils'
