@@ -1,4 +1,4 @@
-<div style="text-align: center;">
+<div align="center">
 
 ![Logo](https://avatars.githubusercontent.com/u/126923974?s=200&v=4)
 
