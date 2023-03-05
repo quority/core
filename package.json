@@ -33,9 +33,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bitomic/mwjs.git"
+    "url": "https://github.com/quority/core.git"
   },
-  "homepage": "https://github.com/bitomic/mwjs#readme",
+  "homepage": "https://github.com/quority/core#readme",
   "dependencies": {
     "@sapphire/shapeshift": "^3.8.1",
     "fs-extra": "^10.1.0",
