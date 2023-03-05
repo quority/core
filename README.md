@@ -2,8 +2,8 @@
 
 ![Logo](https://avatars.githubusercontent.com/u/126923974?s=200&v=4)
 
-[![GitHub](https://img.shields.io/github/license/sapphiredev/framework)](https://github.com/wikiscript-js/core/blob/main/LICENSE.md)
-[![npm](https://img.shields.io/npm/v/@quority/core?color=crimson&logo=npm&style=flat-square)](https://www.npmjs.com/package/@sapphire/framework)
+[![GitHub](https://img.shields.io/github/license/quority/core)](https://github.com/quority/core/blob/main/LICENSE.md)
+[![npm](https://img.shields.io/npm/v/@quority/core?color=crimson&logo=npm&style=flat-square)](https://www.npmjs.com/package/@quority/core)
 </div>
 
 ---
