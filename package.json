@@ -1,6 +1,6 @@
 {
   "name": "@wikiscript/core",
-  "version": "3.1.0",
+  "version": "3.1.1-rc.0",
   "description": "Typed MediaWiki API client for node.js using TypeScript.",
   "main": "dist/main.js",
   "files": [
