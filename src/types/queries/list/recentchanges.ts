@@ -80,6 +80,7 @@ export interface RecentChangesItem {
 	user: string
 	oldlen: number
 	newlen: number
+	timestamp: string
 }
 
 export type RecentChangesResponse = QueryResponse<
