@@ -41,7 +41,7 @@
     "@sapphire/shapeshift": "^3.8.1",
     "fs-extra": "^10.1.0",
     "tough-cookie": "^4.1.2",
-    "undici": "^5.12.0"
+    "undici": "^7.24.6"
   },
   "devDependencies": {
     "@bitomic/eslint-config": "^1.2.0",
