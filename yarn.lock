@@ -275,7 +275,7 @@ __metadata:
     "@types/tough-cookie": 4.0.2
     "@typescript-eslint/eslint-plugin": 5.53.0
     "@typescript-eslint/parser": 5.53.0
-    dotenv: 16.0.3
+    dotenv: 18.0.1
     eslint: 8.27.0
     fs-extra: ^10.1.0
     husky: 8.0.2
@@ -1026,10 +1026,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:16.0.3":
-  version: 16.0.3
-  resolution: "dotenv@npm:16.0.3"
-  checksum: afcf03f373d7a6d62c7e9afea6328e62851d627a4e73f2e12d0a8deae1cd375892004f3021883f8aec85932cd2834b091f568ced92b4774625b321db83b827f8
+"dotenv@npm:18.0.1":
+  version: 18.0.1
+  resolution: "dotenv@npm:18.0.1"
+  bin:
+    dotenv: dist/index.cjs
+  checksum: 8cd50930a9a5ce0b2da5913383f8e4cd1936fedfb3db3f688b6f4217193cf72ad14b0fb26e5e2e68c157db13e8d26805dcf83219c67e23fd2a49867890804f27
   languageName: node
   linkType: hard
 
